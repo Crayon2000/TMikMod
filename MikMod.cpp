@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-#include <ExtCtrls.hpp>  // Used for TTimer
+#include <Vcl.ExtCtrls.hpp>
 #include <map>
 #pragma hdrstop
 
@@ -12,7 +12,7 @@
 typedef struct _MOD_READER
 {
     MREADER Core;
-    TStream *Stream;
+    System::Classes::TStream *Stream;
 } MOD_READER;
 
 static BOOL GST_READER_Eof(MREADER *reader);
@@ -29,7 +29,7 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     FModule(NULL),
     FVolume(128)
 {
-    FTimer = new Extctrls::TTimer(NULL);
+    FTimer = new Vcl::Extctrls::TTimer(NULL);
     FTimer->Enabled = false;
     FTimer->OnTimer = TimerUpdate;
     FTimer->Interval = 50;
@@ -125,7 +125,7 @@ void __fastcall TMikMod::LoadFromFile(const AnsiString AFilename, int Maxchan, b
  * @param Maxchan The maximum number of channels the song is allowed to request from the mixer.
  * @param Curious The curiosity level to use.
  */
-void __fastcall TMikMod::LoadFromStream(TStream *ASream, int Maxchan, bool Curious)
+void __fastcall TMikMod::LoadFromStream(System::Classes::TStream *ASream, int Maxchan, bool Curious)
 {
     MOD_READER Reader;
     Reader.Stream = ASream;

@@ -2,9 +2,15 @@
 #ifndef MikModH
 #define MikModH
 //---------------------------------------------------------------------------
-#include <Classes.hpp>
+#include <System.Classes.hpp>
 //---------------------------------------------------------------------------
-class TTimer;
+namespace Vcl
+{
+    namespace Extctrls
+    {
+        class TTimer;
+    }
+}
 struct MODULE;
 
 /**
@@ -30,7 +36,7 @@ class TMikMod : public TObject
 private:
     MODULE* FModule;
     int FVolume;
-    Extctrls::TTimer* FTimer;
+    Vcl::Extctrls::TTimer* FTimer;
     void __fastcall CheckIfOpen();
 protected:
     void __fastcall TimerUpdate(TObject *Sender);
@@ -47,7 +53,7 @@ public:
 
     void __fastcall LoadFromFile(const UnicodeString AFilename, int Maxchan, bool Curious = 0);
     void __fastcall LoadFromFile(const AnsiString AFilename, int Maxchan, bool Curious = 0);
-    void __fastcall LoadFromStream(TStream *AStream, int Maxchan, bool Curious = 0);
+    void __fastcall LoadFromStream(System::Classes::TStream *AStream, int Maxchan, bool Curious = 0);
     void __fastcall LoadFromResourceName(unsigned Instance, const UnicodeString ResName, int Maxchan, bool Curious = 0);
 
     void __fastcall Start();

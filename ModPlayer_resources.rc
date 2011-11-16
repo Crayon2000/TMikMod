@@ -1,2 +1,2 @@
-MOD_MUSIC RCDATA "..\\aegwynn.mod"
-FUCKEDTOPSONG RCDATA "..\\tillykke.mod"
+MOD_MUSIC RCDATA "music\\aegwynn.mod"
+FUCKEDTOPSONG RCDATA "music\\tillykke.mod"
