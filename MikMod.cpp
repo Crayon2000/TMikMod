@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------
-#include <Vcl.ExtCtrls.hpp>
 #include <map>
 #pragma hdrstop
 
 #include "MikMod.h"
+#include "MikModThread.h"
 #include "mikmod_build.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -29,23 +29,21 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     FModule(NULL),
     FVolume(128)
 {
-    FTimer = new Vcl::Extctrls::TTimer(NULL);
-    FTimer->Enabled = false;
-    FTimer->OnTimer = TimerUpdate;
-    FTimer->Interval = 50;
+    FMikModThread = new TMikModThread();
 
     std::map<TModuleDriver, MDRIVER*> DriverList;
     DriverList[md_DirectSound] = &drv_ds;
+    DriverList[md_Windows] = &drv_win;
+    DriverList[md_MacOSX] = &drv_osx;
     DriverList[md_NoSound] = &drv_nos;
     DriverList[md_Raw] = &drv_raw;
     DriverList[md_StandardOutput] = &drv_stdout;
     DriverList[md_WAV] = &drv_wav;
-    DriverList[md_Windows] = &drv_win;
 
-	// Register a specific driver
-	MikMod_RegisterDriver(DriverList[ADriver]);
+    // Register a specific driver
+    MikMod_RegisterDriver(DriverList[ADriver]);
     // Register all the module loaders
-	MikMod_RegisterAllLoaders();
+    MikMod_RegisterAllLoaders();
     // Only one device is used, this is needed to use command line
     md_device = 1;
 
@@ -55,11 +53,13 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
         CommandLine = "globalfocus"; // Play if window does not have the focus
     }
 
-	// Initialize the library
+    // Initialize the library
     if(MikMod_Init(CommandLine.c_str()))
     {
         throw(Exception("L'initialisation de MikMod a échoué."));
     }
+
+    FIsThreadSafe = MikMod_InitThreads();
 }
 
 /**
@@ -69,7 +69,7 @@ __fastcall TMikMod::~TMikMod()
 {
     UnLoad();
     MikMod_Exit();
-    delete FTimer;
+    delete FMikModThread;
 }
 
 /**
@@ -95,27 +95,15 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
  * @param Maxchan The maximum number of channels the song is allowed to request from the mixer.
  * @param Curious The curiosity level to use.
  */
-void __fastcall TMikMod::LoadFromFile(const UnicodeString AFilename, int Maxchan, bool Curious)
+void __fastcall TMikMod::LoadFromFile(const System::UnicodeString AFileName, int Maxchan, bool Curious)
 {
     MODULE *Module = NULL;
-    FILE *fp = _wfopen(AFilename.w_str(), L"rb");
+    FILE *fp = _wfopen(AFileName.w_str(), L"rb");
     if(fp)
     {
         Module = Player_LoadFP(fp, Maxchan, Curious);
         fclose(fp);
     }
-    SetModule(Module);
-}
-
-/**
- * This function loads a music module from a file.
- * @param AFilename The name of the module file.
- * @param Maxchan The maximum number of channels the song is allowed to request from the mixer.
- * @param Curious The curiosity level to use.
- */
-void __fastcall TMikMod::LoadFromFile(const AnsiString AFilename, int Maxchan, bool Curious)
-{
-    MODULE *Module = Player_Load(AFilename.c_str(), Maxchan, Curious);
     SetModule(Module);
 }
 
@@ -146,7 +134,7 @@ void __fastcall TMikMod::LoadFromStream(System::Classes::TStream *ASream, int Ma
  * @param Maxchan The maximum number of channels the song is allowed to request from the mixer.
  * @param Curious The curiosity level to use.
  */
-void __fastcall TMikMod::LoadFromResourceName(unsigned Instance, const UnicodeString ResName, int Maxchan, bool Curious)
+void __fastcall TMikMod::LoadFromResourceName(unsigned Instance, const System::UnicodeString ResName, int Maxchan, bool Curious)
 {
     TResourceStream *ResStream = new TResourceStream(Instance, ResName, (System::WideChar *)RT_RCDATA);
     LoadFromStream(ResStream, Maxchan, Curious);
@@ -158,23 +146,11 @@ void __fastcall TMikMod::LoadFromResourceName(unsigned Instance, const UnicodeSt
  */
 void __fastcall TMikMod::UnLoad()
 {
-	if(FModule)
-	{
-		Player_Stop();
-		Player_Free(FModule);
-        FModule = NULL;
-	}
-}
-
-/**
- * This routine should be called on a regular basis to update the sound.
- * @note The sound output buffer is filled each time this function is called; if you use a large buffer, you don't need to call this routine as frequently as with a smaller buffer, but you get a bigger shift between the sound being played and the reported state of the player, since the player is always a buffer ahead of the playback.
- */
-void __fastcall TMikMod::TimerUpdate(TObject *Sender)
-{
-    if(FModule && Player_Active())
+    if(FModule)
     {
-        MikMod_Update();
+        Player_Stop();
+        Player_Free(FModule);
+        FModule = NULL;
     }
 }
 
@@ -196,7 +172,7 @@ void __fastcall TMikMod::Stop()
 {
     Player_SetPosition(0);
     Player_Stop();
-    FTimer->Enabled = false;
+    FMikModThread->Suspended = true;
 }
 
 /**
@@ -207,7 +183,7 @@ void __fastcall TMikMod::Start()
 {
     CheckIfOpen();
     Player_Start(FModule);
-    FTimer->Enabled = true;
+    FMikModThread->Suspended = false;
 }
 
 /**

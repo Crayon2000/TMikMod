@@ -245,6 +245,10 @@
 				<DependentOn>MikMod.h</DependentOn>
 				<BuildOrder>47</BuildOrder>
 			</CppCompile>
+			<CppCompile Include="MikModThread.cpp">
+				<DependentOn>MikModThread.h</DependentOn>
+				<BuildOrder>50</BuildOrder>
+			</CppCompile>
 			<CppCompile Include="ModPlayer.cpp">
 				<BuildOrder>0</BuildOrder>
 			</CppCompile>

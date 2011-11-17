@@ -4,13 +4,7 @@
 //---------------------------------------------------------------------------
 #include <System.Classes.hpp>
 //---------------------------------------------------------------------------
-namespace Vcl
-{
-    namespace Extctrls
-    {
-        class TTimer;
-    }
-}
+class TMikModThread;
 struct MODULE;
 
 /**
@@ -19,11 +13,12 @@ struct MODULE;
 enum TModuleDriver
 {
     md_DirectSound,     /**< Win32 DirectSound driver. */
+    md_Windows,         /**< Win32 multimedia API driver. */
+    md_MacOSX,          /**< MacOS X driver. */
     md_NoSound,         /**< no sound. */
     md_Raw,             /**< raw file disk writer [music.raw]. */
     md_StandardOutput,  /**< output to stdout. */
-    md_WAV,             /**< RIFF WAVE file disk writer [music.wav]. */
-    md_Windows          /**< Win32 multimedia API driver. */
+    md_WAV              /**< RIFF WAVE file disk writer [music.wav]. */
 };
 
 /**
@@ -35,11 +30,11 @@ class TMikMod : public TObject
 
 private:
     MODULE* FModule;
+    bool FIsThreadSafe;
     int FVolume;
-    Vcl::Extctrls::TTimer* FTimer;
+    TMikModThread* FMikModThread;
     void __fastcall CheckIfOpen();
 protected:
-    void __fastcall TimerUpdate(TObject *Sender);
     void __fastcall UnLoad();
     void __fastcall SetModule(MODULE* AModule);
     void __fastcall SetVolume(int AVolume);
@@ -51,10 +46,9 @@ public:
     __fastcall TMikMod(TModuleDriver ADriver = md_Windows);
     virtual __fastcall ~TMikMod();
 
-    void __fastcall LoadFromFile(const UnicodeString AFilename, int Maxchan, bool Curious = 0);
-    void __fastcall LoadFromFile(const AnsiString AFilename, int Maxchan, bool Curious = 0);
+    void __fastcall LoadFromFile(const System::UnicodeString AFileName, int Maxchan, bool Curious = 0);
     void __fastcall LoadFromStream(System::Classes::TStream *AStream, int Maxchan, bool Curious = 0);
-    void __fastcall LoadFromResourceName(unsigned Instance, const UnicodeString ResName, int Maxchan, bool Curious = 0);
+    void __fastcall LoadFromResourceName(unsigned Instance, const System::UnicodeString ResName, int Maxchan, bool Curious = 0);
 
     void __fastcall Start();
     void __fastcall Stop();
