@@ -13,7 +13,7 @@ TForm1 *Form1;
 __fastcall TForm1::TForm1(TComponent* Owner)
     : TForm(Owner), FMikMod(NULL)
 {
-    FMikMod = new TMikMod(md_Windows);
+    FMikMod = new TMikMod(mdWindows);
 }
 //---------------------------------------------------------------------------
 
