@@ -4,6 +4,7 @@
 #include "Main.h"
 #include "MikMod.h"
 //---------------------------------------------------------------------------
+#pragma link "TMikModLib.lib"
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 TForm1 *Form1;
