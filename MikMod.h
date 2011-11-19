@@ -42,6 +42,11 @@ protected:
     String __fastcall GetSongTitle();
     String __fastcall GetModType();
     String __fastcall GetComment();
+
+    unsigned short __fastcall GetVoiceVolume(Int8 AVoice);
+    unsigned long __fastcall GetVoiceFrequency(Int8 AVoice);
+    unsigned long __fastcall GetVoiceRealVolume(Int8 AVoice);
+    unsigned long __fastcall GetVoicePanning(Int8 AVoice);
 public:
     __fastcall TMikMod(TModuleDriver ADriver = mdWindows);
     virtual __fastcall ~TMikMod();
@@ -58,6 +63,10 @@ public:
     __property String SongTitle = {read=GetSongTitle}; /**< Song title. */
     __property String ModuleType = {read=GetModType}; /**< Type of the module (which tracker format). */
     __property String Comment = {read=GetComment}; /**< Either the module comments, or NULL if the module doesn't have comments. */
+    __property unsigned short VoiceVolume[Int8 AVoice] = {read=GetVoiceVolume};
+    __property unsigned long VoiceFrequency[Int8 AVoice] = {read=GetVoiceFrequency};
+    __property unsigned long VoiceRealVolume[Int8 AVoice] = {read=GetVoiceRealVolume};
+    __property unsigned long VoicePanning[Int8 AVoice] = {read=GetVoicePanning};
 __published:
     __property int Volume = {read=FVolume, write=SetVolume, default = 128}; /**< Volume. */
 };

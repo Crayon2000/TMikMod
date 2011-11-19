@@ -242,6 +242,46 @@ String __fastcall TMikMod::GetComment()
 }
 
 /**
+ * This function returns the volume of the sample currently playing on the specified voice.
+ * @param AVoice The number of the voice to get volume.
+ * @return The current volume of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
+ */
+unsigned short __fastcall TMikMod::GetVoiceVolume(Int8 AVoice)
+{
+    return Voice_GetVolume(AVoice);
+}
+
+ /**
+ * This function returns the frequency of the sample currently playing on the specified voice.
+ * @param AVoice The number of the voice to get frequency.
+ * @return The current frequency of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
+ */
+unsigned long __fastcall TMikMod::GetVoiceFrequency(Int8 AVoice)
+{
+    return Voice_GetFrequency(AVoice);
+}
+
+/**
+ * This function returns the actual playing volume of the specified voice.
+ * @param AVoice The number of the voice to analyze (starting from zero).
+ * @return The real volume of the voice when the function was called, in the range 0-65535.
+ */
+unsigned long __fastcall TMikMod::GetVoiceRealVolume(Int8 AVoice)
+{
+    return Voice_RealVolume(AVoice);
+}
+
+/**
+ * This function returns the panning position of the sample currently playing on the specified voice.
+ * @param AVoice The number of the voice to get panning position.
+ * @return The current panning position of the sample playing on the specified voice, or PAN_CENTER if no sample is currently playing on the voice.
+ */
+unsigned long __fastcall TMikMod::GetVoicePanning(Int8 AVoice)
+{
+    return Voice_GetPanning(AVoice);
+}
+
+/**
  * This function has the same behaviour as feof.
  */
 static BOOL GST_READER_Eof(MREADER * reader)
