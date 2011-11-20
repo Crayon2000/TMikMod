@@ -24,7 +24,7 @@ enum TModuleDriver
 /**
  * TMikMod class.
  */
-class TMikMod : public TObject
+class TMikMod : public System::TObject
 {
     typedef System::TObject inherited;
 

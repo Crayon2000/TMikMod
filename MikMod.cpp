@@ -23,9 +23,10 @@ static long GST_READER_Tell(MREADER *reader);
 
 /**
  * Constructor.
- * @param ADriver The driver to use. If not specify, md_Windows will be used.
+ * @param ADriver The driver to use. If not specify, mdWindows will be used.
  */
 __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
+    System::TObject(),
     FModule(NULL),
     FVolume(128)
 {
