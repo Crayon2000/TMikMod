@@ -4,7 +4,9 @@
 
 #include "MikMod.h"
 #include "MikModThread.h"
+#include "MikModContnrs.h"
 #include "mikmod_build.h"
+#include "mikmod_internals.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma link "dsound.lib"   // Needed for the DirectSound driver
@@ -23,14 +25,71 @@ static long GST_READER_Tell(MREADER *reader);
 
 /**
  * Constructor.
+ */
+__fastcall TVoice::TVoice(Int8 AVoiceNumber) :
+    FVoiceNumber(AVoiceNumber)
+{
+}
+
+/**
+ * Destructor.
+ */
+__fastcall TVoice::~TVoice()
+{
+}
+
+/**
+ * This function returns the volume of the sample currently playing on the specified voice.
+ * @param AVoice The number of the voice to get volume.
+ * @return The current volume of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
+ */
+unsigned short __fastcall TVoice::GetVolume()
+{
+    return Voice_GetVolume(FVoiceNumber);
+}
+
+ /**
+ * This function returns the frequency of the sample currently playing on the specified voice.
+ * @param AVoice The number of the voice to get frequency.
+ * @return The current frequency of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
+ */
+unsigned long __fastcall TVoice::GetFrequency()
+{
+    return Voice_GetFrequency(FVoiceNumber);
+}
+
+/**
+ * This function returns the actual playing volume of the specified voice.
+ * @param AVoice The number of the voice to analyze (starting from zero).
+ * @return The real volume of the voice when the function was called, in the range 0-65535.
+ */
+unsigned long __fastcall TVoice::GetRealVolume()
+{
+    return Voice_RealVolume(FVoiceNumber);
+}
+
+/**
+ * This function returns the panning position of the sample currently playing on the specified voice.
+ * @param AVoice The number of the voice to get panning position.
+ * @return The current panning position of the sample playing on the specified voice, or PAN_CENTER if no sample is currently playing on the voice.
+ */
+unsigned long __fastcall TVoice::GetPanning()
+{
+    return Voice_GetPanning(FVoiceNumber);
+}
+
+/**
+ * Constructor.
  * @param ADriver The driver to use. If not specify, mdWindows will be used.
  */
 __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     System::TObject(),
     FModule(NULL),
-    FVolume(128)
+    FVolume(128),
+    FVoiceCount(0)
 {
-    FMikModThread = new TMikModThread();
+    FMikModThread = new Mikmod::TMikModThread();
+    FVoiceList = new Mikmod::TVoiceList();
 
     std::map<TModuleDriver, MDRIVER*> DriverList;
     DriverList[mdDirectSound] = &drv_ds;
@@ -71,6 +130,7 @@ __fastcall TMikMod::~TMikMod()
     UnLoad();
     MikMod_Exit();
     delete FMikModThread;
+    delete FVoiceList;
 }
 
 /**
@@ -88,6 +148,15 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
     }
     FModule = AModule;
     FModule->wrap = true;    // The module will restart when it's finished
+
+    MikMod_Lock();
+    FVoiceCount = md_numchn;
+    MikMod_Unlock();
+
+    for(char i = 0; i < FVoiceCount; ++i)
+    {
+        FVoiceList->Add(new TVoice(i));
+    }
 }
 
 /**
@@ -152,6 +221,8 @@ void __fastcall TMikMod::UnLoad()
         Player_Stop();
         Player_Free(FModule);
         FModule = NULL;
+        FVoiceCount = 0;
+        FVoiceList->Clear();
     }
 }
 
@@ -243,43 +314,13 @@ String __fastcall TMikMod::GetComment()
 }
 
 /**
- * This function returns the volume of the sample currently playing on the specified voice.
- * @param AVoice The number of the voice to get volume.
- * @return The current volume of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
+ * Get a voice at a certain position.
+ * @param Index The number of the voice to get.
+ * @return A pointer to the voice at Index.
  */
-unsigned short __fastcall TMikMod::GetVoiceVolume(Int8 AVoice)
+TVoice* __fastcall TMikMod::GetVoice(int Index)
 {
-    return Voice_GetVolume(AVoice);
-}
-
- /**
- * This function returns the frequency of the sample currently playing on the specified voice.
- * @param AVoice The number of the voice to get frequency.
- * @return The current frequency of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
- */
-unsigned long __fastcall TMikMod::GetVoiceFrequency(Int8 AVoice)
-{
-    return Voice_GetFrequency(AVoice);
-}
-
-/**
- * This function returns the actual playing volume of the specified voice.
- * @param AVoice The number of the voice to analyze (starting from zero).
- * @return The real volume of the voice when the function was called, in the range 0-65535.
- */
-unsigned long __fastcall TMikMod::GetVoiceRealVolume(Int8 AVoice)
-{
-    return Voice_RealVolume(AVoice);
-}
-
-/**
- * This function returns the panning position of the sample currently playing on the specified voice.
- * @param AVoice The number of the voice to get panning position.
- * @return The current panning position of the sample playing on the specified voice, or PAN_CENTER if no sample is currently playing on the voice.
- */
-unsigned long __fastcall TMikMod::GetVoicePanning(Int8 AVoice)
-{
-    return Voice_GetPanning(AVoice);
+    return FVoiceList->Items[Index];
 }
 
 /**

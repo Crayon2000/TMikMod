@@ -4,7 +4,11 @@
 //---------------------------------------------------------------------------
 #include <System.Classes.hpp>
 //---------------------------------------------------------------------------
-class TMikModThread;
+namespace Mikmod
+{
+    class TMikModThread;
+    class TVoiceList;
+}
 struct MODULE;
 
 /**
@@ -22,6 +26,32 @@ enum TModuleDriver
 };
 
 /**
+ * TVoice class.
+ */
+class TVoice : public TObject
+{
+    typedef System::TObject inherited;
+
+private:
+    Int8 FVoiceNumber;
+
+protected:
+    unsigned short __fastcall GetVolume();
+    unsigned long __fastcall GetFrequency();
+    unsigned long __fastcall GetRealVolume();
+    unsigned long __fastcall GetPanning();
+
+public:
+    __fastcall TVoice(Int8 AVoiceNumber = 0);
+    virtual __fastcall ~TVoice();
+
+    __property unsigned short Volume = {read=GetVolume};
+    __property unsigned long Frequency = {read=GetFrequency};
+    __property unsigned long RealVolume = {read=GetRealVolume};
+    __property unsigned long Panning = {read=GetPanning};
+};
+
+/**
  * TMikMod class.
  */
 class TMikMod : public System::TObject
@@ -32,7 +62,9 @@ private:
     MODULE* FModule;
     bool FIsThreadSafe;
     int FVolume;
-    TMikModThread* FMikModThread;
+    int FVoiceCount;
+    Mikmod::TMikModThread* FMikModThread;
+    Mikmod::TVoiceList *FVoiceList;
     void __fastcall CheckIfOpen();
 protected:
     void __fastcall UnLoad();
@@ -42,11 +74,7 @@ protected:
     String __fastcall GetSongTitle();
     String __fastcall GetModType();
     String __fastcall GetComment();
-
-    unsigned short __fastcall GetVoiceVolume(Int8 AVoice);
-    unsigned long __fastcall GetVoiceFrequency(Int8 AVoice);
-    unsigned long __fastcall GetVoiceRealVolume(Int8 AVoice);
-    unsigned long __fastcall GetVoicePanning(Int8 AVoice);
+    TVoice* __fastcall GetVoice(int Index);
 public:
     __fastcall TMikMod(TModuleDriver ADriver = mdWindows);
     virtual __fastcall ~TMikMod();
@@ -63,10 +91,8 @@ public:
     __property String SongTitle = {read=GetSongTitle}; /**< Song title. */
     __property String ModuleType = {read=GetModType}; /**< Type of the module (which tracker format). */
     __property String Comment = {read=GetComment}; /**< Either the module comments, or NULL if the module doesn't have comments. */
-    __property unsigned short VoiceVolume[Int8 AVoice] = {read=GetVoiceVolume};
-    __property unsigned long VoiceFrequency[Int8 AVoice] = {read=GetVoiceFrequency};
-    __property unsigned long VoiceRealVolume[Int8 AVoice] = {read=GetVoiceRealVolume};
-    __property unsigned long VoicePanning[Int8 AVoice] = {read=GetVoicePanning};
+    __property int VoiceCount = {read=FVoiceCount}; /**< Number of voice. */
+    __property TVoice* Voices[int Index] = {read=GetVoice}; /**< Use Voices to obtain a pointer to a specific TVoice object in the array. */
 __published:
     __property int Volume = {read=FVolume, write=SetVolume, default = 128}; /**< Volume. */
 };

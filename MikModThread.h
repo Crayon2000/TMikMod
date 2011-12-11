@@ -4,6 +4,9 @@
 //---------------------------------------------------------------------------
 #include <System.Classes.hpp>
 //---------------------------------------------------------------------------
+namespace Mikmod
+{
+
 class TMikModThread : public TThread
 {
 private:
@@ -12,5 +15,10 @@ protected:
 public:
     __fastcall TMikModThread();
 };
+
+}   /* namespace Mikmod */
+
+using namespace Mikmod;
+
 //---------------------------------------------------------------------------
 #endif
