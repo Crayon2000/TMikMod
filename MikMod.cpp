@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma link "dsound.lib"   // Needed for the DirectSound driver
+#define RT_RAWDATA 10 // Same has RT_RCDATA but works in OS X
 
 typedef struct _MOD_READER
 {
@@ -167,14 +168,9 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
  */
 void __fastcall TMikMod::LoadFromFile(const System::UnicodeString AFileName, int Maxchan, bool Curious)
 {
-    MODULE *Module = NULL;
-    FILE *fp = _wfopen(AFileName.w_str(), L"rb");
-    if(fp)
-    {
-        Module = Player_LoadFP(fp, Maxchan, Curious);
-        fclose(fp);
-    }
-    SetModule(Module);
+    TFileStream *FileStream = new TFileStream(AFileName, fmOpenRead);
+    LoadFromStream(FileStream, Maxchan, Curious);
+    delete FileStream;
 }
 
 /**
@@ -206,7 +202,7 @@ void __fastcall TMikMod::LoadFromStream(System::Classes::TStream *ASream, int Ma
  */
 void __fastcall TMikMod::LoadFromResourceName(unsigned Instance, const System::UnicodeString ResName, int Maxchan, bool Curious)
 {
-    TResourceStream *ResStream = new TResourceStream(Instance, ResName, (System::WideChar *)RT_RCDATA);
+    TResourceStream *ResStream = new TResourceStream(Instance, ResName, (System::WideChar *)RT_RAWDATA);
     LoadFromStream(ResStream, Maxchan, Curious);
     delete ResStream;
 }
@@ -366,9 +362,13 @@ static BOOL GST_READER_Seek(MREADER * reader, long offset, int whence)
     MOD_READER *pReader = (MOD_READER *) reader;
 
     if(whence == SEEK_SET)
+    {
         pReader->Stream->Position = offset;
+    }
     else
+    {
         pReader->Stream->Position += offset;
+    }
 
     return 1;
 }
