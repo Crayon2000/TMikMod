@@ -76,7 +76,7 @@ protected:
     String __fastcall GetComment();
     TVoice* __fastcall GetVoice(int Index);
 public:
-    __fastcall TMikMod(TModuleDriver ADriver = mdWindows);
+    __fastcall TMikMod(TModuleDriver ADriver = mdNoSound);
     virtual __fastcall ~TMikMod();
 
     void __fastcall LoadFromFile(const System::UnicodeString AFileName, int Maxchan, bool Curious = 0);

@@ -9,7 +9,11 @@
 #include "mikmod_internals.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
+
+#if defined(DRV_DS)
 #pragma link "dsound.lib"   // Needed for the DirectSound driver
+#endif                      // DRV_DS
+
 #define RT_RAWDATA 10 // Same has RT_RCDATA but works in OS X
 
 typedef struct _MOD_READER
@@ -81,7 +85,7 @@ unsigned long __fastcall TVoice::GetPanning()
 
 /**
  * Constructor.
- * @param ADriver The driver to use. If not specify, mdWindows will be used.
+ * @param ADriver The driver to use. If not specify, mdNoSound will be used.
  */
 __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     System::TObject(),
@@ -89,13 +93,16 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     FVolume(128),
     FVoiceCount(0)
 {
-    FMikModThread = new Mikmod::TMikModThread();
-    FVoiceList = new Mikmod::TVoiceList();
-
     std::map<TModuleDriver, MDRIVER*> DriverList;
+#ifdef DRV_DS
     DriverList[mdDirectSound] = &drv_ds;
+#endif /* DRV_DS */
+#ifdef DRV_WIN
     DriverList[mdWindows] = &drv_win;
+#endif /* DRV_WIN */
+#ifdef DRV_OSX
     DriverList[mdMacOSX] = &drv_osx;
+#endif /* DRV_OSX */
     DriverList[mdNoSound] = &drv_nos;
     DriverList[mdRaw] = &drv_raw;
     DriverList[mdStandardOutput] = &drv_stdout;
@@ -117,8 +124,18 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     // Initialize the library
     if(MikMod_Init(CommandLine.c_str()))
     {
-        throw(Exception("L'initialisation de MikMod a échoué."));
+        String LException = "An error occurred during initialization.";
+        String LError = MikMod_strerror(MikMod_errno); // Get last error
+        if(!LError.IsEmpty())
+        {
+            LException += " " + LError + ".";
+        }
+        throw(Exception(LException), MikMod_errno);
     }
+
+    // This should be at the end of the constructor in case an exception is thrown
+    FMikModThread = new Mikmod::TMikModThread();
+    FVoiceList = new Mikmod::TVoiceList();
 
     FIsThreadSafe = MikMod_InitThreads();
 }
