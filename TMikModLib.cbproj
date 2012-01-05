@@ -6,10 +6,15 @@
 			<Base>True</Base>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<Platform Condition="'$(Platform)'==''">Win32</Platform>
-			<TargetedPlatforms>1</TargetedPlatforms>
+			<TargetedPlatforms>5</TargetedPlatforms>
 			<AppType>StaticLibrary</AppType>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Base)'=='true') or '$(Base_OSX32)'!=''">
+			<Base_OSX32>true</Base_OSX32>
+			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
@@ -22,9 +27,21 @@
 			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Cfg_1)'=='true') or '$(Cfg_1_OSX32)'!=''">
+			<Cfg_1_OSX32>true</Cfg_1_OSX32>
+			<CfgParent>Cfg_1</CfgParent>
+			<Cfg_1>true</Cfg_1>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
 			<Cfg_2>true</Cfg_2>
 			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Cfg_2)'=='true') or '$(Cfg_2_OSX32)'!=''">
+			<Cfg_2_OSX32>true</Cfg_2_OSX32>
+			<CfgParent>Cfg_2</CfgParent>
+			<Cfg_2>true</Cfg_2>
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
@@ -36,12 +53,12 @@
 			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<PackageImports>IPIndyImpl;bindcompfmx;fmx;rtl;dbrtl;IndySystem;DbxClientDriver;bindcomp;inetdb;DBXInterBaseDriver;DataSnapCommon;DataSnapClient;DataSnapServer;DataSnapProviderClient;xmlrtl;DbxCommonDriver;IndyProtocols;DBXMySQLDriver;dbxcds;bindengine;soaprtl;DBXOracleDriver;dsnap;DBXInformixDriver;IndyCore;fmxase;DBXFirebirdDriver;inet;fmxobj;inetdbxpress;DBXSybaseASADriver;fmxdae;dbexpress;DataSnapIndy10ServerTransport;$(PackageImports)</PackageImports>
 			<DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-			<IncludePath>libmikmod-3.2.0-beta2\mmio\;libmikmod-3.2.0-beta2\playercode\;libmikmod-3.2.0-beta2\loaders\;libmikmod-3.2.0-beta2\win32\;libmikmod-3.2.0-beta2\include\;libmikmod-3.2.0-beta2\drivers\;C:\Documents and Settings\Administrateur\Bureau\libmikmod-3.2.0-beta2\;$(BDS)\include;$(BDS)\include\dinkumware;$(IncludePath)</IncludePath>
+			<IncludePath>libmikmod-3.2.0-beta2\mmio\;libmikmod-3.2.0-beta2\playercode\;libmikmod-3.2.0-beta2\loaders\;libmikmod-3.2.0-beta2\include\;libmikmod-3.2.0-beta2\drivers\;C:\Documents and Settings\Administrateur\Bureau\libmikmod-3.2.0-beta2\;$(BDS)\include;$(BDS)\include\dinkumware;$(IncludePath)</IncludePath>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<Manifest_File>None</Manifest_File>
 			<VerInfo_Locale>3084</VerInfo_Locale>
 			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0</VerInfo_Keys>
-			<Defines>HAVE_FCNTL_H;HAVE_MALLOC_H;HAVE_LIMITS_H;_MSC_VER=1;$(Defines)</Defines>
+			<Defines>HAVE_FCNTL_H;HAVE_LIMITS_H;_MSC_VER=1;$(Defines)</Defines>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
 			<IntermediateOutputDir>.\$(Platform)\$(Config)</IntermediateOutputDir>
 			<FinalOutputDir>.\$(Platform)\$(Config)</FinalOutputDir>
@@ -50,8 +67,15 @@
 			<BCC_ExtendedErrorInfo>true</BCC_ExtendedErrorInfo>
 			<ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\release\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base_OSX32)'!=''">
+			<Defines>DRV_OSX;$(Defines)</Defines>
+			<IncludePath>libmikmod-3.2.0-beta2\macosx\;$(IncludePath)</IncludePath>
+			<VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName)</VerInfo_Keys>
+			<Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
-			<Defines>WIN32;DRV_WIN;DRV_DS;$(Defines)</Defines>
+			<IncludePath>libmikmod-3.2.0-beta2\win32\;$(IncludePath)</IncludePath>
+			<Defines>WIN32;DRV_WIN;DRV_DS;HAVE_MALLOC_H;$(Defines)</Defines>
 			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
 			<PackageImports>vcldbx;frx16;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;DBXSybaseASEDriver;ibxpress;vclimg;frxDB16;intrawebdb_120_160;fs16;TeeUI;FMXTee;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;bcbsmp;websnap;vclribbon;frxe16;VclSmp;fsDB16;vcl;DataSnapConnectors;CloudService;DBXMSSQLDriver;CodeSiteExpressPkg;FmxTeeUI;dsnapcon;vclx;webdsnap;bdertl;adortl;bcbie;$(PackageImports)</PackageImports>
 		</PropertyGroup>
@@ -73,9 +97,17 @@
 			<ILINK_LibraryPath>$(BDSLIB)\$(PLATFORM)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\debug\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1_OSX32)'!=''">
+			<DCC_RemoteDebug>true</DCC_RemoteDebug>
+			<VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName)</VerInfo_Keys>
+			<Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
 			<Defines>NDEBUG;$(Defines)</Defines>
 			<TASM_Debugging>None</TASM_Debugging>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2_OSX32)'!=''">
+			<DCC_RemoteDebug>true</DCC_RemoteDebug>
 		</PropertyGroup>
 		<ItemGroup>
 			<CppCompile Include="libmikmod-3.2.0-beta2\drivers\drv_ds.c">
@@ -273,7 +305,7 @@
 				</CPlusPlusBuilder.Personality>
 				<Deployment/>
 				<Platforms>
-					<Platform value="OSX32">False</Platform>
+					<Platform value="OSX32">True</Platform>
 					<Platform value="Win32">True</Platform>
 				</Platforms>
 			</BorlandProject>
