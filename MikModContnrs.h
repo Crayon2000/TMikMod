@@ -29,7 +29,7 @@ protected:
     {
         if(Action == lnDeleted && OwnsObjects)
         {
-            delete (T)Ptr;
+            delete static_cast<T>(Ptr);
         }
         inherited::Notify(Ptr, Action);
     }
@@ -42,7 +42,7 @@ protected:
      */
     T __fastcall GetItem(int Index)
     {
-      return (T)inherited::Items[Index];
+        return static_cast<T>(inherited::Items[Index]);
     }
 
     /**
@@ -109,7 +109,7 @@ public:
      */
     T __fastcall Extract(T Item)
     {
-        return (T)inherited::Extract(Item);
+        return static_cast<T>(inherited::Extract(Item));
     }
 
     /**
@@ -121,7 +121,7 @@ public:
      */
     T __fastcall ExtractItem(T Item, System::Classes::TList::TDirection ADirection)
     {
-        return (T)inherited::ExtractItem(Item, ADirection);
+        return static_cast<T>(inherited::ExtractItem(Item, ADirection));
     }
 
     /**
@@ -207,7 +207,7 @@ public:
      */
     T __fastcall First(void)
     {
-        return (T)inherited::First();
+        return static_cast<T>(inherited::First());
     }
 
     /**
@@ -216,7 +216,7 @@ public:
      */
     T __fastcall Last(void)
     {
-        return (T)inherited::Last();
+        return static_cast<T>(inherited::Last());
     }
 
     /**
@@ -225,7 +225,7 @@ public:
      */
     T operator[](int Index)
     {
-        return (T)Items[Index];
+        return static_cast<T>(Items[Index]);
     }
 
     /**
