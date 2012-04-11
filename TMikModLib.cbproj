@@ -49,11 +49,11 @@
 			<TLIB_PageSize>64</TLIB_PageSize>
 			<AllPackageLibs>rtl.lib</AllPackageLibs>
 			<Multithreaded>true</Multithreaded>
-			<ILINK_LibraryPath>libmikmod-3.2.0-beta2\mmio\;libmikmod-3.2.0-beta2\playercode\;libmikmod-3.2.0-beta2\loaders\;libmikmod-3.2.0-beta2\win32\;libmikmod-3.2.0-beta2\include\;libmikmod-3.2.0-beta2\drivers\;C:\Documents and Settings\Administrateur\Bureau\libmikmod-3.2.0-beta2\;$(BDS)\lib;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+			<ILINK_LibraryPath>libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\win32\;libmikmod\include\;libmikmod\drivers\;$(BDS)\lib;$(ILINK_LibraryPath)</ILINK_LibraryPath>
 			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<PackageImports>IPIndyImpl;bindcompfmx;fmx;rtl;dbrtl;IndySystem;DbxClientDriver;bindcomp;inetdb;DBXInterBaseDriver;DataSnapCommon;DataSnapClient;DataSnapServer;DataSnapProviderClient;xmlrtl;DbxCommonDriver;IndyProtocols;DBXMySQLDriver;dbxcds;bindengine;soaprtl;DBXOracleDriver;dsnap;DBXInformixDriver;IndyCore;fmxase;DBXFirebirdDriver;inet;fmxobj;inetdbxpress;DBXSybaseASADriver;fmxdae;dbexpress;DataSnapIndy10ServerTransport;$(PackageImports)</PackageImports>
 			<DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-			<IncludePath>libmikmod-3.2.0-beta2\mmio\;libmikmod-3.2.0-beta2\playercode\;libmikmod-3.2.0-beta2\loaders\;libmikmod-3.2.0-beta2\include\;libmikmod-3.2.0-beta2\drivers\;C:\Documents and Settings\Administrateur\Bureau\libmikmod-3.2.0-beta2\;$(BDS)\include;$(BDS)\include\dinkumware;$(IncludePath)</IncludePath>
+			<IncludePath>libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\include\;libmikmod\drivers\;$(BDS)\include;$(BDS)\include\dinkumware;$(IncludePath)</IncludePath>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<Manifest_File>None</Manifest_File>
 			<VerInfo_Locale>3084</VerInfo_Locale>
@@ -69,12 +69,12 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_OSX32)'!=''">
 			<Defines>DRV_OSX;$(Defines)</Defines>
-			<IncludePath>libmikmod-3.2.0-beta2\macosx\;$(IncludePath)</IncludePath>
+			<IncludePath>libmikmod\macosx\;$(IncludePath)</IncludePath>
 			<VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName)</VerInfo_Keys>
 			<Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
-			<IncludePath>libmikmod-3.2.0-beta2\win32\;$(IncludePath)</IncludePath>
+			<IncludePath>libmikmod\win32\;$(IncludePath)</IncludePath>
 			<Defines>WIN32;DRV_WIN;DRV_DS;HAVE_MALLOC_H;$(Defines)</Defines>
 			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
 			<PackageImports>vcldbx;frx16;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;DBXSybaseASEDriver;ibxpress;vclimg;frxDB16;intrawebdb_120_160;fs16;TeeUI;FMXTee;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;bcbsmp;websnap;vclribbon;frxe16;VclSmp;fsDB16;vcl;DataSnapConnectors;CloudService;DBXMSSQLDriver;CodeSiteExpressPkg;FmxTeeUI;dsnapcon;vclx;webdsnap;bdertl;adortl;bcbie;$(PackageImports)</PackageImports>
@@ -110,135 +110,135 @@
 			<DCC_RemoteDebug>true</DCC_RemoteDebug>
 		</PropertyGroup>
 		<ItemGroup>
-			<CppCompile Include="libmikmod-3.2.0-beta2\drivers\drv_ds.c">
+			<CppCompile Include="libmikmod\drivers\drv_ds.c">
 				<BuildOrder>3</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\drivers\drv_nos.c">
+			<CppCompile Include="libmikmod\drivers\drv_nos.c">
 				<BuildOrder>4</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\drivers\drv_osx.c">
+			<CppCompile Include="libmikmod\drivers\drv_osx.c">
 				<BuildOrder>46</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\drivers\drv_raw.c">
+			<CppCompile Include="libmikmod\drivers\drv_raw.c">
 				<BuildOrder>5</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\drivers\drv_stdout.c">
+			<CppCompile Include="libmikmod\drivers\drv_stdout.c">
 				<BuildOrder>0</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\drivers\drv_wav.c">
+			<CppCompile Include="libmikmod\drivers\drv_wav.c">
 				<BuildOrder>1</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\drivers\drv_win.c">
+			<CppCompile Include="libmikmod\drivers\drv_win.c">
 				<BuildOrder>2</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_669.c">
+			<CppCompile Include="libmikmod\loaders\load_669.c">
 				<BuildOrder>6</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_amf.c">
+			<CppCompile Include="libmikmod\loaders\load_amf.c">
 				<BuildOrder>7</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_asy.c">
+			<CppCompile Include="libmikmod\loaders\load_asy.c">
 				<BuildOrder>8</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_dsm.c">
+			<CppCompile Include="libmikmod\loaders\load_dsm.c">
 				<BuildOrder>9</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_far.c">
+			<CppCompile Include="libmikmod\loaders\load_far.c">
 				<BuildOrder>10</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_gdm.c">
+			<CppCompile Include="libmikmod\loaders\load_gdm.c">
 				<BuildOrder>11</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_imf.c">
+			<CppCompile Include="libmikmod\loaders\load_imf.c">
 				<BuildOrder>12</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_it.c">
+			<CppCompile Include="libmikmod\loaders\load_it.c">
 				<BuildOrder>13</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_m15.c">
+			<CppCompile Include="libmikmod\loaders\load_m15.c">
 				<BuildOrder>14</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_med.c">
+			<CppCompile Include="libmikmod\loaders\load_med.c">
 				<BuildOrder>15</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_mod.c">
+			<CppCompile Include="libmikmod\loaders\load_mod.c">
 				<BuildOrder>16</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_mtm.c">
+			<CppCompile Include="libmikmod\loaders\load_mtm.c">
 				<BuildOrder>17</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_okt.c">
+			<CppCompile Include="libmikmod\loaders\load_okt.c">
 				<BuildOrder>18</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_s3m.c">
+			<CppCompile Include="libmikmod\loaders\load_s3m.c">
 				<BuildOrder>19</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_stm.c">
+			<CppCompile Include="libmikmod\loaders\load_stm.c">
 				<BuildOrder>20</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_stx.c">
+			<CppCompile Include="libmikmod\loaders\load_stx.c">
 				<BuildOrder>21</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_ult.c">
+			<CppCompile Include="libmikmod\loaders\load_ult.c">
 				<BuildOrder>22</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_uni.c">
+			<CppCompile Include="libmikmod\loaders\load_uni.c">
 				<BuildOrder>23</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\loaders\load_xm.c">
+			<CppCompile Include="libmikmod\loaders\load_xm.c">
 				<BuildOrder>24</BuildOrder>
 			</CppCompile>
-			<None Include="libmikmod-3.2.0-beta2\loaders\Makefile.am"/>
-			<None Include="libmikmod-3.2.0-beta2\loaders\Makefile.in"/>
-			<CppCompile Include="libmikmod-3.2.0-beta2\mmio\mmalloc.c">
+			<None Include="libmikmod\loaders\Makefile.am"/>
+			<None Include="libmikmod\loaders\Makefile.in"/>
+			<CppCompile Include="libmikmod\mmio\mmalloc.c">
 				<BuildOrder>41</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\mmio\mmerror.c">
+			<CppCompile Include="libmikmod\mmio\mmerror.c">
 				<BuildOrder>42</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\mmio\mmio.c">
+			<CppCompile Include="libmikmod\mmio\mmio.c">
 				<BuildOrder>43</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\mdreg.c">
+			<CppCompile Include="libmikmod\playercode\mdreg.c">
 				<BuildOrder>27</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\mdriver.c">
+			<CppCompile Include="libmikmod\playercode\mdriver.c">
 				<BuildOrder>28</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\mdulaw.c">
+			<CppCompile Include="libmikmod\playercode\mdulaw.c">
 				<BuildOrder>29</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\mloader.c">
+			<CppCompile Include="libmikmod\playercode\mloader.c">
 				<BuildOrder>30</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\mlreg.c">
+			<CppCompile Include="libmikmod\playercode\mlreg.c">
 				<BuildOrder>31</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\mlutil.c">
+			<CppCompile Include="libmikmod\playercode\mlutil.c">
 				<BuildOrder>32</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\mplayer.c">
+			<CppCompile Include="libmikmod\playercode\mplayer.c">
 				<BuildOrder>33</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\munitrk.c">
+			<CppCompile Include="libmikmod\playercode\munitrk.c">
 				<BuildOrder>34</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\mwav.c">
+			<CppCompile Include="libmikmod\playercode\mwav.c">
 				<BuildOrder>35</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\npertab.c">
+			<CppCompile Include="libmikmod\playercode\npertab.c">
 				<BuildOrder>36</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\sloader.c">
+			<CppCompile Include="libmikmod\playercode\sloader.c">
 				<BuildOrder>37</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\virtch.c">
+			<CppCompile Include="libmikmod\playercode\virtch.c">
 				<BuildOrder>39</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\virtch2.c">
+			<CppCompile Include="libmikmod\playercode\virtch2.c">
 				<BuildOrder>38</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="libmikmod-3.2.0-beta2\playercode\virtch_common.c">
+			<CppCompile Include="libmikmod\playercode\virtch_common.c">
 				<BuildOrder>40</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="MikMod.cpp">

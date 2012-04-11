@@ -217,8 +217,8 @@ static BOOL DS_Init(void)
 		return 1;
 	}
 
-	notifyUpdateHandle=CreateEvent
-				(NULL,FALSE,FALSE,"libmikmod DirectSound Driver positionNotify Event");
+	notifyUpdateHandle=CreateEventW
+				(NULL,FALSE,FALSE,L"libmikmod DirectSound Driver positionNotify Event");
 	if (!notifyUpdateHandle) {
 		_mm_errno=MMERR_DS_EVENT;
 		return 1;
