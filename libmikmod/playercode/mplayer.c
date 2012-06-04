@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mplayer.c,v 1.5 2004/01/31 22:40:22 raph Exp $
+  $Id$
 
   The Protracker Player Driver
 
@@ -48,9 +48,7 @@ extern long int random(void);
 #endif
 
 /* The currently playing module */
-/* This variable should better be static, but it would break the ABI, so this
-   will wait */
-/*static*/ MODULE *pf = NULL;
+MODULE *pf = NULL;
 
 #define	HIGH_OCTAVE		2	/* number of above-range octaves */
 
@@ -2318,7 +2316,7 @@ void pt_UpdateVoices(MODULE *mod, int max_volume)
 	SAMPLE *s;
 
 	mod->totalchn=mod->realchn=0;
-	for (channel=0;channel<md_sngchn;channel++) {
+	for (channel=0;channel<pf->numchn;channel++) {
 		aout=&mod->voice[channel];
 		i=aout->main.i;
 		s=aout->main.s;
@@ -2976,9 +2974,9 @@ BOOL Player_Init(MODULE* mod)
 	mod->relspd=0;
 
 	/* make sure the player doesn't start with garbage */
-	if (!(mod->control=(MP_CONTROL*)_mm_calloc(mod->numchn,sizeof(MP_CONTROL))))
+	if (!(mod->control=(MP_CONTROL*)MikMod_calloc(mod->numchn,sizeof(MP_CONTROL))))
 		return 1;
-	if (!(mod->voice=(MP_VOICE*)_mm_calloc(md_sngchn,sizeof(MP_VOICE))))
+	if (!(mod->voice=(MP_VOICE*)MikMod_calloc(md_sngchn,sizeof(MP_VOICE))))
 		return 1;
 
 	Player_Init_internal(mod);
@@ -2997,9 +2995,9 @@ void Player_Exit_internal(MODULE* mod)
 	}
 
 	if (mod->control)
-		free(mod->control);
+		MikMod_free(mod->control);
 	if (mod->voice)
-		free(mod->voice);
+		MikMod_free(mod->voice);
 	mod->control=NULL;
 	mod->voice=NULL;
 }
@@ -3089,7 +3087,7 @@ MIKMODAPI void Player_NextPosition(void)
 		pf->patbrk=0;
 		pf->vbtick=pf->sngspd;
 
-		for (t=0;t<md_sngchn;t++) {
+		for (t=0;t<pf->numchn;t++) {
 			Voice_Stop_internal(t);
 			pf->voice[t].main.i=NULL;
 			pf->voice[t].main.s=NULL;
@@ -3114,7 +3112,7 @@ MIKMODAPI void Player_PrevPosition(void)
 		pf->patbrk=0;
 		pf->vbtick=pf->sngspd;
 
-		for (t=0;t<md_sngchn;t++) {
+		for (t=0;t<pf->numchn;t++) {
 			Voice_Stop_internal(t);
 			pf->voice[t].main.i=NULL;
 			pf->voice[t].main.s=NULL;
@@ -3141,7 +3139,7 @@ MIKMODAPI void Player_SetPosition(UWORD pos)
 		pf->sngpos=pos;
 		pf->vbtick=pf->sngspd;
 
-		for (t=0;t<md_sngchn;t++) {
+		for (t=0;t<pf->numchn;t++) {
 			Voice_Stop_internal(t);
 			pf->voice[t].main.i=NULL;
 			pf->voice[t].main.s=NULL;
@@ -3386,6 +3384,26 @@ MIKMODAPI int Player_QueryVoices(UWORD numvoices, VOICEINFO *vinfo)
 	return numvoices;
 }
 
+
+// Get current module order
+MIKMODAPI int Player_GetOrder(void)
+{
+	int ret;
+	MUTEX_LOCK(vars);
+	ret = pf ? pf->sngpos :0; // pf->positions[pf->sngpos ? pf->sngpos-1 : 0]: 0;
+	MUTEX_UNLOCK(vars);
+	return ret;
+}
+
+// Get current module row
+MIKMODAPI int Player_GetRow(void)
+{
+	int ret;
+	MUTEX_LOCK(vars);
+	ret = pf ? pf->patpos : 0;
+	MUTEX_UNLOCK(vars);
+	return ret;
+}
 
 
 /* ex:set ts=4: */

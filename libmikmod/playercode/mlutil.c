@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mlutil.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   Utility functions for the module loader
 
@@ -60,7 +60,7 @@ CHAR *STM_Version[STM_NTRACKERS] = {
 SBYTE  remap[UF_MAXCHAN];   /* for removing empty channels */
 UBYTE* poslookup=NULL;      /* lookup table for pattern jumps after blank
                                pattern removal */
-UBYTE  poslookupcnt;
+UWORD  poslookupcnt;
 UWORD* origpositions=NULL;
 
 BOOL   filters;             /* resonant filters in use */
@@ -77,7 +77,7 @@ int *AllocLinear(void)
 {
 	if(of.numsmp>noteindexcount) {
 		noteindexcount=of.numsmp;
-		noteindex=realloc(noteindex,noteindexcount*sizeof(int));
+		noteindex=MikMod_realloc(noteindex,noteindexcount*sizeof(int));
 	}
 	return noteindex;
 }
@@ -85,7 +85,7 @@ int *AllocLinear(void)
 void FreeLinear(void)
 {
 	if(noteindex) {
-		free(noteindex);
+		MikMod_free(noteindex);
 		noteindex=NULL;
 	}
 	noteindexcount=0;

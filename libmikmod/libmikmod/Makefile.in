@@ -35,10 +35,10 @@ COMPILE=$(LIBTOOL) --silent --mode=compile $(CC) $(DEFS) $(CFLAGS) -I$(top_srcdi
 LIB = libmikmod.la
 OBJ = $(LIBOBJS) $(DLOBJS) \
       drv_AF.lo drv_aiff.lo drv_aix.lo drv_alsa.lo drv_esd.lo drv_hp.lo drv_nos.lo \
-      drv_oss.lo drv_osx.lo drv_mac.lo drv_pipe.lo drv_raw.lo drv_sam9407.lo drv_sgi.lo \
+      drv_oss.lo drv_osx.lo drv_mac.lo drv_nas.lo drv_pipe.lo drv_raw.lo drv_sam9407.lo drv_sgi.lo \
       drv_stdout.lo drv_sun.lo drv_ultra.lo drv_wav.lo \
       load_669.lo load_amf.lo load_asy.lo load_dsm.lo load_far.lo \
-      load_gdm.lo load_it.lo load_imf.lo load_m15.lo load_med.lo \
+      load_gdm.lo load_gt2.lo load_it.lo load_imf.lo load_m15.lo load_med.lo \
       load_mod.lo load_mtm.lo load_okt.lo \
       load_s3m.lo load_stm.lo load_stx.lo load_ult.lo load_uni.lo load_xm.lo \
       mmalloc.lo mmerror.lo mmio.lo \
@@ -100,6 +100,9 @@ drv_hp.lo:	$(top_srcdir)/drivers/drv_hp.c \
 drv_mac.lo:	$(top_srcdir)/drivers/drv_mac.c \
 			$(top_builddir)/include/mikmod.h $(top_srcdir)/include/mikmod_internals.h
 	$(COMPILE) -c $(top_srcdir)/drivers/drv_mac.c
+drv_nas.lo:	$(top_srcdir)/drivers/drv_nas.c \
+			$(top_builddir)/include/mikmod.h $(top_srcdir)/include/mikmod_internals.h
+	$(COMPILE) -c $(top_srcdir)/drivers/drv_nas.c
 drv_nos.lo:	$(top_srcdir)/drivers/drv_nos.c \
 			$(top_builddir)/include/mikmod.h $(top_srcdir)/include/mikmod_internals.h
 	$(COMPILE) -c $(top_srcdir)/drivers/drv_nos.c
@@ -152,6 +155,9 @@ load_far.lo:	$(top_srcdir)/loaders/load_far.c \
 load_gdm.lo:	$(top_srcdir)/loaders/load_gdm.c \
 			$(top_builddir)/include/mikmod.h $(top_srcdir)/include/mikmod_internals.h
 	$(COMPILE) -c $(top_srcdir)/loaders/load_gdm.c
+load_gt2.lo:	$(top_srcdir)/loaders/load_gt2.c \
+			$(top_builddir)/include/mikmod.h $(top_srcdir)/include/mikmod_internals.h
+	$(COMPILE) -c $(top_srcdir)/loaders/load_gt2.c
 load_it.lo:	$(top_srcdir)/loaders/load_it.c \
 			$(top_builddir)/include/mikmod.h $(top_srcdir)/include/mikmod_internals.h
 	$(COMPILE) -c $(top_srcdir)/loaders/load_it.c

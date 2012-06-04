@@ -14,15 +14,19 @@ Check out the file 'NEWS' for more history information.
 So, you're on an angry fruit salad Windows system, aren't you ? With
 those so cute icons and an overflowed system tray ?
 
-Currently, libmikmod can be build under Windows only with the Microsoft
-compiler (but I suppose that the Watcom compiler and Metrowerks
+Currently, libmikmod can be build under Windows with the Microsoft
+compiler, lcc-win32 and MinGW (I suppose that the Watcom compiler and Metrowerks
 Codewarrior could be used as well).
+
 You'll need the DirectX SDK (if not included with the compiler) to
 compile the DirectSound driver; version 5 or better is required. The
 standard Win32 SDK is enough for the winmm driver.
 
 Oh, I almost forgot: you need long filenames to compile libmikmod, but
 that should not be a problem nowadays.
+
+
+-- Instructions for Microsoft Compiler
 
 You might want to edit one of the files 'Makefile.dynamic' and
 'Makefile.static' located in the 'win32' directory to suit your
@@ -53,6 +57,13 @@ library directory. If you built a DLL, you'll also have to put
 HTML documentation of the library, for programmers, is located in the
 doc directory.
 
+-- Instructions for lcc-win32
+
+Use Makefile.lcc
+
+-- Instructions for MingGW
+
+Use Makefile.mingw
 
 >> THANKS
 ---------

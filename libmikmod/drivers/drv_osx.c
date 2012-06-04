@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_osx.c,v 1.5 2004/02/16 17:27:29 raph Exp $
+  $Id$
 
   Driver for output via CoreAudio [MacOS X and Darwin].
 
@@ -49,14 +49,13 @@
         - gave up on whole thread idea, since it stutters if you rescale a window
 	    - moved a #pragma mark and added DRV_OSX/MISSING, for non-Darwin compiles
 	    - added support for float-point buffers, to avoid the conversion and copying
+		- Altivec optimizations of the various vector transforms (S.Denis)
 
 	Future ideas: (TODO)
-	
+
 		- support possibly partially filled buffers from libmikmod
 		- clean up the rest of the code and lose even more macros
 		- use hardware preferred native size for the sample buffers
-		
-		- Altivec optimizations of the various vector transforms
 	    - provide a PPC64 version of the library, for PowerMac G5
 
 */
@@ -74,6 +73,8 @@
 
 #pragma mark INCLUDES
 
+#include <mach-o/arch.h>
+#include <sys/sysctl.h>
 #include <CoreAudio/AudioHardware.h>
 
 #pragma mark -
@@ -178,6 +179,7 @@ static unsigned char 		*gSoundBuffer = NULL;
 
 static AudioDeviceID 		gSoundDeviceID;
 static UInt32			gInBufferSize;
+static UInt32			gHardwareBufferSize = 0;
 static Boolean			gIOProcIsInstalled = 0,
                                 gDeviceHasStarted = 0,
                                 gBufferMono2Stereo = 0;
@@ -245,7 +247,7 @@ static void * OSX_FillBuffer (void *theID)
        			buffer = gSoundBackBuffer[gCurrentFillBuffer];
          		if (++gCurrentFillBuffer >= NUMBER_BACK_BUFFERS)
     				gCurrentFillBuffer = 0;	
-				
+
 					// fill the buffer...
 				FILL_BUFFER (buffer, gInBufferSize);
 			}
@@ -330,6 +332,62 @@ static OSStatus OSX_AudioIOProc8Bit (AudioDeviceID 		inDevice,
 
 //_________________________________________________________________________________OSX_AudioIOProc16Bit()
 
+
+#ifdef HAVE_ALTIVEC
+// note: AltiVec code needs to be in a function of it's own,
+//       since the compiler will generate vrsave instructions
+
+#ifdef __GNUC__
+__attribute__ ((noinline))
+#endif
+static void OSX_AudioIOProc16Bit_Altivec(SInt16	*myInBuffer, float *myOutBuffer)
+{
+		register UInt32	i;
+
+		float f = SOUND_BUFFER_SCALE_16BIT;
+   		const vector float gain = vec_load_ps1(&f); // multiplier
+		const vector float mix = vec_setzero();
+		if (gBufferMono2Stereo)
+		{
+			int j=0;
+			// TEST: OK
+			for (i=0;i<SOUND_BUFFER_SIZE;i+=8, j+=16)
+			{
+				vector short int v0 = vec_ld(0, myInBuffer + i); // Load 8 shorts
+				vector float v1 = vec_ctf((vector signed int)vec_unpackh(v0), 0); // convert to float
+				vector float v2 = vec_ctf((vector signed int)vec_unpackl(v0), 0); // convert to float
+				vector float v3 = vec_madd(v1, gain, mix); // scale
+				vector float v4 = vec_madd(v2, gain, mix); // scale
+
+				vector float v5 = vec_mergel(v3, v3); // v3(0,0,1,1);
+				vector float v6 = vec_mergeh(v3, v3); // v3(2,2,3,3);
+				vector float v7 = vec_mergel(v4, v4); // v4(0,0,1,1);
+				vector float v8 = vec_mergeh(v4, v4); // v4(2,2,3,3);
+
+				vec_st(v5, 0, myOutBuffer + j); // Store 4 floats
+				vec_st(v6, 0, myOutBuffer + 4 + j); // Store 4 floats
+				vec_st(v7, 0, myOutBuffer + 8 + j); // Store 4 floats
+				vec_st(v8, 0, myOutBuffer + 12 + j); // Store 4 floats
+
+			}
+		}
+		else
+		{
+			// TEST: OK
+			for (i=0;i<SOUND_BUFFER_SIZE;i+=8)
+			{
+				vector short int v0 = vec_ld(0, myInBuffer + i); // Load 8 shorts
+				vector float v1 = vec_ctf((vector signed int)vec_unpackh(v0), 0); // convert to float
+				vector float v2 = vec_ctf((vector signed int)vec_unpackl(v0), 0); // convert to float
+				vector float v3 = vec_madd(v1, gain, mix); // scale
+				vector float v4 = vec_madd(v2, gain, mix); // scale
+				vec_st(v3, 0, myOutBuffer + i); // Store 4 floats
+				vec_st(v4, 0, myOutBuffer + 4 + i); // Store 4 floats
+			}
+		}
+}
+#endif // HAVE_ALTIVEC
+
 static OSStatus OSX_AudioIOProc16Bit (AudioDeviceID 		inDevice,
                                       const AudioTimeStamp 	*inNow,
                                       const AudioBufferList 	*inInputData,
@@ -367,20 +425,35 @@ static OSStatus OSX_AudioIOProc16Bit (AudioDeviceID 		inDevice,
 
 #endif /* USE_FILL_THREAD */
 
-	if (gBufferMono2Stereo)
+#ifdef HAVE_ALTIVEC
+    if (md_mode & DMODE_SIMDMIXER)
 	{
-		for (i = 0; i < SOUND_BUFFER_SIZE >> 1; i++)
+	#if __MWERKS__
+		#pragma dont_inline on
+	#endif
+		OSX_AudioIOProc16Bit_Altivec(myInBuffer,myOutBuffer);
+	#if __MWERKS__
+		#pragma dont_inline reset
+	#endif
+	}
+	else
+#endif
+	{
+		if (gBufferMono2Stereo)
 		{
-			myOutBuffer[1] = myOutBuffer[0] = (*myInBuffer++) * SOUND_BUFFER_SCALE_16BIT;
-            myOutBuffer+=2;
-        }
-    }
-    else
-    {
-    	for (i = 0; i < SOUND_BUFFER_SIZE; i++)
-        {
-        	*myOutBuffer++ = (*myInBuffer++) * SOUND_BUFFER_SCALE_16BIT;
-        }
+			for (i = 0; i < SOUND_BUFFER_SIZE >> 1; i++)
+			{
+				myOutBuffer[1] = myOutBuffer[0] = (*myInBuffer++) * SOUND_BUFFER_SCALE_16BIT;
+	            myOutBuffer+=2;
+	        }
+	    }
+	    else
+	    {
+	    	for (i = 0; i < SOUND_BUFFER_SIZE; i++)
+	        {
+	        	*myOutBuffer++ = (*myInBuffer++) * SOUND_BUFFER_SCALE_16BIT;
+	        }
+		}
 	}
 
 	return 0;
@@ -444,6 +517,17 @@ static OSStatus OSX_AudioIOProcFloat (AudioDeviceID 		inDevice,
 
 	return 0;
 }
+//________________________________________________________________________________________OSX_HasAltivec()
+
+
+static BOOL OSX_HasAltivec (void)
+{
+    int result = 0;
+    int selectors[2] = { CTL_HW, HW_VECTORUNIT };
+    size_t length = sizeof(result);
+    sysctl(selectors, 2, &result, &length, NULL, 0);
+	return !!result;
+}
 
 //________________________________________________________________________________________OSX_IsPresent()
 
@@ -488,6 +572,14 @@ static BOOL OSX_Init (void)
 
     // set up basic md_mode, just to be secure...
     md_mode |= DMODE_SOFT_MUSIC | DMODE_SOFT_SNDFX;
+
+#ifdef HAVE_ALTIVEC
+	// check for Altivec support
+	if (OSX_HasAltivec())
+	{
+	    md_mode |= DMODE_SIMDMIXER;
+	}
+#endif
 
     // try the selected mix frequency, if failure, fall back to native frequency...
     if (mySoundBasicDescription.mSampleRate != md_mixfreq)
@@ -549,6 +641,12 @@ static BOOL OSX_Init (void)
         gInBufferSize *= sizeof(UInt8);
         gAudioIOProc = OSX_AudioIOProc8Bit;
     }
+
+    // save the original buffer size
+    myPropertySize = sizeof (gHardwareBufferSize);
+    AudioDeviceGetProperty (gSoundDeviceID, 0, 0, kAudioDevicePropertyBufferSize,
+                                &myPropertySize, &gHardwareBufferSize);
+
     myBufferByteCount = SOUND_BUFFER_SIZE * sizeof(float);
     CHECK_ERROR
     (
@@ -568,7 +666,7 @@ static BOOL OSX_Init (void)
  #if !USE_FILL_THREAD
 
    // get the buffer memory...
-    if ((gSoundBuffer = malloc(gInBufferSize)) == NULL)
+    if ((gSoundBuffer = MikMod_malloc(gInBufferSize)) == NULL)
     {
         _mm_errno = MMERR_OUT_OF_MEMORY;
         return (1);
@@ -588,7 +686,7 @@ static BOOL OSX_Init (void)
     	int i;
     	
     	for (i = 0; i < NUMBER_BACK_BUFFERS; i++)
-  		if ((gSoundBackBuffer[i] = malloc(gInBufferSize)) == NULL)
+  		if ((gSoundBackBuffer[i] = MikMod_malloc(gInBufferSize)) == NULL)
     	{
      	   _mm_errno = MMERR_OUT_OF_MEMORY;
      	   return (1);
@@ -639,6 +737,13 @@ static void OSX_Exit (void)
     {
         AudioDeviceRemoveIOProc (gSoundDeviceID, gAudioIOProc);
         gIOProcIsInstalled = 0;
+    }
+
+    if (gHardwareBufferSize)
+    {
+        AudioDeviceSetProperty (gSoundDeviceID, NULL, 0, 0, kAudioDevicePropertyBufferSize,
+                                sizeof(gHardwareBufferSize), &gHardwareBufferSize);
+        gHardwareBufferSize = 0;
     }
 
 #if !USE_FILL_THREAD

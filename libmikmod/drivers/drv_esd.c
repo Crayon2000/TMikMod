@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_esd.c,v 1.3 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for the Enlightened sound daemon (EsounD)
 
@@ -148,7 +148,7 @@ static void ESD_CommandLine(CHAR *cmdline)
 	CHAR *ptr=MD_GetAtom("machine",cmdline,0);
 
 	if (ptr) {
-		if (espeaker) free(espeaker);
+		if (espeaker) MikMod_free(espeaker);
 		espeaker=ptr;
 	}
 }
@@ -198,7 +198,7 @@ static BOOL ESD_Init_internal(void)
 		return 1;
 	}
 
-	if (!(audiobuffer=(SBYTE*)_mm_malloc(ESD_BUF_SIZE*sizeof(char))))
+	if (!(audiobuffer=(SBYTE*)MikMod_malloc(ESD_BUF_SIZE*sizeof(char))))
 		return 1;
 
 	return VC_Init();
@@ -218,7 +218,7 @@ static BOOL ESD_Init(void)
 static void ESD_Exit_internal(void)
 {
 	VC_Exit();
-	_mm_free(audiobuffer);
+	MikMod_free(audiobuffer);
 	if (sndfd>=0) {
 		esd_closestream(sndfd);
 		sndfd=-1;

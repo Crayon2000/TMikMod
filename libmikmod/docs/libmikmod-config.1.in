@@ -1,4 +1,4 @@
-.TH LIBMIKMOD 1 "Version @VERSION@, 3rd Januark 2000"
+.TH LIBMIKMOD 1 "Version @VERSION@, March 2004"
 
 .SH NAME
 libmikmod-config - script to get information about the installed version of

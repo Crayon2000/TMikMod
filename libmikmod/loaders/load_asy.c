@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_asy.c,v 1.3 2004/01/28 01:18:22 raph Exp $
+  $Id$
 
   ASYLUM Music Format v1.0 (.amf) loader
   adapted from load_mod.c by Raphael Assenat <raph@raphnet.net>,
@@ -131,15 +131,15 @@ static BOOL ASY_Test(void)
 
 static BOOL ASY_Init(void)
 {
-	if (!(mh = (MODULEHEADER *)_mm_malloc(sizeof(MODULEHEADER))))
+	if (!(mh = (MODULEHEADER *)MikMod_malloc(sizeof(MODULEHEADER))))
 		return 0;
 	return 1;
 }
 
 static void ASY_Cleanup(void)
 {
-	_mm_free(mh);
-	_mm_free(patbuf);
+	MikMod_free(mh);
+	MikMod_free(patbuf);
 }
 
 static void ConvertNote(MODNOTE *n)
@@ -247,7 +247,7 @@ static BOOL ML_LoadPatterns(void)
 	}
 	
 	/* Allocate temporary buffer for loading and converting the patterns */
-	if (!(patbuf = (MODNOTE *)_mm_calloc(64U * of.numchn, sizeof(MODNOTE))))
+	if (!(patbuf = (MODNOTE *)MikMod_calloc(64U * of.numchn, sizeof(MODNOTE))))
 		return 0;
 
 
@@ -367,7 +367,7 @@ static BOOL ASY_Load(BOOL curious)
 		q++;
 	}
 
-	of.modtype = strdup(descr);
+	of.modtype = StrDup(descr);
 
 	if (!ML_LoadPatterns())
 		return 0;

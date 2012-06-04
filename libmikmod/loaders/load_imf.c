@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_imf.c,v 1.2 2004/02/06 19:29:03 raph Exp $
+  $Id$
 
   Imago Orpheus (IMF) module loader
 
@@ -137,8 +137,8 @@ BOOL IMF_Test(void)
 
 BOOL IMF_Init(void)
 {
-	if(!(imfpat=(IMFNOTE*)_mm_malloc(32*256*sizeof(IMFNOTE)))) return 0;
-	if(!(mh=(IMFHEADER*)_mm_malloc(sizeof(IMFHEADER)))) return 0;
+	if(!(imfpat=(IMFNOTE*)MikMod_malloc(32*256*sizeof(IMFNOTE)))) return 0;
+	if(!(mh=(IMFHEADER*)MikMod_malloc(sizeof(IMFHEADER)))) return 0;
 
 	return 1;
 }
@@ -147,8 +147,8 @@ void IMF_Cleanup(void)
 {
 	FreeLinear();
 
-	_mm_free(imfpat);
-	_mm_free(mh);
+	MikMod_free(imfpat);
+	MikMod_free(mh);
 }
 
 static BOOL IMF_ReadPattern(SLONG size,UWORD rows)
@@ -409,7 +409,7 @@ BOOL IMF_Load(BOOL curious)
 
 	/* set module variables */
 	of.songname=DupStr(mh->songname,31,1);
-	of.modtype=strdup(IMF_Version);
+	of.modtype=StrDup(IMF_Version);
 	of.numpat=mh->patnum;
 	of.numins=mh->insnum;
 	of.reppos=0;
@@ -542,8 +542,8 @@ BOOL IMF_Load(BOOL curious)
 		   instruments following a multi-sample instrument... */
 		if(memcmp(id,"II10",4) && 
 		   (oldnumsmp && memcmp(id,"\x0\x0\x0\x0",4))) {
-			if(nextwav) free(nextwav);
-			if(wh) free(wh);
+			if(nextwav) MikMod_free(nextwav);
+			if(wh) MikMod_free(wh);
 			_mm_errno=MMERR_LOADING_SAMPLEINFO;
 			return 0;
 		}
@@ -551,8 +551,8 @@ BOOL IMF_Load(BOOL curious)
 
 		if((ih.numsmp>16)||(ih.volpts>IMFENVCNT/2)||(ih.panpts>IMFENVCNT/2)||
 		   (ih.pitpts>IMFENVCNT/2)||(_mm_eof(modreader))) {
-			if(nextwav) free(nextwav);
-			if(wh) free(wh);
+			if(nextwav) MikMod_free(nextwav);
+			if(wh) MikMod_free(wh);
 			_mm_errno=MMERR_LOADING_SAMPLEINFO;
 			return 0;
 		}
@@ -612,13 +612,13 @@ BOOL IMF_Load(BOOL curious)
 			/* allocate more room for sample information if necessary */
 			if(of.numsmp+u==wavcnt) {
 				wavcnt+=IMF_SMPINCR;
-				if(!(nextwav=realloc(nextwav,wavcnt*sizeof(ULONG)))) {
-					if(wh) free(wh);
+				if(!(nextwav=MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))) {
+					if(wh) MikMod_free(wh);
 					_mm_errno=MMERR_OUT_OF_MEMORY;
 					return 0;
 				}
-				if(!(wh=realloc(wh,wavcnt*sizeof(IMFWAVHEADER)))) {
-					free(nextwav);
+				if(!(wh=MikMod_realloc(wh,wavcnt*sizeof(IMFWAVHEADER)))) {
+					MikMod_free(nextwav);
 					_mm_errno=MMERR_OUT_OF_MEMORY;
 					return 0;
 				}
@@ -639,7 +639,7 @@ BOOL IMF_Load(BOOL curious)
 			_mm_read_UBYTES(id,4,modreader);
 			if(((memcmp(id,"IS10",4))&&(memcmp(id,"IW10",4)))||
 			   (_mm_eof(modreader))) {
-				free(nextwav);free(wh);
+				MikMod_free(nextwav);MikMod_free(wh);
 				_mm_errno=MMERR_LOADING_SAMPLEINFO;
 				return 0;
 			}
@@ -653,19 +653,19 @@ BOOL IMF_Load(BOOL curious)
 
 	/* sanity check */
 	if(!of.numsmp) {
-		if(nextwav) free(nextwav);
-		if(wh) free(wh);
+		if(nextwav) MikMod_free(nextwav);
+		if(wh) MikMod_free(wh);
 		_mm_errno=MMERR_LOADING_SAMPLEINFO;
 		return 0;
 	}
 
 	/* load samples */
 	if(!AllocSamples()) {
-		free(nextwav);free(wh);
+		MikMod_free(nextwav);MikMod_free(wh);
 		return 0;
 	}
 	if(!AllocLinear()) {
-		free(nextwav);free(wh);
+		MikMod_free(nextwav);MikMod_free(wh);
 		return 0;
 	}
 	q=of.samples;
@@ -708,7 +708,7 @@ BOOL IMF_Load(BOOL curious)
 		}
 	}
 
-	free(wh);free(nextwav);
+	MikMod_free(wh);MikMod_free(nextwav);
 	return 1;
 }
 

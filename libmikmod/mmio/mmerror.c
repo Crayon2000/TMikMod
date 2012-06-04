@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mmerror.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   Error handling functions.
   Register an error handler with _mm_RegisterErrorHandler() and you're all set.
@@ -158,6 +158,22 @@ CHAR *_mm_errmsg[MMERR_MAX+1] =
 
 	"Unsupported sample rate",
 	"Could not start playback",
+
+/* MacOS X/Darwin driver errors */
+
+	"Unknown device",
+	"Bad property",
+	"Could not set playback format",
+	"Could not set mono/stereo setting",
+	"Could not create playback buffers",
+	"Could not create playback thread",
+	"Could not start audio device",
+	"Could not create buffer thread",
+
+/* DOS driver errors */
+
+	"WSS_STARTDMA",
+	"SB_STARTDMA",
 
 /* Invalid error */
 

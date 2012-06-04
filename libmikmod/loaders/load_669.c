@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_669.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   Composer 669 module loader
 
@@ -124,16 +124,16 @@ BOOL S69_Test(void)
 
 BOOL S69_Init(void)
 {
-	if(!(s69pat=(S69NOTE *)_mm_malloc(64*8*sizeof(S69NOTE)))) return 0;
-	if(!(mh=(S69HEADER *)_mm_malloc(sizeof(S69HEADER)))) return 0;
+	if(!(s69pat=(S69NOTE *)MikMod_malloc(64*8*sizeof(S69NOTE)))) return 0;
+	if(!(mh=(S69HEADER *)MikMod_malloc(sizeof(S69HEADER)))) return 0;
 
 	return 1;
 }
 
 void S69_Cleanup(void)
 {
-	_mm_free(s69pat);
-	_mm_free(mh);
+	MikMod_free(s69pat);
+	MikMod_free(mh);
 }
 
 static BOOL S69_LoadPatterns(void)
@@ -280,7 +280,7 @@ BOOL S69_Load(BOOL curious)
 	of.initspeed=4;
 	of.inittempo=78;
 	of.songname=DupStr(mh->message,36,1);
-	of.modtype=strdup(S69_Version[memcmp(mh->marker,"JN",2)==0]);
+	of.modtype=StrDup(S69_Version[memcmp(mh->marker,"JN",2)==0]);
 	of.numchn=8;
 	of.numpat=mh->nop;
 	of.numins=of.numsmp=mh->nos;
@@ -291,7 +291,7 @@ BOOL S69_Load(BOOL curious)
 	for(i=36+35;(i>=36+0)&&(mh->message[i]==' ');i--) mh->message[i]=0;
 	for(i=72+35;(i>=72+0)&&(mh->message[i]==' ');i--) mh->message[i]=0;
 	if((mh->message[0])||(mh->message[36])||(mh->message[72]))
-		if((of.comment=(CHAR*)_mm_malloc(3*(36+1)+1))) {
+		if((of.comment=(CHAR*)MikMod_malloc(3*(36+1)+1))) {
 			strncpy(of.comment,mh->message,36);
 			strcat(of.comment,"\r");
 			if (mh->message[36]) strncat(of.comment,mh->message+36,36);

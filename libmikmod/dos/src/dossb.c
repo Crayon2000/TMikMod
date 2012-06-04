@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: dossb.c,v 1.1 2004/02/01 02:01:17 raph Exp $
+  $Id$
 
   Sound Blaster I/O routines, common for SB8, SBPro and SB16
 

@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_win.c,v 1.2 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output on win32 platforms using the multimedia API
 
@@ -104,7 +104,7 @@ static BOOL WIN_Init(void)
 	wfe.wBitsPerSample=md_mode&DMODE_16BITS?16:8;
 	wfe.cbSize=sizeof(wfe);
 
-	mmr=waveOutOpen(&hwaveout,WAVE_MAPPER,&wfe,(DWORD)WIN_CallBack,0,CALLBACK_FUNCTION);
+	mmr=waveOutOpen(&hwaveout,WAVE_MAPPER,&wfe,(DWORD_PTR)WIN_CallBack,0,CALLBACK_FUNCTION);
 	if (mmr!=MMSYSERR_NOERROR) {
 		_mm_errno=WIN_GetError(mmr);
 		return 1;
@@ -113,7 +113,7 @@ static BOOL WIN_Init(void)
 	buffersize=md_mixfreq*samplesize*BUFFERSIZE/1000;
 
 	for (n=0;n<NUMBUFFERS;n++) {
-		buffer[n]=_mm_malloc(buffersize);
+		buffer[n]=MikMod_malloc(buffersize);
 		header[n].lpData=buffer[n];
 		header[n].dwBufferLength=buffersize;
 		mmr=waveOutPrepareHeader(hwaveout,&header[n],sizeof(WAVEHDR));
@@ -127,6 +127,11 @@ static BOOL WIN_Init(void)
 	}
 
 	md_mode|=DMODE_SOFT_MUSIC|DMODE_SOFT_SNDFX;
+	// This test only works on Windows XP or later
+	if (IsProcessorFeaturePresent(PF_XMMI64_INSTRUCTIONS_AVAILABLE))
+	{
+		md_mode|=DMODE_SIMDMIXER;
+	}
 	buffersout=nextbuffer=0;
 	return VC_Init();
 }
@@ -140,7 +145,7 @@ static void WIN_Exit(void)
 		for (n=0;n<NUMBUFFERS;n++) {
 			if (header[n].dwFlags&WHDR_PREPARED)
 				waveOutUnprepareHeader(hwaveout,&header[n],sizeof(WAVEHDR));
-			_mm_free(buffer[n]);
+			MikMod_free(buffer[n]);
 		}
 		while (waveOutClose(hwaveout)==WAVERR_STILLPLAYING) Sleep(10);
 		hwaveout=NULL;

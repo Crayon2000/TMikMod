@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_it.c,v 1.2 2004/02/06 19:29:03 raph Exp $
+  $Id$
 
   Impulse tracker (IT) module loader
 
@@ -192,11 +192,11 @@ BOOL IT_Test(void)
 
 BOOL IT_Init(void)
 {
-	if(!(mh=(ITHEADER*)_mm_malloc(sizeof(ITHEADER)))) return 0;
-	if(!(poslookup=(UBYTE*)_mm_malloc(256*sizeof(UBYTE)))) return 0;
-	if(!(itpat=(ITNOTE*)_mm_malloc(200*64*sizeof(ITNOTE)))) return 0;
-	if(!(mask=(UBYTE*)_mm_malloc(64*sizeof(UBYTE)))) return 0;
-	if(!(last=(ITNOTE*)_mm_malloc(64*sizeof(ITNOTE)))) return 0;
+	if(!(mh=(ITHEADER*)MikMod_malloc(sizeof(ITHEADER)))) return 0;
+	if(!(poslookup=(UBYTE*)MikMod_malloc(256*sizeof(UBYTE)))) return 0;
+	if(!(itpat=(ITNOTE*)MikMod_malloc(200*64*sizeof(ITNOTE)))) return 0;
+	if(!(mask=(UBYTE*)MikMod_malloc(64*sizeof(UBYTE)))) return 0;
+	if(!(last=(ITNOTE*)MikMod_malloc(64*sizeof(ITNOTE)))) return 0;
 
 	return 1;
 }
@@ -205,13 +205,13 @@ void IT_Cleanup(void)
 {
 	FreeLinear();
 
-	_mm_free(mh);
-	_mm_free(poslookup);
-	_mm_free(itpat);
-	_mm_free(mask);
-	_mm_free(last);
-	_mm_free(paraptr);
-	_mm_free(origpositions);
+	MikMod_free(mh);
+	MikMod_free(poslookup);
+	MikMod_free(itpat);
+	MikMod_free(mask);
+	MikMod_free(last);
+	MikMod_free(paraptr);
+	MikMod_free(origpositions);
 }
 
 /* Because so many IT files have 64 channels as the set number used, but really
@@ -506,11 +506,11 @@ BOOL IT_Load(BOOL curious)
 	/* 2.16 : IT 2.14p3 with resonant filters */
 	/* 2.15 : IT 2.14p3 (improved compression) */
 	if((mh->cwt<=0x219)&&(mh->cwt>=0x217))
-		of.modtype=strdup(IT_Version[mh->cmwt<0x214?4:5]);
+		of.modtype=StrDup(IT_Version[mh->cmwt<0x214?4:5]);
 	else if (mh->cwt>=0x215)
-		of.modtype=strdup(IT_Version[mh->cmwt<0x214?2:3]);
+		of.modtype=StrDup(IT_Version[mh->cmwt<0x214?2:3]);
 	else {
-		of.modtype     = strdup(IT_Version[mh->cmwt<0x214?0:1]);
+		of.modtype     = StrDup(IT_Version[mh->cmwt<0x214?0:1]);
 		of.modtype[mh->cmwt<0x214?15:26] = (mh->cwt>>8)+'0';
 		of.modtype[mh->cmwt<0x214?17:28] = ((mh->cwt>>4)&0xf)+'0';
 		of.modtype[mh->cmwt<0x214?18:29] = ((mh->cwt)&0xf)+'0';
@@ -550,7 +550,7 @@ BOOL IT_Load(BOOL curious)
 
 	/* read the order data */
 	if(!AllocPositions(mh->ordnum)) return 0;
-	if(!(origpositions=_mm_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
+	if(!(origpositions=MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
 
 	for(t=0;t<mh->ordnum;t++) {
 		origpositions[t]=_mm_read_UBYTE(modreader);
@@ -566,7 +566,7 @@ BOOL IT_Load(BOOL curious)
 	poslookupcnt=mh->ordnum;
 	S3MIT_CreateOrders(curious);
 
-	if(!(paraptr=(ULONG*)_mm_malloc((mh->insnum+mh->smpnum+of.numpat)*
+	if(!(paraptr=(ULONG*)MikMod_malloc((mh->insnum+mh->smpnum+of.numpat)*
 	                               sizeof(ULONG)))) return 0;
 
 	/* read the instrument, sample, and pattern parapointers */
@@ -743,6 +743,8 @@ BOOL IT_Load(BOOL curious)
 #define IT_LoadEnvelope(name,type) 										\
 				ih. name##flg   =_mm_read_UBYTE(modreader);				\
 				ih. name##pts   =_mm_read_UBYTE(modreader);				\
+				if (ih. name##pts > ITENVCNT)							\
+					ih. name##pts = ITENVCNT;							\
 				ih. name##beg   =_mm_read_UBYTE(modreader);				\
 				ih. name##end   =_mm_read_UBYTE(modreader);				\
 				ih. name##susbeg=_mm_read_UBYTE(modreader);				\
@@ -756,6 +758,8 @@ BOOL IT_Load(BOOL curious)
 #define IT_LoadEnvelope(name,type) 										\
 				ih. name/**/flg   =_mm_read_UBYTE(modreader);			\
 				ih. name/**/pts   =_mm_read_UBYTE(modreader);			\
+				if (ih. name/**/pts > ITENVCNT)							\
+					ih. name/**/pts = ITENVCNT;							\
 				ih. name/**/beg   =_mm_read_UBYTE(modreader);			\
 				ih. name/**/end   =_mm_read_UBYTE(modreader);			\
 				ih. name/**/susbeg=_mm_read_UBYTE(modreader);			\
@@ -862,6 +866,7 @@ BOOL IT_Load(BOOL curious)
 #endif
 
 				IT_ProcessEnvelope(vol);
+			
 				for(u=0;u<ih.volpts;u++)
 					d->volenv[u].val=(ih.volnode[u]<<2);
 

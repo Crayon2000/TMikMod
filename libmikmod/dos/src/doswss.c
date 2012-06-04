@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: doswss.c,v 1.1 2004/02/01 02:01:17 raph Exp $
+  $Id$
 
   Windows Sound System I/O routines (CS42XX, ESS18XX, GUS+DaughterBoard etc)
 

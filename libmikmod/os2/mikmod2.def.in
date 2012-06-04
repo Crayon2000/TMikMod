@@ -136,4 +136,5 @@ EXPORTS
 	VC_VoiceGetVolume				@160
 	VC_VoiceGetFrequency				@161
 	VC_VoiceGetPanning				@162
+	VC_SetCallback					@163
 

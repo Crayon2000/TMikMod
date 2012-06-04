@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_uni.c,v 1.2 2004/02/06 19:29:03 raph Exp $
+  $Id$
 
   UNIMOD (libmikmod's and APlayer's internal module format) loader
 
@@ -101,7 +101,7 @@ static char* readstring(void)
 	
 	len=_mm_read_I_UWORD(modreader);
 	if(len) {
-		s=_mm_malloc(len+1);
+		s=MikMod_malloc(len+1);
 		_mm_read_UBYTES(s,len,modreader);
 		s[len]=0;
 	}
@@ -132,7 +132,7 @@ BOOL UNI_Init(void)
 
 void UNI_Cleanup(void)
 {
-	_mm_free(wh);
+	MikMod_free(wh);
 	s=NULL;
 }
 
@@ -148,7 +148,7 @@ static UBYTE* readtrack(void)
 		len=_mm_read_I_UWORD(modreader);
 
 	if(!len) return NULL;
-	if(!(t=_mm_malloc(len))) return NULL;
+	if(!(t=MikMod_malloc(len))) return NULL;
 	_mm_read_UBYTES(t,len,modreader);
 
 	/* Check if the track is correct */
@@ -160,7 +160,7 @@ static UBYTE* readtrack(void)
 			int opcode,oplen;
 
 			if(cur>=len) {
-				free(t);
+				MikMod_free(t);
 				return NULL;
 			}
 			opcode=t[cur];
@@ -168,7 +168,7 @@ static UBYTE* readtrack(void)
 			/* Remap opcodes */
 			if (universion <= 5) {
 				if (opcode > 29) {
-					free(t);
+					MikMod_free(t);
 					return NULL;
 				}
 				switch (opcode) {
@@ -202,7 +202,7 @@ static UBYTE* readtrack(void)
 			}
 
 			if((!opcode)||(opcode>=UNI_LAST)) {
-				free(t);
+				MikMod_free(t);
 				return NULL;
 			}
 			t[cur]=opcode;
@@ -211,7 +211,7 @@ static UBYTE* readtrack(void)
 			chunk-=oplen;
 		}
 		if((chunk<0)||(cur>=len)) {
-			free(t);
+			MikMod_free(t);
 			return NULL;
 		}
 	}
@@ -415,7 +415,7 @@ static BOOL loadinstr5(void)
 			/* Allocate more room for sample information if necessary */
 			if(of.numsmp+u==wavcnt) {
 				wavcnt+=UNI_SMPINCR;
-				if(!(wh=realloc(wh,wavcnt*sizeof(UNISMP05)))) {
+				if(!(wh=MikMod_realloc(wh,wavcnt*sizeof(UNISMP05)))) {
 					_mm_errno=MMERR_OUT_OF_MEMORY;
 					return 0;
 				}
@@ -438,7 +438,7 @@ static BOOL loadinstr5(void)
 			s->vibrate =vibrate;
 
 			if(_mm_eof(modreader)) {
-				free(wh);wh=NULL;
+				MikMod_free(wh);wh=NULL;
 				_mm_errno=MMERR_LOADING_SAMPLEINFO;
 				return 0;
 			}
@@ -447,7 +447,7 @@ static BOOL loadinstr5(void)
 
 	/* sanity check */
 	if(!of.numsmp) {
-		if(wh) { free(wh);wh=NULL; }
+		if(wh) { MikMod_free(wh);wh=NULL; }
 		_mm_errno=MMERR_LOADING_SAMPLEINFO;
 		return 0;
 	}
@@ -493,7 +493,7 @@ static BOOL loadsmp5(void)
 			d->samplenote[t]=(d->samplenumber[t]>=of.numsmp)?
 			  255:(t+s[d->samplenumber[t]].transpose);
 
-	free(wh);wh=NULL;
+	MikMod_free(wh);wh=NULL;
 
 	return 1;
 }
@@ -576,23 +576,23 @@ BOOL UNI_Load(BOOL curious)
 	if(universion<0x102)
 		oldtype=readstring();
 	if(oldtype) {
-		int len=strlen(oldtype)+20;
-		if(!(modtype=_mm_malloc(len))) return 0;
+		size_t len=strlen(oldtype)+20;
+		if(!(modtype=MikMod_malloc(len))) return 0;
 #ifdef HAVE_SNPRINTF
 		snprintf(modtype,len,"%s (was %s)",(universion>=0x100)?"APlayer":"MikCvt2",oldtype);
 #else
 		sprintf(modtype,"%s (was %s)",(universion>=0x100)?"APlayer":"MikCvt2",oldtype);
 #endif
 	} else {
-		if(!(modtype=_mm_malloc(10))) return 0;
+		if(!(modtype=MikMod_malloc(10))) return 0;
 #ifdef HAVE_SNPRINTF
 		snprintf(modtype,10,"%s",(universion>=0x100)?"APlayer":"MikCvt3");
 #else
 		sprintf(modtype,"%s",(universion>=0x100)?"APlayer":"MikCvt3");
 #endif
 	}
-	of.modtype=strdup(modtype);
-	free(modtype);free(oldtype);
+	of.modtype=StrDup(modtype);
+	MikMod_free(modtype);MikMod_free(oldtype);
 	of.comment=readstring();
 
 	if(universion>=6) {
@@ -641,7 +641,7 @@ BOOL UNI_Load(BOOL curious)
 		if(!AllocInstruments()) return 0;
 		if(!loadinstr5()) return 0;
 		if(!AllocSamples()) {
-			if(wh) { free(wh);wh=NULL; }
+			if(wh) { MikMod_free(wh);wh=NULL; }
 			return 0;
 		}
 		if(!loadsmp5()) return 0;

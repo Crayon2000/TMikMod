@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_ultra.c,v 1.4 2004/02/05 17:34:49 raph Exp $
+  $Id$
 
   Driver for Gravis Ultrasound cards using libGUS.
   A subset of libGUS is provided for DOS/DJGPP and OS/2
@@ -270,12 +270,12 @@ static void Ultra_CommandLine(CHAR *cmdline)
 		
 		if (buf >= 0 && buf <= 8)
 			ultra_dev = buf;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 #ifdef __DJGPP__
 	if ((ptr = MD_GetAtom("dma", cmdline, 0))) {
 		gus_dma_usage (atoi(ptr));
-		free(ptr);
+		MikMod_free(ptr);
 	}
 #endif
 }
@@ -297,7 +297,7 @@ static BOOL Ultra_IsThere(void)
 }
 
 /* Load a new sample directly into GUS DRAM and return a handle */
-static SWORD Ultra_SampleLoad(struct SAMPLOAD *sload)
+static SWORD Ultra_SampleLoad(struct SAMPLOAD *sload, int type)
 {
 	int handle;
 	SAMPLE *s = sload->sample;
@@ -337,13 +337,13 @@ static SWORD Ultra_SampleLoad(struct SAMPLOAD *sload)
 	}
 
 	/* Load sample into normal memory */
-	if (!(buffer = _mm_malloc(length))) {
+	if (!(buffer = MikMod_malloc(length))) {
 		_mm_errno = MMERR_SAMPLE_TOO_BIG;
 		return -1;
 	}
 
 	if (SL_Load(buffer, sload, s->length)) {
-		free(buffer);
+		MikMod_free(buffer);
 		return -1;
 	}
 
@@ -372,12 +372,12 @@ static SWORD Ultra_SampleLoad(struct SAMPLOAD *sload)
 
 	/* Download the sample to GUS RAM */
 	if (libgus_memory_alloc(&instrument)) {
-		free(buffer);
+		MikMod_free(buffer);
 		_mm_errno = MMERR_SAMPLE_TOO_BIG;
 		return -1;
 	}
 
-	free(buffer);
+	MikMod_free(buffer);
 	return handle;
 }
 
@@ -397,14 +397,14 @@ static void Ultra_SampleUnload(SWORD handle)
 }
 
 /* Reports available sample space */
-static ULONG Ultra_SampleSpace(void)
+static ULONG Ultra_SampleSpace(int type)
 {
 	libgus_memory_pack();
 	return (libgus_memory_free_size());
 }
 
 /* Reports the size of a sample */
-static ULONG Ultra_SampleLength(SAMPLE *s)
+static ULONG Ultra_SampleLength(int type, SAMPLE *s)
 {
 	if (!s)
 		return 0;

@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_med.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   Amiga MED module loader
 
@@ -172,23 +172,23 @@ BOOL MED_Test(void)
 
 BOOL MED_Init(void)
 {
-	if (!(me = (MEDEXP *)_mm_malloc(sizeof(MEDEXP))))
+	if (!(me = (MEDEXP *)MikMod_malloc(sizeof(MEDEXP))))
 		return 0;
-	if (!(mh = (MEDHEADER *)_mm_malloc(sizeof(MEDHEADER))))
+	if (!(mh = (MEDHEADER *)MikMod_malloc(sizeof(MEDHEADER))))
 		return 0;
-	if (!(ms = (MEDSONG *)_mm_malloc(sizeof(MEDSONG))))
+	if (!(ms = (MEDSONG *)MikMod_malloc(sizeof(MEDSONG))))
 		return 0;
 	return 1;
 }
 
 void MED_Cleanup(void)
 {
-	_mm_free(me);
-	_mm_free(mh);
-	_mm_free(ms);
-	_mm_free(ba);
-	_mm_free(mmd0pat);
-	_mm_free(mmd1pat);
+	MikMod_free(me);
+	MikMod_free(mh);
+	MikMod_free(ms);
+	MikMod_free(ba);
+	MikMod_free(mmd0pat);
+	MikMod_free(mmd1pat);
 }
 
 static void EffectCvt(UBYTE eff, UBYTE dat)
@@ -348,7 +348,7 @@ static BOOL LoadMEDPatterns(void)
 
 	if (!
 		(mmd0pat =
-		 (MMD0NOTE *)_mm_calloc(of.numchn * (maxlines + 1),
+		 (MMD0NOTE *)MikMod_calloc(of.numchn * (maxlines + 1),
 								sizeof(MMD0NOTE)))) return 0;
 
 	/* second read: read and convert patterns */
@@ -398,7 +398,7 @@ static BOOL LoadMMD1Patterns(void)
 
 	if (!
 		(mmd1pat =
-		 (MMD1NOTE *)_mm_calloc(of.numchn * (maxlines + 1),
+		 (MMD1NOTE *)MikMod_calloc(of.numchn * (maxlines + 1),
 								sizeof(MMD1NOTE)))) return 0;
 
 	/* second read: really read and convert patterns */
@@ -515,7 +515,7 @@ BOOL MED_Load(BOOL curious)
 	}
 
 	/* alloc and read the blockpointer array */
-	if (!(ba = (ULONG *)_mm_calloc(ms->numblocks, sizeof(ULONG))))
+	if (!(ba = (ULONG *)MikMod_calloc(ms->numblocks, sizeof(ULONG))))
 		return 0;
 	_mm_fseek(modreader, mh->MEDBlockPP, SEEK_SET);
 	if (!_mm_read_M_ULONGS(ba, ms->numblocks, modreader)) {
@@ -571,7 +571,7 @@ BOOL MED_Load(BOOL curious)
 		of.flags |= UF_HIGHBPM;
 	}
 	MED_Version[12] = mh->id;
-	of.modtype = strdup(MED_Version);
+	of.modtype = StrDup(MED_Version);
 	of.numchn = 0;				/* will be counted later */
 	of.numpat = ms->numblocks;
 	of.numpos = ms->songlen;
@@ -582,10 +582,10 @@ BOOL MED_Load(BOOL curious)
 		char *name;
 
 		_mm_fseek(modreader, me->songname, SEEK_SET);
-		name = _mm_malloc(me->songnamelen);
+		name = MikMod_malloc(me->songnamelen);
 		_mm_read_UBYTES(name, me->songnamelen, modreader);
 		of.songname = DupStr(name, me->songnamelen, 1);
-		free(name);
+		MikMod_free(name);
 	} else
 		of.songname = DupStr(NULL, 0, 0);
 	if ((mh->MEDEXPP) && (me->annotxt) && (me->annolen)) {
@@ -694,10 +694,10 @@ CHAR *MED_LoadTitle(void)
 		namelen = _mm_read_M_ULONG(modreader);
 
 		_mm_fseek(modreader, posit, SEEK_SET);
-		name = _mm_malloc(namelen);
+		name = MikMod_malloc(namelen);
 		_mm_read_UBYTES(name, namelen, modreader);
 		retvalue = DupStr(name, namelen, 1);
-		free(name);
+		MikMod_free(name);
 	}
 
 	return retvalue;

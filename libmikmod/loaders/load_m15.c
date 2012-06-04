@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_m15.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   15 instrument MOD loader
   Also supports Ultimate Sound Tracker (old M15 format)
@@ -242,14 +242,14 @@ static BOOL M15_Test(void)
 
 static BOOL M15_Init(void)
 {
-	if(!(mh=(MODULEHEADER*)_mm_malloc(sizeof(MODULEHEADER)))) return 0;
+	if(!(mh=(MODULEHEADER*)MikMod_malloc(sizeof(MODULEHEADER)))) return 0;
 	return 1;
 }
 
 static void M15_Cleanup(void)
 {
-	_mm_free(mh);
-	_mm_free(patbuf);
+	MikMod_free(mh);
+	MikMod_free(patbuf);
 }
 
 /*
@@ -378,7 +378,7 @@ static BOOL M15_LoadPatterns(void)
 	if(!AllocTracks()) return 0;
 
 	/* Allocate temporary buffer for loading and converting the patterns */
-	if(!(patbuf=(MODNOTE*)_mm_calloc(64U*4,sizeof(MODNOTE)))) return 0;
+	if(!(patbuf=(MODNOTE*)MikMod_calloc(64U*4,sizeof(MODNOTE)))) return 0;
 
 	for(t=0;t<of.numpat;t++) {
 		/* Load the pattern into the temp buffer and convert it */
@@ -408,9 +408,9 @@ static BOOL M15_Load(BOOL curious)
 	}
 
 	if(ust_loader)
-		of.modtype = strdup("Ultimate Soundtracker");
+		of.modtype = StrDup("Ultimate Soundtracker");
 	else
-		of.modtype = strdup("Soundtracker");
+		of.modtype = StrDup("Soundtracker");
 
 	/* set module variables */
 	of.initspeed = 6;

@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: munitrk.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   All routines dealing with the manipulation of UNITRK streams
 
@@ -207,9 +207,9 @@ static BOOL UniExpand(int wanted)
 		UBYTE *newbuf;
 
 		/* Expand the buffer by BUFPAGE bytes */
-		newbuf=(UBYTE*)realloc(unibuf,(unimax+BUFPAGE)*sizeof(UBYTE));
+		newbuf=(UBYTE*)MikMod_realloc(unibuf,(unimax+BUFPAGE)*sizeof(UBYTE));
 
-		/* Check if realloc succeeded */
+		/* Check if MikMod_realloc succeeded */
 		if(newbuf) {
 			unibuf = newbuf;
 			unimax+=BUFPAGE;
@@ -280,7 +280,7 @@ UBYTE* UniDup(void)
 	if (!UniExpand(unitt-unipc)) return NULL;
 	unibuf[unitt] = 0;
 
-	if(!(d=(UBYTE *)_mm_malloc(unipc))) return NULL;
+	if(!(d=(UBYTE *)MikMod_malloc(unipc))) return NULL;
 	memcpy(d,unibuf,unipc);
 
 	return d;
@@ -290,13 +290,13 @@ BOOL UniInit(void)
 {
 	unimax = BUFPAGE;
 
-	if(!(unibuf=(UBYTE*)_mm_malloc(unimax*sizeof(UBYTE)))) return 0;
+	if(!(unibuf=(UBYTE*)MikMod_malloc(unimax*sizeof(UBYTE)))) return 0;
 	return 1;
 }
 
 void UniCleanup(void)
 {
-	if(unibuf) free(unibuf);
+	if(unibuf) MikMod_free(unibuf);
 	unibuf = NULL;
 }
 

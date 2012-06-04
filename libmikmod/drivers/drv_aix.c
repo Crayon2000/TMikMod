@@ -20,7 +20,7 @@
   
 /*==============================================================================
 
-  $Id: drv_aix.c,v 1.2 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output to AIX series audio device
 
@@ -65,7 +65,7 @@ static void AIX_CommandLine(CHAR *cmdline)
 		if((buf<12)||(buf>19)) buf=BUFFERSIZE;
 		buffersize=1<<buf;
 
-		free(buffer);
+		MikMod_free(buffer);
 	}
 }
 
@@ -139,7 +139,7 @@ static BOOL AIX_Init(void)
 		return 1;
 	}
 	
-	if (!(audiobuffer=(SBYTE*)_mm_malloc(buffersize))) return 1;
+	if (!(audiobuffer=(SBYTE*)MikMod_malloc(buffersize))) return 1;
 	
 	return VC_Init();
 }
@@ -151,7 +151,7 @@ static void AIX_Exit(void)
 		close(fd);
 		fd=-1;
 	}
-	_mm_free(audiobuffer);
+	MikMod_free(audiobuffer);
 }
 
 static void AIX_Update(void)

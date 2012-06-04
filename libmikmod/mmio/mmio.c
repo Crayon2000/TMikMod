@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mmio.c,v 1.2 2004/02/06 19:29:05 raph Exp $
+  $Id$
 
   Portable file I/O routines
 
@@ -43,15 +43,6 @@
 
 */
 
-/* FIXME
-	the _mm_iobase variable ought to be MREADER-specific. It will eventually
-	become a private field of the MREADER structure, but this will require a
-	soname version bump.
-
-	In the meantime, the drawback is that if you use the xxx_LoadFP functions,
-	you can't have several MREADER objects with different iobase values.
-*/
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -63,6 +54,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "mikmod.h"
 #include "mikmod_internals.h"
 
 #ifdef SUNOS
@@ -76,7 +68,14 @@ extern size_t fwrite(const void *, size_t, size_t, FILE *);
 
 #define COPY_BUFSIZE  1024
 
-static long _mm_iobase=0,temp_iobase=0;
+/* some prototypes */
+static BOOL _mm_MemReader_Eof(MREADER* reader);
+static BOOL _mm_MemReader_Read(MREADER* reader,void* ptr,size_t size);
+static int _mm_MemReader_Get(MREADER* reader);
+static BOOL _mm_MemReader_Seek(MREADER* reader,long offset,int whence);
+static long _mm_MemReader_Tell(MREADER* reader);
+
+//static long _mm_iobase=0,temp_iobase=0;
 
 FILE* _mm_fopen(CHAR* fname,CHAR* attrib)
 {
@@ -104,17 +103,17 @@ int _mm_fclose(FILE *fp)
 	return fclose(fp);
 }
 
-/* Sets the current file-position as the new _mm_iobase */
+/* Sets the current file-position as the new iobase */
 void _mm_iobase_setcur(MREADER* reader)
 {
-	temp_iobase=_mm_iobase;  /* store old value in case of revert */
-	_mm_iobase=reader->Tell(reader);
+	reader->prev_iobase=reader->iobase;  /* store old value in case of revert */
+	reader->iobase=reader->Tell(reader);
 }
 
-/* Reverts to the last known _mm_iobase value. */
-void _mm_iobase_revert(void)
+/* Reverts to the last known iobase value. */
+void _mm_iobase_revert(MREADER* reader)
 {
-	_mm_iobase=temp_iobase;
+	reader->iobase=reader->prev_iobase;
 }
 
 /*========== File Reader */
@@ -131,7 +130,7 @@ static BOOL _mm_FileReader_Eof(MREADER* reader)
 
 static BOOL _mm_FileReader_Read(MREADER* reader,void* ptr,size_t size)
 {
-	return fread(ptr,size,1,((MFILEREADER*)reader)->file);
+	return !!fread(ptr,size,1,((MFILEREADER*)reader)->file);
 }
 
 static int _mm_FileReader_Get(MREADER* reader)
@@ -142,17 +141,17 @@ static int _mm_FileReader_Get(MREADER* reader)
 static BOOL _mm_FileReader_Seek(MREADER* reader,long offset,int whence)
 {
 	return fseek(((MFILEREADER*)reader)->file,
-				 (whence==SEEK_SET)?offset+_mm_iobase:offset,whence);
+				 (whence==SEEK_SET)?offset+reader->iobase:offset,whence);
 }
 
 static long _mm_FileReader_Tell(MREADER* reader)
 {
-	return ftell(((MFILEREADER*)reader)->file)-_mm_iobase;
+	return ftell(((MFILEREADER*)reader)->file)-reader->iobase;
 }
 
 MREADER *_mm_new_file_reader(FILE* fp)
 {
-	MFILEREADER* reader=(MFILEREADER*)_mm_malloc(sizeof(MFILEREADER));
+	MFILEREADER* reader=(MFILEREADER*)MikMod_malloc(sizeof(MFILEREADER));
 	if (reader) {
 		reader->core.Eof =&_mm_FileReader_Eof;
 		reader->core.Read=&_mm_FileReader_Read;
@@ -166,7 +165,7 @@ MREADER *_mm_new_file_reader(FILE* fp)
 
 void _mm_delete_file_reader (MREADER* reader)
 {
-	if(reader) free(reader);
+	if(reader) MikMod_free(reader);
 }
 
 /*========== File Writer */
@@ -198,7 +197,7 @@ static BOOL _mm_FileWriter_Put(MWRITER* writer,int value)
 
 MWRITER *_mm_new_file_writer(FILE* fp)
 {
-	MFILEWRITER* writer=(MFILEWRITER*)_mm_malloc(sizeof(MFILEWRITER));
+	MFILEWRITER* writer=(MFILEWRITER*)MikMod_malloc(sizeof(MFILEWRITER));
 	if (writer) {
 		writer->core.Seek =&_mm_FileWriter_Seek;
 		writer->core.Tell =&_mm_FileWriter_Tell;
@@ -211,7 +210,121 @@ MWRITER *_mm_new_file_writer(FILE* fp)
 
 void _mm_delete_file_writer (MWRITER* writer)
 {
-	if(writer) free (writer);
+	if(writer) MikMod_free (writer);
+}
+
+/*========== Memory Reader */
+
+
+typedef struct MMEMREADER {
+	MREADER core;
+	const void *buffer;
+	long len;
+	long pos;
+} MMEMREADER;
+
+void _mm_delete_mem_reader(MREADER* reader)
+{
+	if (reader) { MikMod_free(reader); }
+}
+
+MREADER *_mm_new_mem_reader(const void *buffer, int len)
+{
+	MMEMREADER* reader=(MMEMREADER*)MikMod_malloc(sizeof(MMEMREADER));
+	if (reader)
+	{
+		reader->core.Eof =&_mm_MemReader_Eof;
+		reader->core.Read=&_mm_MemReader_Read;
+		reader->core.Get =&_mm_MemReader_Get;
+		reader->core.Seek=&_mm_MemReader_Seek;
+		reader->core.Tell=&_mm_MemReader_Tell;
+		reader->buffer = buffer;
+		reader->len = len;
+		reader->pos = 0;
+	}
+	return (MREADER*)reader;
+}
+
+static BOOL _mm_MemReader_Eof(MREADER* reader)
+{
+	if (!reader) { return 1; }
+	if ( ((MMEMREADER*)reader)->pos > ((MMEMREADER*)reader)->len ) { 
+		return 1; 
+	}
+	return 0;
+}
+
+static BOOL _mm_MemReader_Read(MREADER* reader,void* ptr,size_t size)
+{
+	unsigned char *d=ptr;
+	const unsigned char *s;
+	
+	if (!reader) { return 0; }
+
+	if (reader->Eof(reader)) { return 0; }
+
+	s = ((MMEMREADER*)reader)->buffer;
+	s += ((MMEMREADER*)reader)->pos;
+
+	if ( ((MMEMREADER*)reader)->pos + size > ((MMEMREADER*)reader)->len) 
+	{
+		((MMEMREADER*)reader)->pos = ((MMEMREADER*)reader)->len;
+		return 0; /* not enough remaining bytes */
+	}
+
+	((MMEMREADER*)reader)->pos += (long)size;
+
+	while (size--)
+	{
+		*d = *s;
+		s++;
+		d++;	
+	}
+	
+	return 1;
+}
+
+static int _mm_MemReader_Get(MREADER* reader)
+{
+	int pos;
+
+	if (reader->Eof(reader)) { return 0; }
+	
+	pos = ((MMEMREADER*)reader)->pos;
+	((MMEMREADER*)reader)->pos++;
+
+	return ((unsigned char*)(((MMEMREADER*)reader)->buffer))[pos];
+}
+
+static BOOL _mm_MemReader_Seek(MREADER* reader,long offset,int whence)
+{
+	if (!reader) { return -1; }
+	
+	switch(whence)
+	{
+		case SEEK_CUR:
+			((MMEMREADER*)reader)->pos += offset;
+			break;
+		case SEEK_SET:
+			((MMEMREADER*)reader)->pos = offset;
+			break;
+		case SEEK_END:
+			((MMEMREADER*)reader)->pos = ((MMEMREADER*)reader)->len - offset - 1;
+			break;
+	}
+	if ( ((MMEMREADER*)reader)->pos < 0) { ((MMEMREADER*)reader)->pos = 0; }
+	if ( ((MMEMREADER*)reader)->pos > ((MMEMREADER*)reader)->len ) { 
+		((MMEMREADER*)reader)->pos = ((MMEMREADER*)reader)->len;
+	}
+	return 0;
+}
+
+static long _mm_MemReader_Tell(MREADER* reader)
+{
+	if (reader) {
+		return ((MMEMREADER*)reader)->pos;
+	}
+	return 0;
 }
 
 /*========== Write functions */

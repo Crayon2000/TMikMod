@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  $Id: dl_hpux.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   simple dlopen()-like implementation above HP-UX shl_xxx() API
 
@@ -41,7 +41,7 @@ void *dlopen(const char *name, int flags)
 		(flags & RTLD_LAZY ? BIND_DEFERRED : BIND_IMMEDIATE) | DYNAMIC_PATH,
 	    0L);
 
-	free(library);
+	MikMod_free(library);
 
 	return (void *)handle;
 }

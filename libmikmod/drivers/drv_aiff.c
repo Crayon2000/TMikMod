@@ -21,7 +21,7 @@
 
 /*==============================================================================
 
-  $Id: drv_aiff.c,v 1.4 2004/02/20 22:08:33 raph Exp $
+  $Id$
 
   Driver for output to a file called MUSIC.AIFF [or .AIF on Windows].
 
@@ -217,7 +217,7 @@ static void	AIFF_CommandLine (CHAR *theCmdLine)
 
     if (myFileName != NULL)
     {
-        _mm_free (gAiffFileName);
+        MikMod_free (gAiffFileName);
         gAiffFileName = myFileName;
     }
 }
@@ -256,7 +256,7 @@ static BOOL	AIFF_Init (void)
         return (1);
     }
 
-    if (!(gAiffAudioBuffer = (SBYTE*) _mm_malloc (AIFF_BUFFERSIZE)))
+    if (!(gAiffAudioBuffer = (SBYTE*) MikMod_malloc (AIFF_BUFFERSIZE)))
     {
         _mm_delete_file_writer (gAiffOut);
         fclose (gAiffFile);

@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl
-dnl $Id: configure.in,v 1.20 2004/02/20 22:08:30 raph Exp $
+dnl $Id$
 
 AC_INIT(include/mikmod.h.in)
 
@@ -9,11 +9,11 @@ LIBMIKMOD_MINOR_VERSION=2
 LIBMIKMOD_MICRO_VERSION=0
 
 # bn where n is the beta
-BETA=b2
+BETA=''
 # used for #if in header files
-IS_BETA=1
+IS_BETA=0
 # used when a numeric beta number is required.
-BETA_RELEASE=2  # beta 1
+BETA_RELEASE=0  # No beta
 
 LIBMIKMOD_VERSION=$LIBMIKMOD_MAJOR_VERSION.$LIBMIKMOD_MINOR_VERSION.$LIBMIKMOD_MICRO_VERSION$BETA
 
@@ -28,7 +28,7 @@ SPEC_PRERELEASE=-beta2
 AM_INIT_AUTOMAKE(libmikmod,$LIBMIKMOD_VERSION)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
-
+AC_CONFIG_MACRO_DIR([m4])
 # ==============================================================
 # libmikmod specific control variables and their default values.
 # ==============================================================
@@ -36,7 +36,7 @@ AM_MAINTAINER_MODE
 libmikmod_driver_af=yes
 libmikmod_driver_aix=no
 libmikmod_driver_alsa=yes
-libmikmod_driver_esd=yes
+libmikmod_driver_nas=no
 libmikmod_driver_hp=no
 libmikmod_driver_oss=yes
 libmikmod_driver_sam9407=yes
@@ -51,6 +51,7 @@ libmikmod_dynload=yes
 libmikmod_dynload_underscores=no
 libmikmod_debug=no
 libmikmod_threads=yes
+libmikmod_altivec=yes
 
 DLOBJS=""
 
@@ -77,13 +78,13 @@ else
   libmikmod_driver_alsa=no
 fi])
 
-AC_ARG_ENABLE(esd,
-[  --enable-esd            include Enlightened sound daemon driver [guessed]],
+AC_ARG_ENABLE(nas,         
+[  --enable-nas            include the Network Audio System driver [default=no]],
 [if test "$enableval" = "yes"
 then
-  libmikmod_driver_esd=yes
+  libmikmod_driver_nas=yes
 else
-  libmikmod_driver_esd=no
+  libmikmod_driver_nas=no
 fi])
 
 AC_ARG_ENABLE(oss,
@@ -96,7 +97,7 @@ else
 fi])
 
 AC_ARG_ENABLE(osx,
-[  --enable-osx            include OSX driver [guessed]],
+[  --enable-osx            Darwin only: include OSX driver [guessed]],
 [if test "$enableval" = "yes"
 then
   libmikmod_driver_osx=yes
@@ -105,7 +106,7 @@ else
 fi])
 
 AC_ARG_ENABLE(mac,
-[  --enable-mac            include MAC carbon driver [default=no]],
+[  --enable-mac            Darwin only: include MAC carbon driver [default=no]],
 [if test "$enableval" = "yes"
 then
   libmikmod_driver_mac=yes
@@ -161,6 +162,15 @@ else
 	libmikmod_threads=no
 fi])
 
+AC_ARG_ENABLE(altivec,
+[  --enable-altivec        PowerPC only: include AltiVec optimizations [default=yes]],
+[if test "$enableval" = "yes"
+then
+  libmikmod_altivec=yes
+else
+  libmikmod_altivec=no
+fi])
+
 # ===================
 # Check for programs.
 # ===================
@@ -171,6 +181,7 @@ AC_PROG_LN_S
 AM_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
+AC_PATH_X
 
 # Check if makeinfo support html output. If it doesn't, pretend it's missing
 # rather than failing rebuilding the documentation.
@@ -296,35 +307,45 @@ fi
 if test "`uname`" = "Linux" && test $libmikmod_driver_alsa = yes
 then
 	libmikmod_driver_alsa=no
-	AC_CHECK_HEADERS(sys/asoundlib.h)
-	if test $ac_cv_header_sys_asoundlib_h = yes
+	AC_CHECK_HEADERS(alsa/asoundlib.h)
+	if test $ac_cv_header_alsa_asoundlib_h = yes
 	then
-		AC_CHECK_LIB(asound,snd_cards,libmikmod_driver_alsa=yes)
+		AC_CHECK_LIB(asound,snd_pcm_open,libmikmod_driver_alsa=yes)
 	fi
 else
 	libmikmod_driver_alsa=no
 fi
 
-# esd
+# nas
 # ---
-if test $libmikmod_driver_esd = yes
+if test $libmikmod_driver_nas = yes
 then
-	libmikmod_driver_esd=no
-	AM_PATH_ESD(0.2.6,libmikmod_driver_esd=yes)
-# We also need to know if esd is compiled with alsa support
-	if test $libmikmod_driver_esd = yes
+	libmikmod_driver_nas=no
+
+	AC_CHECK_HEADERS(audio/audiolib.h)
+	if test $ac_cv_header_audio_audiolib_h = yes
 	then
-		AC_CACHE_CHECK([if esd requires alsa],libmikmod_cv_esd_needs_alsa,
-		if (esd-config --libs 2>&1 |grep asound >/dev/null) 2>/dev/null
-		then
-			libmikmod_cv_esd_needs_alsa=yes
-		else
-			libmikmod_cv_esd_needs_alsa=no
-		fi)
-	else
-		libmikmod_cv_esd_needs_alsa=no
+		AC_CHECK_LIB(audio,AuCreateFlow,libmikmod_driver_nas=yes)		
+	fi
+	if test $libmikmod_driver_nas = no
+	then		
+		if test -r /usr/X11R6/include/audio/audiolib.h; then
+			libmikmod_driver_nas=yes
+			CFLAGS="$CFLAGS -I/usr/X11R6/include"
+			LIBRARY_LIB="$LIBRARY_LIB -L/usr/X11R6/lib" # note: -laudio is added later
+		fi
 	fi
 fi
+
+#if test $libmikmod_driver_nas = yes
+#then
+#	libmikmod_driver_nas=no
+#	AC_CHECK_HEADERS(audio/audiolib.h)
+#	if test $ac_cv_header_audio_audiolib_h = yes
+#	then
+#		AC_CHECK_LIB(audio,AuCreateFlow,libmikmod_driver_nas=yes)		
+#	fi
+#fi
 
 # sgi audio - IRIX only
 # ---------------------
@@ -394,6 +415,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_C_CONST
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
+AC_C_BIGENDIAN
 
 AC_CACHE_CHECK([if compiler understands the signed keyword],
 	libmikmod_cv_gcc_signed,
@@ -418,6 +440,7 @@ AC_REPLACE_FUNCS(strcasecmp strdup strstr)
 # Change extension, as we use libtool
 LIBOBJS="`echo $LIBOBJS|sed -e 's/\.o/\.lo/g'`"
 
+AC_CHECK_LIB([m],[floor],LIBRARY_LIB="-lm $LIBRARY_LIB")
 AC_HEADER_EGREP(srandom,math.h,AC_DEFINE(SRANDOM_IN_MATH_H))
 
 # ================
@@ -496,21 +519,11 @@ then
 	fi
 fi
 
-if test $libmikmod_driver_esd = yes
+if test $libmikmod_driver_nas = yes
 then
-	libmikmod_driverlist="$libmikmod_driverlist esd"
-	AC_DEFINE(DRV_ESD)
-	CFLAGS="$CFLAGS $ESD_CFLAGS"
-
-	# Under Solaris and perhaps other systems, we have to forward esd
-	# dependencies to libmikmod's dependency list.
-	# However, no need to keep libraries we won't require (libossaudio on BSD
-	# systems, libaudiofile, libasound on Linux)
-	if test $libmikmod_dynload != no
-	then
-		ESD_LIBS="`echo $ESD_LIBS|sed -e 's/-lesd//'|sed -e 's/-lasound//'|sed -e 's/-laudiofile//'|sed -e 's/-lossaudio//'`"
-	fi
-	LIBRARY_LIB="$ESD_LIBS $LIBRARY_LIB"
+	libmikmod_driverlist="nas $libmikmod_driverlist"
+	AC_DEFINE(DRV_NAS)	
+	LIBRARY_LIB="-laudio $LIBRARY_LIB"
 fi
 
 if test $libmikmod_driver_hp = yes
@@ -605,39 +618,6 @@ fi
 if test $libmikmod_dynload != no
 then
 	AC_DEFINE(MIKMOD_DYNAMIC)
-	if test "`uname`" = "Linux" && \
-	   test $libmikmod_cv_esd_needs_alsa = yes && \
-	   test $libmikmod_driver_esd = yes
-	then
-		# @#!$ libmikmod_dynloading esd requires us to define and make visible
-		# extra symbols (at least for 0.2.6 to 0.2.8)
-		AC_CACHE_CHECK([if libmikmod_dynloading esd causes problems],
-		libmikmod_cv_esd_broken,
-		libmikmod_oldlibs=$LIBS
-		LIBS="$LIBS $ESD_LIBS"
-		AC_TRY_LINK([
-#include <esd.h>
-extern void *handle;],
-		[void *p = handle;],
-		libmikmod_cv_esd_broken=no,libmikmod_cv_esd_broken=yes)
-		LIBS=$libmikmod_oldlibs)
-		if test $libmikmod_cv_esd_broken = yes
-		then
-			AC_DEFINE(MIKMOD_DYNAMIC_ESD_NEEDS_ALSA)
-			LIB_LDADD="$LIB_LDADD -rdynamic"
-			echo "
-*** This means your version of EsounD defines some public symbols,
-*** which should have been defined static or weak. The compiled
-*** libmikmod will try to take care of the problem, but you'll have to
-*** use the '-rdynamic' option when linking an application which uses
-*** libmikmod with gcc. If you use another compiler, or -rdynamic is not
-*** available on your platform, you might not be able to use libmikmod's
-*** EsounD driver.
-*** In this case, consider recompiling libmikmod specifying
-*** '--disable-dl' in the configure script options.
-" >&2
-		fi
-	fi
 
 	LIBRARY_LIB="$libmikmod_dllib $LIBRARY_LIB"
 	if test $libmikmod_dynload = sun
@@ -731,7 +711,27 @@ then
 		fi
 	fi
 fi
-		
+
+case `arch` in
+ppc|ppc64|powerpc|powerpc64)
+	AC_MSG_CHECKING(whether to use altivec)
+	if test x$libmikmod_altivec != xno
+	then
+		case `uname` in
+		Darwin)
+			dnl compile all Altivec functions, check at run-time
+			CFLAGS="$CFLAGS -faltivec -force_cpusubtype_ALL"
+			;;
+		Linux)
+			dnl force_cpusubtype_ALL not allowed for Linux as
+			CFLAGS="$CFLAGS -faltivec"
+			;;
+		esac
+	fi
+	AC_MSG_RESULT($libmikmod_altivec)
+	;;
+esac
+	
 # =================
 # Create Makefiles.
 # =================
@@ -775,8 +775,8 @@ macintosh/Makefile
 macintosh/mikmod.h
 macintosh/_libmikmodversion.r
 macosx/mikmod.h
-macosx/Info-Carbon_Framework.plist
-macosx/Info-CoreAudio_Framework.plist
+macosx/Info.plist
+macosx/InfoPlist.strings
 os2/Makefile
 dos/Makefile
 dos/include/Makefile

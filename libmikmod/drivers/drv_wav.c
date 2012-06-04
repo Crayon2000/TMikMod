@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_wav.c,v 1.3 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output to a file called MUSIC.WAV
 
@@ -55,7 +55,7 @@ static void putheader(void)
 {
 	_mm_fseek(wavout,0,SEEK_SET);
 	_mm_write_string("RIFF",wavout);
-	_mm_write_I_ULONG(dumpsize+44,wavout);
+	_mm_write_I_ULONG(dumpsize+44-8,wavout);	/* <AWE> must be smaller by 8! */
 	_mm_write_string("WAVEfmt ",wavout);
 	_mm_write_I_ULONG(16,wavout);	/* length of this RIFF block crap */
 
@@ -77,7 +77,7 @@ static void WAV_CommandLine(CHAR *cmdline)
 	CHAR *ptr=MD_GetAtom("file",cmdline,0);
 
 	if(ptr) {
-		_mm_free(filename);
+		MikMod_free(filename);
 		filename=ptr;
 	}
 }
@@ -105,7 +105,7 @@ static BOOL WAV_Init(void)
 		wavfile=NULL;
 		return 1;
 	}
-	if(!(audiobuffer=(SBYTE*)_mm_malloc(BUFFERSIZE))) {
+	if(!(audiobuffer=(SBYTE*)MikMod_malloc(BUFFERSIZE))) {
 		_mm_delete_file_writer(wavout);
 		fclose(wavfile);unlink(filename?filename:FILENAME);
 		wavfile=NULL;wavout=NULL;
@@ -138,7 +138,7 @@ static void WAV_Exit(void)
 		wavfile=NULL;wavout=NULL;
 	}
 	if(audiobuffer) {
-		free(audiobuffer);
+		MikMod_free(audiobuffer);
 		audiobuffer=NULL;
 	}
 }
@@ -148,7 +148,13 @@ static void WAV_Update(void)
 	ULONG done;
 
 	done=VC_WriteBytes(audiobuffer,BUFFERSIZE);
-	_mm_write_UBYTES(audiobuffer,done,wavout);
+
+/*    <AWE> Fix for 16bit samples on big endian systems:				*/
+/*	      Just swap bytes via "_mm_write_I_UWORDS ()" if we have 16 bit output.	*/
+        if (md_mode & DMODE_16BITS)		
+            _mm_write_I_UWORDS((UWORD *) audiobuffer,done>>1,wavout);       
+        else
+            _mm_write_UBYTES(audiobuffer,done,wavout);
 	dumpsize+=done;
 }
 

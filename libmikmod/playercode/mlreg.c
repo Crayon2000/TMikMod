@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mlreg.c,v 1.2 2004/01/28 00:49:56 raph Exp $
+  $Id$
 
   Routine for registering all loaders in libmikmod for the current platform.
 
@@ -40,6 +40,7 @@ void MikMod_RegisterAllLoaders_internal(void)
 	_mm_registerloader(&load_dsm);
 	_mm_registerloader(&load_far);
 	_mm_registerloader(&load_gdm);
+	_mm_registerloader(&load_gt2);
 	_mm_registerloader(&load_it);
 	_mm_registerloader(&load_imf);
 	_mm_registerloader(&load_mod);

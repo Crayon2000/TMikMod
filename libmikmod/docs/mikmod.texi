@@ -7,7 +7,7 @@
 
   MikMod Sound Library Documentation
 
-  $Id: mikmod.texi,v 1.2 2004/01/27 18:59:23 raph Exp $
+  $Id$
 
 @end ignore
 @c comment this during modifications
@@ -18,8 +18,8 @@
 
 @syncodeindex tp vr
 @set documentation-version 1.3
-@set documentation-date February 2004
-@set library-version 3.1.12
+@set documentation-date April 2004
+@set library-version 3.2.0
 @set authorname Miodrag Vallat
 @set authoraddress miod@@mikmod.org
 
@@ -1661,6 +1661,53 @@ This error occurs when the playback speed is not supported by the audio device.
 @item MMERR_MAC_START
 This error occurs when the MacOS driver can not start playback.
 @end table
+@ifnottex
+@subsection MaxOS X Driver Specific Errors
+@end ifnottex
+@iftex
+MacOS X Driver Specific Errors
+@end iftex
+@table @samp
+@item MMERR_OSX_UNKNOWN_DEVICE
+This error occurs if the default audio output device is not an audio device! If
+this happens, please contact the maintainer.
+@item MMERR_OSX_BAD_PROPERTY
+This error occurs...
+@item MMERR_OSX_UNSUPPORTED_FORMAT
+This error occurs when the detected audio device does not support
+the required format (Linear PCM).
+@item MMERR_OSX_SET_STEREO
+This error occurs...
+@item MMERR_OSX_BUFFER_ALLOC
+This error occurs if the driver fails to allocate the audio buffers.
+@item MMERR_OSX_ADD_IO_PROC
+This error occurs if the driver fails to add its Audio IO Proc.
+@item MMERR_OSX_DEVICE_START
+This error occurs if the driver fails to start the audio IO Proc.
+@item MMERR_OSX_PTHREAD
+This error occurs if the initialization of the mutex fails.
+@end table
+@ifnottex
+@subsection Dos ``Windows Sound System'' Driver Specific Errors 
+@end ifnottex
+@iftex
+Dos ``Windows Sound System'' Driver Specific Errors 
+@end iftex
+@table @samp
+@item MMERR_DOSWSS_STARTDMA
+This error occurs if the driver failed to start the cyclic DMA transfer.
+@end table
+@ifnottex
+@subsection Dos ``SoundBlaster'' Driver Specific Errors 
+@end ifnottex
+@iftex
+Dos ``SoundBlaster'' Driver Specific Errors 
+@end iftex
+@table @samp
+@item MMERR_DOSSB_STARTDMA
+This error occurs if the driver failed to start the cyclic DMA transfer.
+@end table
+
 
 @c ========================================================== Function reference
 @node Function Reference, Library Core Functions, Error Reference, Library Reference
@@ -1767,7 +1814,7 @@ This function returns a formatted list of the registered drivers in a buffer.
 @item Result
 A pointer to a text buffer, or @code{NULL} if no drivers are registered.
 @item Notes
-The buffer is created with @code{malloc}; the caller must free it when it is
+The buffer is created with @code{MikMod_malloc}; the caller must free it when it is
 no longer necessary.
 @item See also
 @code{MikMod_RegisterDriver}, @code{MikMod_RegisterAllDrivers}.
@@ -1785,7 +1832,7 @@ buffer.
 @item Result
 A pointer to a text buffer, or @code{NULL} if no loaders are registered.
 @item Notes
-The buffer is created with @code{malloc}; the caller must free it when it is
+The buffer is created with @code{MikMod_malloc}; the caller must free it when it is
 no longer necessary.
 @item See also
 @code{MikMod_RegisterLoader}, @code{MikMod_RegisterAllLoaders}.
@@ -2270,7 +2317,7 @@ The name of the module file.
 A pointer to the song title, or @code{NULL} if either the module has no title
 or an error has occurred.
 @item Notes
-The title buffer is created with @code{malloc}; the caller must free it when it
+The title buffer is created with @code{MikMod_malloc}; the caller must free it when it
 is no longer necessary.
 @item See also
 @code{Player_Load}, @code{Player_LoadFP}, @code{Player_LoadTitleFP}.
@@ -2291,7 +2338,7 @@ An open file, at the position where the module starts.
 A pointer to the song title, or @code{NULL} if either the module has no title
 or an error has occurred.
 @item Notes
-The title buffer is created with @code{malloc}; the caller must free it when it
+The title buffer is created with @code{MikMod_malloc}; the caller must free it when it
 is no longer necessary.
 @item See also
 @code{Player_Load}, @code{Player_LoadFP}, @code{Player_LoadTitle}.
@@ -2896,6 +2943,8 @@ format has the same limitations as the S3M format. The most famous DSMI
 application was DMP, the Dual Module Player.@*
 DMP and the DSMI library were written by Otto Chrons. DSMI was first released
 in 1993.
+@item load_asy
+This loader recognize the ``ASYLUM Music Format'', which was used in Crusader series of games by Origin. This format uses the .amf extension, but is very similar to a 8 Channel Mod file.
 @item load_dsm
 This loader recognizes the internal DSIK format, which is the internal module
 format of the ``Digital Sound Interface Kit'' (DSIK) library, the ancester of
@@ -3019,6 +3068,10 @@ Start the server on the machine you want, set its hostname in the
 This driver works with the ``Enlightened Sound Daemon''.@*
 Start the esd daemon on the machine you want, set its hostname in the
 @samp{ESPEAKER} environment variable, and MikMod is ready to send it sound.
+@item drv_nas
+This driver works with the ``Network Audio System''.@*
+Start the nas server on the machine you want, and set its hostname with
+the @samp{server} driver command line argument.
 @end table
 
 @node Hardware Drivers, Disk Writer Drivers, Network Drivers, Driver Reference
@@ -3041,9 +3094,18 @@ might be able to use the hardware capabilities of some sound cards.
 This driver is only available under OS/2 version 3 and higher (Warp), and uses
 the ``Direct Audio Real-Time'' interface.@*
 This driver only supports software mixing.
+@item drv_ds
+This driver is only available under WIN32, and uses the ``DirectSound'' api.@*
+This driver only supports software mixing.
+@item drv_gp32
+This driver is only for the GP32 platform, and uses the ``GP32'' api.@*
+This driver only supports software mixing. This driver is not tested yet.
 @item drv_hp
 This driver is only available under HP-UX, and access its audio device.@*
 This driver only supports software mixing.
+@item drv_mac
+This driver is only available under MacOS, and uses the ``Sound Manager''.@*
+This driver supports the Classic and Carbon environments, and does only software mixing.
 @item drv_os2
 This driver is only available under OS/2 version 3 and higher (Warp), and OS/2
 2.x with MMPM/2.@*
@@ -3053,10 +3115,16 @@ This driver is available under any Unix with the Open Sound System drivers
 installed. Linux and FreeBSD also come with the OSS/Lite driver (the
 non-commercial version of OSS) and can make use of this driver.@*
 This driver only supports software mixing.
+@item drv_osx
+This driver is available under MacOS X and Darwin, and uses the ``CoreAudio'' interface.@*
+This driver only supports software mixing.
 @item drv_sam9407
 This driver is only available under Linux, and requires the Linux sam9407
 driver to be compiled for your current kernel.@*
 This driver only supports hardware mixing.
+@item drv_sb
+This driver is only available under DOS, and supports the SoundBlaster/Pro/16/AWE32.@*
+This driver only supports hardware mixing. This driver needs to be tested.
 @item drv_sgi
 This driver is only available under IRIX, and uses the SGI audio library.@*
 This driver only supports software mixing.
@@ -3065,9 +3133,15 @@ This driver is only available under Unices which implement SunOS-like audio
 device interfaces, that is, SunOS, Solaris, NetBSD and OpenBSD.@*
 This driver only supports software mixing.
 @item drv_ultra
-This driver is only available under Linux, and requires the Linux Ultrasound
-driver (the ancestor of ALSA) to be compiled for your current kernel.@*
-This driver only supports hardware mixing.
+This driver is available under Linux, and requires the Linux Ultrasound
+driver (the ancestor of ALSA) to be compiled for your current kernel. This driver is also available under DOS/DJGPP and OS/2.@*
+This driver only supports hardware mixing. The DOS/DJGPP and OS/2 parts needs to be tested.
+@item drv_win
+This driver is only available under WIN32, and uses the ``multimedia API''.@*
+This driver only supports software mixing.
+@item drv_wss
+This driver is only available under DOS, and supports Windows Sound System compatible sound cards.@*
+This driver only supports software mixing. This driver needs to be tested.
 @end table
 
 @node Disk Writer Drivers, Other Drivers, Hardware Drivers, Driver Reference
@@ -3078,8 +3152,10 @@ hardware, but written in a file. Disk writer drivers only support software
 mixing.
 
 @table @code
+@item drv_aiff
+This driver outputs the sound data in a AIFF (Audio Interchange File Format) file by default named @file{music.aiff} or @file{music.aif} on win32/dos in the current directory.
 @item drv_raw
-This driver outputs the sound date in a file by default named @file{music.raw}
+This driver outputs the sound data in a file by default named @file{music.raw}
 in the current directory. The file has no header and only contains the sound
 output.
 @item drv_wav

@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_s3m.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   Screamtracker (S3M) module loader
 
@@ -129,9 +129,9 @@ BOOL S3M_Test(void)
 
 BOOL S3M_Init(void)
 {
-	if(!(s3mbuf=(S3MNOTE*)_mm_malloc(32*64*sizeof(S3MNOTE)))) return 0;
-	if(!(mh=(S3MHEADER*)_mm_malloc(sizeof(S3MHEADER)))) return 0;
-	if(!(poslookup=(UBYTE*)_mm_malloc(sizeof(UBYTE)*256))) return 0;
+	if(!(s3mbuf=(S3MNOTE*)MikMod_malloc(32*64*sizeof(S3MNOTE)))) return 0;
+	if(!(mh=(S3MHEADER*)MikMod_malloc(sizeof(S3MHEADER)))) return 0;
+	if(!(poslookup=(UBYTE*)MikMod_malloc(sizeof(UBYTE)*256))) return 0;
 	memset(poslookup,-1,256);
 
 	return 1;
@@ -139,11 +139,11 @@ BOOL S3M_Init(void)
 
 void S3M_Cleanup(void)
 {
-	_mm_free(s3mbuf);
-	_mm_free(paraptr);
-	_mm_free(poslookup);
-	_mm_free(mh);
-	_mm_free(origpositions);
+	MikMod_free(s3mbuf);
+	MikMod_free(paraptr);
+	MikMod_free(poslookup);
+	MikMod_free(mh);
+	MikMod_free(origpositions);
 }
 
 /* Because so many s3m files have 16 channels as the set number used, but really
@@ -294,7 +294,7 @@ BOOL S3M_Load(BOOL curious)
 			tracker=NUMTRACKERS; /* IT 2.14p3 */
 		else tracker--;
 	}
-	of.modtype = strdup(S3M_Version[tracker]);
+	of.modtype = StrDup(S3M_Version[tracker]);
 	if(tracker<NUMTRACKERS) {
 		of.modtype[numeric[tracker]] = ((mh->tracker>>8) &0xf)+'0';
 		of.modtype[numeric[tracker]+2] = ((mh->tracker>>4)&0xf)+'0';
@@ -315,7 +315,7 @@ BOOL S3M_Load(BOOL curious)
 
 	/* read the order data */
 	if(!AllocPositions(mh->ordnum)) return 0;
-	if(!(origpositions=_mm_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
+	if(!(origpositions=MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
 
 	for(t=0;t<mh->ordnum;t++) {
 		origpositions[t]=_mm_read_UBYTE(modreader);
@@ -331,7 +331,7 @@ BOOL S3M_Load(BOOL curious)
 	poslookupcnt=mh->ordnum;
 	S3MIT_CreateOrders(curious);
 
-	if(!(paraptr=(UWORD*)_mm_malloc((of.numins+of.numpat)*sizeof(UWORD))))
+	if(!(paraptr=(UWORD*)MikMod_malloc((of.numins+of.numpat)*sizeof(UWORD))))
 		return 0;
 
 	/* read the instrument+pattern parapointers */

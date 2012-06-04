@@ -1,5 +1,5 @@
 /*	MikMod sound library
-	(c) 1998-2001 Miodrag Vallat and others - see file AUTHORS for
+	(c) 1998-2005 Miodrag Vallat and others - see file AUTHORS for
 	complete list.
 
 	This library is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_ds.c,v 1.3 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output on win32 platforms using DirectSound
 
@@ -45,6 +45,11 @@
 
 #define INITGUID
 #include <dsound.h>
+
+/* Not in compilers <= MSVC 6 */
+#ifndef PF_XMMI64_INSTRUCTIONS_AVAILABLE
+#define PF_XMMI64_INSTRUCTIONS_AVAILABLE 10
+#endif
 
 /* DSBCAPS_CTRLALL is not defined anymore with DirectX 7. Of course DirectSound
    is a coherent, backwards compatible API... */
@@ -135,12 +140,12 @@ static void DS_CommandLine(CHAR *cmdline)
 		if ((buf<12)||(buf>19)) buf=FRAGSIZE;
 		fragsize=1<<buf;
 
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	
 	if ((ptr=MD_GetAtom("globalfocus",cmdline,1))) {
 		controlflags |= DSBCAPS_GLOBALFOCUS;
-		free(ptr);
+		MikMod_free(ptr);
 	} else
 		controlflags &= ~DSBCAPS_GLOBALFOCUS;
 }
@@ -217,8 +222,8 @@ static BOOL DS_Init(void)
 		return 1;
 	}
 
-	notifyUpdateHandle=CreateEventW
-				(NULL,FALSE,FALSE,L"libmikmod DirectSound Driver positionNotify Event");
+	notifyUpdateHandle=CreateEvent
+				(NULL,FALSE,FALSE,"libmikmod DirectSound Driver positionNotify Event");
 	if (!notifyUpdateHandle) {
 		_mm_errno=MMERR_DS_EVENT;
 		return 1;
@@ -242,6 +247,10 @@ static BOOL DS_Init(void)
 		return 1;
 	}
 
+	if (IsProcessorFeaturePresent(PF_XMMI64_INSTRUCTIONS_AVAILABLE))
+	{
+		md_mode|=DMODE_SIMDMIXER;
+	}
 	return VC_Init();
 }
 

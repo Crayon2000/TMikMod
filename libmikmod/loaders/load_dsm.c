@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_dsm.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   DSIK internal format (DSM) module loader
 
@@ -117,15 +117,15 @@ BOOL DSM_Test(void)
 
 BOOL DSM_Init(void)
 {
-	if(!(dsmbuf=(DSMNOTE *)_mm_malloc(DSM_MAXCHAN*64*sizeof(DSMNOTE)))) return 0;
-	if(!(mh=(DSMSONG *)_mm_calloc(1,sizeof(DSMSONG)))) return 0;
+	if(!(dsmbuf=(DSMNOTE *)MikMod_malloc(DSM_MAXCHAN*64*sizeof(DSMNOTE)))) return 0;
+	if(!(mh=(DSMSONG *)MikMod_calloc(1,sizeof(DSMSONG)))) return 0;
 	return 1;
 }
 
 void DSM_Cleanup(void)
 {
-	_mm_free(dsmbuf);
-	_mm_free(mh);
+	MikMod_free(dsmbuf);
+	MikMod_free(mh);
 }
 
 static BOOL GetBlockHeader(void)
@@ -265,7 +265,7 @@ BOOL DSM_Load(BOOL curious)
 	/* set module variables */
 	of.initspeed=mh->speed;
 	of.inittempo=mh->bpm;
-	of.modtype=strdup(DSM_Version);
+	of.modtype=StrDup(DSM_Version);
 	of.numchn=mh->numtrk;
 	of.numpat=mh->numpat;
 	of.numtrk=of.numchn*of.numpat;

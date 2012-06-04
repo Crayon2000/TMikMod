@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_sb.c,v 1.4 2004/02/10 17:52:18 raph Exp $
+  $Id$
 
   Driver for SoundBlaster/Pro/16/AWE32 under DOS
 
@@ -55,19 +55,19 @@ static void SB_CommandLine(CHAR *cmdline)
 
 	if ((ptr=MD_GetAtom("port",cmdline,0))) {
 		sb.port = strtol(ptr, &end, 16);
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	if ((ptr=MD_GetAtom("irq",cmdline,0))) {
 		sb.irq = strtol(ptr, &end, 10);
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	if ((ptr=MD_GetAtom("dma",cmdline,0))) {
 		sb.dma8 = strtol(ptr, &end, 10);
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	if ((ptr=MD_GetAtom("hidma",cmdline,0))) {
 		sb.dma16 = strtol(ptr, &end, 10);
-		free(ptr);
+		MikMod_free(ptr);
 	}
 }
 

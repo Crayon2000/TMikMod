@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_raw.c,v 1.4 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output to a file called MUSIC.RAW
 
@@ -64,7 +64,7 @@ static void RAW_CommandLine(CHAR *cmdline)
 	CHAR *ptr=MD_GetAtom("file",cmdline,0);
 
 	if(ptr) {
-		_mm_free(filename);
+		MikMod_free(filename);
 		filename=ptr;
 	}
 }
@@ -93,7 +93,7 @@ static BOOL RAW_Init(void)
 	}
 	md_mode|=DMODE_SOFT_MUSIC|DMODE_SOFT_SNDFX;
 
-	if (!(audiobuffer=(SBYTE*)_mm_malloc(BUFFERSIZE))) {
+	if (!(audiobuffer=(SBYTE*)MikMod_malloc(BUFFERSIZE))) {
 		close(rawout);unlink(filename?filename:FILENAME);
 		rawout=-1;
 		return 1;
@@ -114,7 +114,7 @@ static void RAW_Exit(void)
 		close(rawout);
 		rawout=-1;
 	}
-	_mm_free(audiobuffer);
+	MikMod_free(audiobuffer);
 }
 
 static void RAW_Update(void)

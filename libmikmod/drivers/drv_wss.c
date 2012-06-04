@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_wss.c,v 1.4 2004/02/10 17:52:18 raph Exp $
+  $Id$
 
   Driver for Windows Sound System under DOS
 
@@ -55,15 +55,15 @@ static void WSS_CommandLine(CHAR *cmdline)
 	
 	if ((ptr=MD_GetAtom("port",cmdline,0))) {
 		wss.port = strtol(ptr, &end, 16);
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	if ((ptr=MD_GetAtom("irq",cmdline,0))) {
 		wss.irq = strtol(ptr, &end, 10);
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	if ((ptr=MD_GetAtom("dma",cmdline,0))) {
 		wss.dma = strtol(ptr, &end, 10);
-		free(ptr);
+		MikMod_free(ptr);
 	}
 }
 

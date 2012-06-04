@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_stdout.c,v 1.3 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Output data to stdout
 
@@ -49,7 +49,7 @@ static BOOL stdout_IsThere(void)
 
 static BOOL stdout_Init(void)
 {
-	if(!(audiobuffer=(SBYTE*)_mm_malloc(BUFFERSIZE))) return 1;
+	if(!(audiobuffer=(SBYTE*)MikMod_malloc(BUFFERSIZE))) return 1;
 #ifdef __EMX__
 	_fsetmode(stdout,"b");
 #endif
@@ -63,7 +63,7 @@ static void stdout_Exit(void)
 	_fsetmode(stdout,"t");
 #endif
 	if (audiobuffer) {
-		free(audiobuffer);
+		MikMod_free(audiobuffer);
 		audiobuffer=NULL;
 	}
 }

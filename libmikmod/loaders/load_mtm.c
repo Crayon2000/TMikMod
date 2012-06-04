@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_mtm.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   MTM module loader
 
@@ -98,16 +98,16 @@ BOOL MTM_Test(void)
 
 BOOL MTM_Init(void)
 {
-	if(!(mtmtrk=(MTMNOTE*)_mm_calloc(64,sizeof(MTMNOTE)))) return 0;
-	if(!(mh=(MTMHEADER*)_mm_malloc(sizeof(MTMHEADER)))) return 0;
+	if(!(mtmtrk=(MTMNOTE*)MikMod_calloc(64,sizeof(MTMNOTE)))) return 0;
+	if(!(mh=(MTMHEADER*)MikMod_malloc(sizeof(MTMHEADER)))) return 0;
 
 	return 1;
 }
 
 void MTM_Cleanup(void)
 {
-	_mm_free(mtmtrk);
-	_mm_free(mh);
+	MikMod_free(mtmtrk);
+	MikMod_free(mh);
 }
 
 static UBYTE* MTM_Convert(void)
@@ -168,7 +168,7 @@ BOOL MTM_Load(BOOL curious)
 	/* set module variables */
 	of.initspeed = 6;
 	of.inittempo = 125;
-	of.modtype   = strdup(MTM_Version);
+	of.modtype   = StrDup(MTM_Version);
 	of.numchn    = mh->numchannels;
 	of.numtrk    = mh->numtracks+1;           /* get number of channels */
 	of.songname  = DupStr(mh->songname,20,1); /* make a cstr of songname */

@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: dosgus.c,v 1.1 2004/02/01 02:01:17 raph Exp $
+  $Id$
   
   Driver for GUS cards under DOS
 
@@ -619,8 +619,8 @@ static void __gus_detect_transfer()
 
 #define TRANSFER_SIZE	0x4000
 
-	outbuff = malloc(TRANSFER_SIZE);
-	inbuff = malloc(TRANSFER_SIZE);
+	outbuff = MikMod_malloc(TRANSFER_SIZE);
+	inbuff = MikMod_malloc(TRANSFER_SIZE);
 
 	/* Suppose we have an malfunctioning GUS */
 	gus.transfer = NULL;
@@ -681,8 +681,8 @@ static void __gus_detect_transfer()
 
 #undef TRANSFER_SIZE
 
-	free(inbuff);
-	free(outbuff);
+	MikMod_free(inbuff);
+	MikMod_free(outbuff);
 }
 
 static void __gus_detect_memory()
@@ -884,12 +884,12 @@ static void __gus_mem_clear()
 	while (cur) {
 		__gus_mcb *next = cur->next;
 		if (cur != gus.mcb)
-			free(cur);
+			MikMod_free(cur);
 		cur = next;
 	}
 
 	if (!gus.mcb)
-		gus.mcb = malloc(sizeof(__gus_mcb));
+		gus.mcb = MikMod_malloc(sizeof(__gus_mcb));
 
 	gus.mcb->next = gus.mcb->prev = NULL;
 	gus.mcb->addr = 0;
@@ -1068,7 +1068,7 @@ static unsigned int __gus_mem_alloc(unsigned int size, int bits16)
 	/* If we have a considerable hole at the beginning of sample,
 	   create a free node describing the hole */
 	if (memaddr - best_min->addr >= DRAM_SPLIT_THRESHOLD) {
-		__gus_mcb *newmcb = malloc(sizeof(__gus_mcb));
+		__gus_mcb *newmcb = MikMod_malloc(sizeof(__gus_mcb));
 		newmcb->prev = best_min->prev;
 		newmcb->next = best_min;
 		newmcb->addr = best_min->addr;
@@ -1088,7 +1088,7 @@ static unsigned int __gus_mem_alloc(unsigned int size, int bits16)
 	if (memsize > DRAM_SPLIT_THRESHOLD) {
 		/* The next node cannot be free since free blocks are always glued
 		   together */
-		__gus_mcb *newmcb = malloc(sizeof(__gus_mcb));
+		__gus_mcb *newmcb = MikMod_malloc(sizeof(__gus_mcb));
 		best_min->size -= memsize;
 		newmcb->prev = best_min;
 		newmcb->next = best_min->next;
@@ -1119,7 +1119,7 @@ static void __gus_mem_free(unsigned int addr)
 				cur->next = next->next;
 				if (next->next)
 					next->next->prev = cur;
-				free(next);
+				MikMod_free(next);
 			}
 
 			/* If previous block is free, link current block with it */
@@ -1128,7 +1128,7 @@ static void __gus_mem_free(unsigned int addr)
 				cur->prev->next = cur->next;
 				if (cur->next)
 					cur->next->prev = cur->prev;
-				free(cur);
+				MikMod_free(cur);
 			}
 			return;
 		}
@@ -1189,12 +1189,12 @@ instr_loaded:
 				__gus_mem_free(cur_wave->begin.memory);
 		}
 	if (wave_head)
-		free(wave_head);
+		MikMod_free(wave_head);
 
-	free(instrument->info.layer);
+	MikMod_free(instrument->info.layer);
 	if (instrument->name)
-		free(instrument->name);
-	free(instrument);
+		MikMod_free(instrument->name);
+	MikMod_free(instrument);
 	return 0;
 }
 
@@ -1222,7 +1222,7 @@ static gus_instrument_t *__gus_instrument_copy(gus_instrument_t * instrument)
 	if (__gus_instrument_get(instrument->number.instrument))
 		return NULL;
 
-	instr = malloc(sizeof(gus_instrument_t));
+	instr = MikMod_malloc(sizeof(gus_instrument_t));
 	*instr = *instrument;
 
 	if (instrument->name)
@@ -1232,10 +1232,10 @@ static gus_instrument_t *__gus_instrument_copy(gus_instrument_t * instrument)
 	for (layers = 0, cur_layer = instrument->info.layer; cur_layer; layers++)
 		cur_layer = cur_layer->next;
 
-	if (!(dest_layer = instr->info.layer = malloc(sizeof(gus_layer_t) * layers))) {
+	if (!(dest_layer = instr->info.layer = MikMod_malloc(sizeof(gus_layer_t) * layers))) {
 		if (instr->name)
-			free(instr->name);
-		free(instr);
+			MikMod_free(instr->name);
+		MikMod_free(instr);
 		return NULL;
 	}
 	for (waves = 0, cur_layer = instrument->info.layer; cur_layer;
@@ -1253,11 +1253,11 @@ static gus_instrument_t *__gus_instrument_copy(gus_instrument_t * instrument)
 	}
 
 	/* Allocate memory for waves */
-	if (!(dest_wave = malloc(sizeof(gus_wave_t) * waves))) {
-		free(instr->info.layer);
+	if (!(dest_wave = MikMod_malloc(sizeof(gus_wave_t) * waves))) {
+		MikMod_free(instr->info.layer);
 		if (instr->name)
-			free(instr->name);
-		free(instr);
+			MikMod_free(instr->name);
+		MikMod_free(instr);
 		return NULL;
 	}
 	for (cur_layer = instrument->info.layer, dest_layer = instr->info.layer;
@@ -1389,7 +1389,7 @@ int gus_open(int card, size_t queue_buffer_size, int non_block)
 		queue_buffer_size = 64;
 	if (queue_buffer_size > 16384)
 		queue_buffer_size = 16384;
-	gus.cmd_pool = malloc(queue_buffer_size);
+	gus.cmd_pool = MikMod_malloc(queue_buffer_size);
 	pool_info.address = __djgpp_base_address + (unsigned long)&gus.cmd_pool;
 	pool_info.size = sizeof(queue_buffer_size);
 	if (__dpmi_lock_linear_region(&pool_info)) {

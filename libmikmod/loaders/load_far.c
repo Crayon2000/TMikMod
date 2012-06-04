@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_far.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   Farandole (FAR) module loader
 
@@ -107,18 +107,18 @@ BOOL FAR_Test(void)
 
 BOOL FAR_Init(void)
 {
-	if(!(mh1 = (FARHEADER1*)_mm_malloc(sizeof(FARHEADER1)))) return 0;
-	if(!(mh2 = (FARHEADER2*)_mm_malloc(sizeof(FARHEADER2)))) return 0;
-	if(!(pat = (FARNOTE*)_mm_malloc(256*16*4*sizeof(FARNOTE)))) return 0;
+	if(!(mh1 = (FARHEADER1*)MikMod_malloc(sizeof(FARHEADER1)))) return 0;
+	if(!(mh2 = (FARHEADER2*)MikMod_malloc(sizeof(FARHEADER2)))) return 0;
+	if(!(pat = (FARNOTE*)MikMod_malloc(256*16*4*sizeof(FARNOTE)))) return 0;
 
 	return 1;
 }
 
 void FAR_Cleanup(void)
 {
-	_mm_free(mh1);
-	_mm_free(mh2);
-	_mm_free(pat);
+	MikMod_free(mh1);
+	MikMod_free(mh2);
+	MikMod_free(pat);
 }
 
 static UBYTE *FAR_ConvertTrack(FARNOTE* n,int rows)
@@ -195,7 +195,7 @@ BOOL FAR_Load(BOOL curious)
 	mh1->stlen     = _mm_read_I_UWORD (modreader);
 
 	/* init modfile data */
-	of.modtype   = strdup(FAR_Version);
+	of.modtype   = StrDup(FAR_Version);
 	of.songname  = DupStr(mh1->songname,40,1);
 	of.numchn    = 16;
 	of.initspeed = mh1->speed;

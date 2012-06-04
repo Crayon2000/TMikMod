@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mdreg.c,v 1.5 2004/02/20 22:08:35 raph Exp $
+  $Id$
 
   Routine for registering all drivers in libmikmod for the current platform.
 
@@ -40,6 +40,9 @@ void _mm_registeralldrivers(void)
 #endif
 #ifdef DRV_ESD
 	_mm_registerdriver(&drv_esd);
+#endif
+#ifdef DRV_NAS
+	_mm_registerdriver(&drv_nas);
 #endif
 
 	/* Register hardware drivers - hardware mixing */
@@ -84,7 +87,10 @@ void _mm_registeralldrivers(void)
 #ifdef DRV_OSX
 	_mm_registerdriver(&drv_osx);
 #endif
-
+#ifdef DRV_GP32
+	_mm_registerdriver(&drv_gp32);
+#endif
+	
 	/* dos drivers */
 #ifdef DRV_WSS
 	/* wss first, since some cards emulate sb */

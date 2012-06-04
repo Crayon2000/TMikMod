@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "mikmod.h"
 
 char* strdup(const char *__s)
 {
@@ -12,7 +13,7 @@ char* strdup(const char *__s)
 	if (!__s)
 		return NULL;
 
-	charptr=(char *)malloc(sizeof(char) * (strlen(__s) + 1));
+	charptr=(char *)MikMod_malloc(sizeof(char) * (strlen(__s) + 1));
 	if (charptr) 
 		strcpy(charptr, __s);
 

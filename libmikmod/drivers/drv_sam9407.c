@@ -20,7 +20,7 @@
 
 /*==============================================================================
   
-  $Id: drv_sam9407.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
   
   Driver for the Linux sam9407 driver
   
@@ -106,7 +106,7 @@ static void commandLine(CHAR *cmdline)
 
 	if((ptr=MD_GetAtom("card", cmdline, 0))) {
 		card=atoi(ptr);
-		free(ptr);
+		MikMod_free(ptr);
 	}
 }
 
@@ -161,14 +161,14 @@ int rc;
 	bankP->loopend=s->sample->loopend ? s->sample->loopend : s->sample->length;
 	bankP->flags=s->sample->flags;
 
-	if(!(samples=(SWORD *)malloc((bankP->length+NO_LOOP_SAMPLES)<<1))) {
+	if(!(samples=(SWORD *)MikMod_malloc((bankP->length+NO_LOOP_SAMPLES)<<1))) {
 		bankP->inUse=0;
 		_mm_errno=MMERR_SAMPLE_TOO_BIG;
 		return -1;
 	}
 
 	if(SL_Load(samples, s, bankP->length)) {
-		free(samples);
+		MikMod_free(samples);
 		bankP->inUse=0;
 		_mm_errno=MMERR_SAMPLE_TOO_BIG;
 		return -1;
@@ -185,13 +185,13 @@ int rc;
 	modSamples.data=samples;
 	modSamples.size=bankP->length;
 	if((rc=ioctl(modfd, SAM_IOC_MOD_SAMPLES_LOAD, &modSamples))<0) {
-		free(samples);
+		MikMod_free(samples);
 		bankP->inUse=0;
 		_mm_errno=MMERR_SAMPLE_TOO_BIG;
 		return -1;
 	}
 
-	free(samples);
+	MikMod_free(samples);
 
 	return handle;
 }

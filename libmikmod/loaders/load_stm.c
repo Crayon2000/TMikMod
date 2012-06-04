@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_stm.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   Screamtracker 2 (STM) module loader
 
@@ -120,16 +120,16 @@ BOOL STM_Test(void)
 
 BOOL STM_Init(void)
 {
-	if(!(mh=(STMHEADER*)_mm_malloc(sizeof(STMHEADER)))) return 0;
-	if(!(stmbuf=(STMNOTE*)_mm_calloc(64U*4,sizeof(STMNOTE)))) return 0;
+	if(!(mh=(STMHEADER*)MikMod_malloc(sizeof(STMHEADER)))) return 0;
+	if(!(stmbuf=(STMNOTE*)MikMod_calloc(64U*4,sizeof(STMNOTE)))) return 0;
 
 	return 1;
 }
 
 static void STM_Cleanup(void)
 {
-	_mm_free(mh);
-	_mm_free(stmbuf);
+	MikMod_free(mh);
+	MikMod_free(stmbuf);
 }
 
 static void STM_ConvertNote(STMNOTE *n)
@@ -297,7 +297,7 @@ BOOL STM_Load(BOOL curious)
 	/* set module variables */
 	for(t=0;t<STM_NTRACKERS;t++)
 		if(!memcmp(mh->trackername,STM_Signatures[t],8)) break;
-	of.modtype   = strdup(STM_Version[t]);
+	of.modtype   = StrDup(STM_Version[t]);
 	of.songname  = DupStr(mh->songname,20,1); /* make a cstr of songname */
 	of.numpat    = mh->numpat;
 	of.inittempo = 125;                     /* mh->inittempo+0x1c; */

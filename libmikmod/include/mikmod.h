@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mikmod.h,v 1.9 2004/02/21 02:01:55 raph Exp $
+  $Id$
 
   MikMod sound library include file
 
@@ -85,7 +85,7 @@ typedef char CHAR;
 
 
 
-#if defined(__arch64__) || defined(__alpha)
+#if defined(__arch64__) || defined(__alpha) || defined(__x86_64) || defined(__powerpc64__)
 /* 64 bit architectures */
 
 typedef signed char     SBYTE;      /* 1 byte, signed */
@@ -248,6 +248,11 @@ MIKMODAPI extern BOOL   MikMod_InitThreads(void);
 MIKMODAPI extern void   MikMod_Lock(void);
 MIKMODAPI extern void   MikMod_Unlock(void);
 
+MIKMODAPI extern void*  MikMod_malloc(size_t);
+MIKMODAPI extern void*  MikMod_realloc(void *, size_t);
+MIKMODAPI extern void*  MikMod_calloc(size_t,size_t);
+MIKMODAPI extern void   MikMod_free(void*);
+
 /*
  *	========== Reader, Writer
  */
@@ -258,6 +263,8 @@ typedef struct MREADER {
 	BOOL (*Read)(struct MREADER*,void*,size_t);
 	int  (*Get)(struct MREADER*);
 	BOOL (*Eof)(struct MREADER*);
+	long iobase;
+	long prev_iobase;
 } MREADER;
 
 typedef struct MWRITER {
@@ -334,12 +341,20 @@ typedef struct SAMPLE {
 	UBYTE  divfactor;   /* for sample scaling, maintains proper period slides */
 	ULONG  seekpos;     /* seek position in file */
 	SWORD  handle;      /* sample handle used by individual drivers */
+	void (*onfree)(void *ctx); /* called from Sample_Free if not NULL */
+	void *ctx;			/* context passed to previous function*/
 } SAMPLE;
 
 /* Sample functions */
 
+MIKMODAPI extern SAMPLE *Sample_LoadRaw(CHAR *,ULONG rate, ULONG channel, ULONG flags);
+MIKMODAPI extern SAMPLE *Sample_LoadRawFP(FILE *fp,ULONG rate,ULONG channel, ULONG flags);
+MIKMODAPI extern SAMPLE *Sample_LoadRawMem(const char *buf, int len, ULONG rate, ULONG channel, ULONG flags);
+MIKMODAPI extern SAMPLE *Sample_LoadRawGeneric(MREADER*reader,ULONG rate, ULONG channel, ULONG flags);
+
 MIKMODAPI extern SAMPLE *Sample_Load(CHAR*);
 MIKMODAPI extern SAMPLE *Sample_LoadFP(FILE*);
+MIKMODAPI extern SAMPLE *Sample_LoadMem(const char *buf, int len);
 MIKMODAPI extern SAMPLE *Sample_LoadGeneric(MREADER*);
 MIKMODAPI extern void   Sample_Free(SAMPLE*);
 MIKMODAPI extern SBYTE  Sample_Play(SAMPLE*,ULONG,UBYTE);
@@ -541,6 +556,7 @@ MIKMODAPI extern struct MLOADER load_asy; /* ASYLUM Music Format 1.0 */
 MIKMODAPI extern struct MLOADER load_dsm; /* DSIK internal module format */
 MIKMODAPI extern struct MLOADER load_far; /* Farandole Composer (by Daniel Potter) */
 MIKMODAPI extern struct MLOADER load_gdm; /* General DigiMusic (by Edward Schlunder) */
+MIKMODAPI extern struct MLOADER load_gt2; /* Graoumf tracker */
 MIKMODAPI extern struct MLOADER load_it;  /* Impulse Tracker (by Jeffrey Lim) */
 MIKMODAPI extern struct MLOADER load_imf; /* Imago Orpheus (by Lutz Roeder) */
 MIKMODAPI extern struct MLOADER load_med; /* Amiga MED modules (by Teijo Kinnunen) */
@@ -561,9 +577,13 @@ MIKMODAPI extern struct MLOADER load_xm;  /* FastTracker 2 (by Triton) */
 
 MIKMODAPI extern MODULE* Player_Load(CHAR*,int,BOOL);
 MIKMODAPI extern MODULE* Player_LoadFP(FILE*,int,BOOL);
+MIKMODAPI extern MODULE* Player_LoadMem(const char *buffer,int len,int maxchan,BOOL curious);
 MIKMODAPI extern MODULE* Player_LoadGeneric(MREADER*,int,BOOL);
 MIKMODAPI extern CHAR*   Player_LoadTitle(CHAR*);
 MIKMODAPI extern CHAR*   Player_LoadTitleFP(FILE*);
+MIKMODAPI extern CHAR*   Player_LoadTitleMem(const char *buffer,int len);
+MIKMODAPI extern CHAR*   Player_LoadTitleGeneric(MREADER*);
+
 MIKMODAPI extern void    Player_Free(MODULE*);
 MIKMODAPI extern void    Player_Start(MODULE*);
 MIKMODAPI extern BOOL    Player_Active(void);
@@ -584,9 +604,11 @@ MIKMODAPI extern void    Player_ToggleMute(SLONG,...);
 MIKMODAPI extern int     Player_GetChannelVoice(UBYTE);
 MIKMODAPI extern UWORD   Player_GetChannelPeriod(UBYTE);
 MIKMODAPI extern int     Player_QueryVoices(UWORD numvoices, VOICEINFO *vinfo); 
+MIKMODAPI extern int     Player_GetRow(void);
+MIKMODAPI extern int     Player_GetOrder(void); 
 
-typedef void (MikMod_player)(void);
-typedef MikMod_player *MikMod_player_t;
+typedef void (*MikMod_player_t)(void);
+typedef void (*MikMod_callback_t)(unsigned char *data, size_t len);
 
 MIKMODAPI extern MikMod_player_t MikMod_RegisterPlayer(MikMod_player_t);
 
@@ -620,18 +642,20 @@ enum {
 #define DMODE_SURROUND   0x0100 /* enable surround sound */
 #define DMODE_INTERP     0x0200 /* enable interpolation */
 #define DMODE_REVERSE    0x0400 /* reverse stereo */
+#define DMODE_SIMDMIXER    0x0800 /* enable SIMD mixing */
+#define DMODE_NOISEREDUCTION 0x1000 /* Low pass filtering */
 
 struct SAMPLOAD;
 typedef struct MDRIVER {
 struct MDRIVER* next;
-	CHAR*       Name;
-	CHAR*       Version;
+	const CHAR* Name;
+	const CHAR* Version;
 
 	UBYTE       HardVoiceLimit; /* Limit of hardware mixer voices */
 	UBYTE       SoftVoiceLimit; /* Limit of software mixer voices */
 
-	CHAR        *Alias;
-	CHAR        *CmdLineHelp;
+	const CHAR* Alias;
+	const CHAR* CmdLineHelp;
 
 	void        (*CommandLine)      (CHAR*);
 	BOOL        (*IsPresent)        (void);
@@ -685,6 +709,7 @@ MIKMODAPI extern struct MDRIVER drv_pipe;   /* piped output */
 MIKMODAPI extern struct MDRIVER drv_raw;    /* raw file disk writer [music.raw] */
 MIKMODAPI extern struct MDRIVER drv_stdout; /* output to stdout */
 MIKMODAPI extern struct MDRIVER drv_wav;    /* RIFF WAVE file disk writer [music.wav] */
+MIKMODAPI extern struct MDRIVER drv_aiff;   /* AIFF file disk writer [music.aiff] */
 
 MIKMODAPI extern struct MDRIVER drv_ultra;  /* Linux Ultrasound driver */
 MIKMODAPI extern struct MDRIVER drv_sam9407;	/* Linux sam9407 driver */
@@ -694,6 +719,7 @@ MIKMODAPI extern struct MDRIVER drv_aix;    /* AIX audio device */
 MIKMODAPI extern struct MDRIVER drv_alsa;   /* Advanced Linux Sound Architecture (ALSA) */
 MIKMODAPI extern struct MDRIVER drv_esd;    /* Enlightened sound daemon (EsounD) */
 MIKMODAPI extern struct MDRIVER drv_hp;     /* HP-UX audio device */
+MIKMODAPI extern struct MDRIVER drv_nas;    /* Network Audio System (NAS) */	
 MIKMODAPI extern struct MDRIVER drv_oss;    /* OpenSound System (Linux,FreeBSD...) */
 MIKMODAPI extern struct MDRIVER drv_sgi;    /* SGI audio library */
 MIKMODAPI extern struct MDRIVER drv_sun;    /* Sun/NetBSD/OpenBSD audio device */
@@ -707,10 +733,16 @@ MIKMODAPI extern struct MDRIVER drv_win;    /* Win32 multimedia API driver */
 MIKMODAPI extern struct MDRIVER drv_mac;    /* Macintosh Sound Manager driver */
 MIKMODAPI extern struct MDRIVER drv_osx;	/* MacOS X CoreAudio Driver */
 
+MIKMODAPI extern struct MDRIVER drv_gp32;   /* GP32 Sound driver */
+
+MIKMODAPI extern struct MDRIVER drv_wss;    /* DOS WSS driver */
+MIKMODAPI extern struct MDRIVER drv_sb;     /* DOS SB driver */
+
 /*========== Virtual channel mixer interface (for user-supplied drivers only) */
 
 MIKMODAPI extern BOOL  VC_Init(void);
 MIKMODAPI extern void  VC_Exit(void);
+MIKMODAPI extern void  VC_SetCallback(MikMod_callback_t callback);
 MIKMODAPI extern BOOL  VC_SetNumVoices(void);
 MIKMODAPI extern ULONG VC_SampleSpace(int);
 MIKMODAPI extern ULONG VC_SampleLength(int,SAMPLE*);

@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: doswss.h,v 1.1 2004/02/01 02:01:17 raph Exp $
+  $Id$
 
   Windows Sound System and compatible soundcards definitions
 

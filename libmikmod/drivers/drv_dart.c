@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_dart.c,v 1.2 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output on OS/2 MMPM/2 using direct audio (DART)
 
@@ -72,21 +72,21 @@ static void Dart_CommandLine(CHAR *cmdline)
 		buf = atoi(ptr);
 		if (buf >= 12 && buf <= 16)
 			BufferSize = 1 << buf;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	
 	if ((ptr = MD_GetAtom("count", cmdline, 0))) {
 		buf = atoi(ptr);
 		if (buf >= 2 && buf <= MAX_BUFFERCOUNT)
 			BufferCount = buf;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	
 	if ((ptr = MD_GetAtom("device", cmdline, 0))) {
 		buf = atoi(ptr);
 		if (buf >= 0 && buf <= 8)
 			DeviceIndex = buf;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 }
 

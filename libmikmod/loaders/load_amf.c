@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_amf.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   DMP Advanced Module Format loader
 
@@ -102,16 +102,16 @@ BOOL AMF_Test(void)
 
 BOOL AMF_Init(void)
 {
-	if(!(mh=(AMFHEADER*)_mm_malloc(sizeof(AMFHEADER)))) return 0;
-	if(!(track=(AMFNOTE*)_mm_calloc(64,sizeof(AMFNOTE)))) return 0;
+	if(!(mh=(AMFHEADER*)MikMod_malloc(sizeof(AMFHEADER)))) return 0;
+	if(!(track=(AMFNOTE*)MikMod_calloc(64,sizeof(AMFNOTE)))) return 0;
 
 	return 1;
 }
 
 void AMF_Cleanup(void)
 {
-	_mm_free(mh);
-	_mm_free(track);
+	MikMod_free(mh);
+	MikMod_free(track);
 }
 
 static BOOL AMF_UnpackTrack(MREADER* modreader)
@@ -384,7 +384,7 @@ BOOL AMF_Load(BOOL curious)
 	of.inittempo = mh->songbpm;
 	AMF_Version[AMFTEXTLEN-3]='0'+(mh->version/10);
 	AMF_Version[AMFTEXTLEN-1]='0'+(mh->version%10);
-	of.modtype   = strdup(AMF_Version);
+	of.modtype   = StrDup(AMF_Version);
 	of.numchn    = mh->numchannels;
 	of.numtrk    = mh->numorders*mh->numchannels;
 	if (mh->numtracks>of.numtrk)
@@ -491,11 +491,11 @@ BOOL AMF_Load(BOOL curious)
 	}
 
 	/* read track table */
-	if(!(track_remap=_mm_calloc(mh->numtracks+1,sizeof(UWORD))))
+	if(!(track_remap=MikMod_calloc(mh->numtracks+1,sizeof(UWORD))))
 		return 0;
 	_mm_read_I_UWORDS(track_remap+1,mh->numtracks,modreader);
 	if(_mm_eof(modreader)) {
-		free(track_remap);
+		MikMod_free(track_remap);
 		_mm_errno=MMERR_LOADING_TRACK;
 		return 0;
 	}
@@ -507,7 +507,7 @@ BOOL AMF_Load(BOOL curious)
 		of.patterns[t]=(of.patterns[t]<=mh->numtracks)?
 		               track_remap[of.patterns[t]]-1:realtrackcnt;
 
-	free(track_remap);
+	MikMod_free(track_remap);
 
 	/* unpack tracks */
 	for(t=0;t<realtrackcnt;t++) {

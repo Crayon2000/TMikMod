@@ -18,14 +18,6 @@
 	02111-1307, USA.
 */
 
-/*==============================================================================
-
-  $Id: mikmod.h.in,v 1.1 2004/02/16 17:36:00 raph Exp $
-
-  MikMod sound library include file
-
-==============================================================================*/
-
 #ifndef _MIKMOD_H_
 #define _MIKMOD_H_
 
@@ -583,7 +575,10 @@ MIKMODAPI extern void    Player_Mute(SLONG,...);
 MIKMODAPI extern void    Player_ToggleMute(SLONG,...);
 MIKMODAPI extern int     Player_GetChannelVoice(UBYTE);
 MIKMODAPI extern UWORD   Player_GetChannelPeriod(UBYTE);
-MIKMODAPI extern int     Player_QueryVoices(UWORD numvoices, VOICEINFO *vinfo); 
+MIKMODAPI extern int     Player_QueryVoices(UWORD numvoices, VOICEINFO *vinfo);
+MIKMODAPI extern int     Player_GetRow(void);
+MIKMODAPI extern int     Player_GetOrder(void); 
+
 
 typedef void (MikMod_player)(void);
 typedef MikMod_player *MikMod_player_t;
@@ -685,6 +680,7 @@ MIKMODAPI extern struct MDRIVER drv_pipe;   /* piped output */
 MIKMODAPI extern struct MDRIVER drv_raw;    /* raw file disk writer [music.raw] */
 MIKMODAPI extern struct MDRIVER drv_stdout; /* output to stdout */
 MIKMODAPI extern struct MDRIVER drv_wav;    /* RIFF WAVE file disk writer [music.wav] */
+MIKMODAPI extern struct MDRIVER drv_aiff;   /* AIFF file disk writer [music.aiff] */
 
 MIKMODAPI extern struct MDRIVER drv_ultra;  /* Linux Ultrasound driver */
 MIKMODAPI extern struct MDRIVER drv_sam9407;	/* Linux sam9407 driver */
@@ -711,6 +707,7 @@ MIKMODAPI extern struct MDRIVER drv_osx;	/* MacOS X CoreAudio Driver */
 
 MIKMODAPI extern BOOL  VC_Init(void);
 MIKMODAPI extern void  VC_Exit(void);
+MIKMODAPI extern void  VC_SetCallback(MikMod_callback_t callback);
 MIKMODAPI extern BOOL  VC_SetNumVoices(void);
 MIKMODAPI extern ULONG VC_SampleSpace(int);
 MIKMODAPI extern ULONG VC_SampleLength(int,SAMPLE*);

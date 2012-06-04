@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_os2.c,v 1.2 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output on OS/2 using MMPM/2 MCI interface
 
@@ -117,13 +117,13 @@ static void OS2_CommandLine(CHAR *cmdline)
 		buf = atoi(ptr);
 		if (buf >= 12 && buf <= 16)
 			BufferSize = 1 << buf;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	if ((ptr = MD_GetAtom("device", cmdline, 0))) {
 		buf = atoi(ptr);
 		if (buf >= 0 && buf <= 8)
 			DeviceIndex = buf;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 }
 
@@ -190,7 +190,7 @@ static BOOL OS2_Init(void)
 	   sizes (16K for 44KHz, 16 bit stereo). */
 
 	/* Allocate buffer */
-	if (!(AudioBuffer = _mm_malloc(BufferSize * FRAGMENTS))) {
+	if (!(AudioBuffer = MikMod_malloc(BufferSize * FRAGMENTS))) {
 		_mm_errno = MMERR_OUT_OF_MEMORY;
 		return 1;
 	}
@@ -291,7 +291,7 @@ static void OS2_Exit(void)
 					   (PVOID) & mciGenericParms, 0);
 		DeviceID = 0;
 	}
-	_mm_free(AudioBuffer);
+	MikMod_free(AudioBuffer);
 }
 
 static BOOL OS2_PlayStart(void)

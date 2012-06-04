@@ -74,7 +74,7 @@ libmikmod.a: $(OBJ)
 version.mak: ../configure.in
 	grep "LIBMIKMOD_.*_VERSION=" $< >$@
 
-include/mikmod.h include/mikmod_build.h: ../include/mikmod_h.in
+include/mikmod.h include/mikmod_build.h: ../include/mikmod.h.in
 	sed $(SED_CONFIG) $< >$@
 
 -include version.mak

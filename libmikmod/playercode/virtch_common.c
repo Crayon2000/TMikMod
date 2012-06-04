@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: virtch_common.c,v 1.2 2004/02/13 13:31:54 raph Exp $
+  $Id$
 
   Common source parts between the two software mixers.
   This file is probably the ugliest part of libmikmod...
@@ -103,7 +103,7 @@ extern ULONG VC1_VoiceRealVolume(UBYTE);
 extern ULONG VC2_VoiceRealVolume(UBYTE);
 static ULONG (*VC_VoiceRealVolume_ptr)(UBYTE);
 
-#if defined __STDC__ || defined _MSC_VER
+#if defined __STDC__ || defined _MSC_VER || defined MPW_C
 #define VC_PROC0(suffix) \
 MIKMODAPI void VC_##suffix (void) { VC_##suffix##_ptr(); }
 
@@ -274,9 +274,9 @@ ULONG VC1_WriteBytes(SBYTE* buf,ULONG todo)
 
 void VC1_Exit(void)
 {
-	if(vc_tickbuf) free(vc_tickbuf);
-	if(vinf) free(vinf);
-	if(Samples) free(Samples);
+	if(vc_tickbuf) MikMod_free(vc_tickbuf);
+	if(vinf) MikMod_free(vinf);
+	if(Samples) MikMod_free(Samples);
 
 	vc_tickbuf = NULL;
 	vinf = NULL;
@@ -328,7 +328,7 @@ BOOL VC1_VoiceStopped(UBYTE voice)
 
 SLONG VC1_VoiceGetPosition(UBYTE voice)
 {
-	return(vinf[voice].current>>FRACBITS);
+	return (SLONG)(vinf[voice].current>>FRACBITS);
 }
 
 void VC1_VoiceSetVolume(UBYTE voice,UWORD vol)
@@ -351,9 +351,9 @@ void VC1_VoiceSetPanning(UBYTE voice,ULONG pan)
 
 void VC1_SampleUnload(SWORD handle)
 {
-	if (handle<MAXSAMPLEHANDLES) {
+	if (Samples && (handle < MAXSAMPLEHANDLES)) {
 		if (Samples[handle])
-			free(Samples[handle]);
+			MikMod_free(Samples[handle]);
 		Samples[handle]=NULL;
 	}
 }
@@ -388,7 +388,7 @@ SWORD VC1_SampleLoad(struct SAMPLOAD* sload,int type)
 	SL_SampleSigned(sload);
 	SL_Sample8to16(sload);
 
-	if(!(Samples[handle]=(SWORD*)_mm_malloc((length+20)<<1))) {
+	if(!(Samples[handle]=(SWORD*)MikMod_malloc((length+20)<<1))) {
 		_mm_errno = MMERR_SAMPLE_TOO_BIG;
 		return -1;
 	}
@@ -431,7 +431,7 @@ ULONG VC1_VoiceRealVolume(UBYTE voice)
 	SWORD *smp;
 	SLONG t;
 
-	t = vinf[voice].current>>FRACBITS;
+	t = (SLONG)(vinf[voice].current>>FRACBITS);
 	if(!vinf[voice].active) return 0;
 
 	s = vinf[voice].handle;
@@ -451,6 +451,7 @@ ULONG VC1_VoiceRealVolume(UBYTE voice)
 	}
 	return abs(k-j);
 }
+
 
 #endif
 

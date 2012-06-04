@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_mac.c,v 1.7 2004/02/16 17:58:05 raph Exp $
+  $Id$
 
   Driver for output to the Macintosh Sound Manager
 

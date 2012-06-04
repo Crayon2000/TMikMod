@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: libgus.h,v 1.1 2004/02/01 02:01:17 raph Exp $
+  $Id$
 
   Linux libGUS-alike library for DOS, used by drv_ultra.c under DOS.
 

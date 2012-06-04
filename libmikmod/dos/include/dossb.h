@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: dossb.h,v 1.1 2004/02/01 02:01:17 raph Exp $
+  $Id$
 
   SoundBlaster and compatible soundcards definitions
 

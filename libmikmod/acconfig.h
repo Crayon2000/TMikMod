@@ -23,6 +23,8 @@
 #undef DRV_ESD
 /* Define if the HP-UX audio driver is compiled */
 #undef DRV_HP
+/* Define if the Network Audio System driver is compiled */
+#undef DRV_NAS
 /* Define if the Open Sound System driver is compiled */
 #undef DRV_OSS
 /* Define if the Linux SAM9407 driver is compiled */
@@ -61,3 +63,6 @@
 #undef HAVE_RTLD_GLOBAL
 /* Define if your system needs leading underscore to function names in dlsym() calls */
 #undef DLSYM_NEEDS_UNDERSCORE
+
+/* define this if you are running a bigendian system (motorola, sparc, etc) */
+#undef WORDS_BIGENDIAN

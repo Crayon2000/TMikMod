@@ -87,12 +87,12 @@ static int _allocate_iret_wrapper(_go32_dpmi_seginfo * info)
 
 	wrappersize = 4 + __irq_stack_size * __irq_stack_count + 4 +
 	  ((long)irqend - (long)irqtpl);
-	irqwrapper = malloc(wrappersize);
+	irqwrapper = MikMod_malloc(wrappersize);
 	/* Lock the wrapper */
 	handler_info.address = __djgpp_base_address + (unsigned long)irqwrapper;
 	handler_info.size = wrappersize;
 	if (__dpmi_lock_linear_region(&handler_info)) {
-		free(irqwrapper);
+		MikMod_free(irqwrapper);
 		return -1;
 	}
 
@@ -130,7 +130,7 @@ static void _free_iret_wrapper(_go32_dpmi_seginfo * info)
 	handler_info.size = *(unsigned long *)info->pm_offset;
 	__dpmi_unlock_linear_region(&handler_info);
 
-	free((void *)info->pm_offset);
+	MikMod_free((void *)info->pm_offset);
 }
 
 irq_handle *irq_hook(int irqno, void (*handler) (), unsigned long size)
@@ -166,7 +166,7 @@ irq_handle *irq_hook(int irqno, void (*handler) (), unsigned long size)
 		return NULL;
 	}
 
-	irq = malloc(sizeof(irq_handle));
+	irq = MikMod_malloc(sizeof(irq_handle));
 	irq->c_handler = handler;
 	irq->handler_size = size;
 	irq->handler = info.pm_offset;
@@ -179,7 +179,7 @@ irq_handle *irq_hook(int irqno, void (*handler) (), unsigned long size)
 	struct_info.address = __djgpp_base_address + (unsigned long)irq;
 	struct_info.size = sizeof(irq_handle);
 	if (__dpmi_lock_linear_region(&struct_info)) {
-		free(irq);
+		MikMod_free(irq);
 		__dpmi_unlock_linear_region(&handler_info);
 		_free_iret_wrapper(&info);
 		return NULL;
@@ -224,7 +224,7 @@ void irq_unhook(irq_handle * irq)
 	else
 		irq_disable(irq);
 
-	free(irq);
+	MikMod_free(irq);
 }
 
 /*---------------------------------------------- IRQ detection mechanism -----*/

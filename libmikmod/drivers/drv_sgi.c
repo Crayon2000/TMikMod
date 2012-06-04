@@ -20,7 +20,7 @@
   
 /*==============================================================================
 
-  $Id: drv_sgi.c,v 1.2 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output on SGI audio system (needs libaudio from the dmedia
   package).
@@ -75,12 +75,12 @@ static void SGI_CommandLine(CHAR *cmdline)
 	
 	if ((ptr=MD_GetAtom("fragsize",cmdline,0))) {
 		sgi_fragsize=atol(ptr);
-		free(ptr);
+		MikMod_free(ptr);
 	} else sgi_fragsize=DEFAULT_SGI_FRAGSIZE;
 
 	if ((ptr=MD_GetAtom("bufsize",cmdline,0))) {
 		sgi_bufsize=atol(ptr);
-		free(ptr);
+		MikMod_free(ptr);
 	} else sgi_bufsize=DEFAULT_SGI_BUFSIZE;
 }
 
@@ -167,7 +167,7 @@ static BOOL SGI_Init(void)
 		return 1;
 	}
 
-	if(!(audiobuffer=(SBYTE*)_mm_malloc(sgi_fragsize))) return 1;
+	if(!(audiobuffer=(SBYTE*)MikMod_malloc(sgi_fragsize))) return 1;
 	
 	return VC_Init();
 }
@@ -175,7 +175,7 @@ static BOOL SGI_Init(void)
 static void SGI_Exit(void)
 {
 	VC_Exit();
-	_mm_free(audiobuffer);
+	MikMod_free(audiobuffer);
 }
 
 static void SGI_Update(void)

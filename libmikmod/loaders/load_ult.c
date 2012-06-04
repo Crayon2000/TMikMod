@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_ult.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   Ultratracker (ULT) module loader
 
@@ -224,7 +224,14 @@ BOOL ULT_Load(BOOL curious)
 	for(u=0;u<of.numchn;u++)
 		for(t=0;t<of.numpat;t++)
 			of.patterns[(t*of.numchn)+u]=tracks++;
+	/* fix for CVE-2009-3996 - snatched from SuSe's fix -- AW */
+	if (of.numchn>=UF_MAXCHAN)
+		of.numchn=UF_MAXCHAN - 1;
 
+	// SA37775
+	if (of.numchn>=UF_MAXCHAN)
+		of.numchn=UF_MAXCHAN - 1;
+	
 	/* read pan position table for v1.5 and higher */
 	if(mh.id[14]>='3') {
 		for(t=0;t<of.numchn;t++) of.panning[t]=_mm_read_UBYTE(modreader)<<4;

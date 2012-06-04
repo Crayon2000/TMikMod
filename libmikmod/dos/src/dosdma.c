@@ -137,7 +137,7 @@ dma_buffer *dma_allocate(unsigned int channel, unsigned int size)
 		goto exit;
 	}
 
-	buffer = malloc(sizeof(dma_buffer));
+	buffer = MikMod_malloc(sizeof(dma_buffer));
 	buffer->linear = (void *)(__djgpp_conventional_base + bound * 16);
 	buffer->physical = bound * 16;
 	buffer->size = parsize * 16;
@@ -158,7 +158,7 @@ dma_buffer *dma_allocate(unsigned int channel, unsigned int size)
 	if (__dpmi_lock_linear_region(&struct_info)) {
 		__dpmi_unlock_linear_region(&buff_info);
 		__dpmi_free_dos_memory(selector);
-		free(buffer);
+		MikMod_free(buffer);
 		buffer = NULL;
 		goto exit;
 	}
@@ -183,7 +183,7 @@ void dma_free(dma_buffer * buffer)
 	__dpmi_unlock_linear_region(&buff_info);
 
 	__dpmi_free_dos_memory(buffer->selector);
-	free(buffer);
+	MikMod_free(buffer);
 
 	if (--__buffer_count == 0)
 		dma_finalize();

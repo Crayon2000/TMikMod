@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_stx.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   STMIK 0.2 (STX) module loader
 
@@ -129,9 +129,9 @@ static BOOL STX_Test(void)
 
 static BOOL STX_Init(void)
 {
-	if(!(stxbuf=(STXNOTE*)_mm_malloc(4*64*sizeof(STXNOTE)))) return 0;
-	if(!(mh=(STXHEADER*)_mm_malloc(sizeof(STXHEADER)))) return 0;
-	if(!(poslookup=(UBYTE*)_mm_malloc(sizeof(UBYTE)*256))) return 0;
+	if(!(stxbuf=(STXNOTE*)MikMod_malloc(4*64*sizeof(STXNOTE)))) return 0;
+	if(!(mh=(STXHEADER*)MikMod_malloc(sizeof(STXHEADER)))) return 0;
+	if(!(poslookup=(UBYTE*)MikMod_malloc(sizeof(UBYTE)*256))) return 0;
 	memset(poslookup,-1,256);
 
 	return 1;
@@ -139,10 +139,10 @@ static BOOL STX_Init(void)
 
 static void STX_Cleanup(void)
 {
-	_mm_free(stxbuf);
-	_mm_free(paraptr);
-	_mm_free(poslookup);
-	_mm_free(mh);
+	MikMod_free(stxbuf);
+	MikMod_free(paraptr);
+	MikMod_free(poslookup);
+	MikMod_free(mh);
 }
 
 static BOOL STX_ReadPattern(void)
@@ -309,7 +309,7 @@ static BOOL STX_Load(BOOL curious)
 	of.flags      |= UF_S3MSLIDES;
 	of.bpmlimit    = 32;
 
-	if(!(paraptr=(UWORD*)_mm_malloc((of.numins+of.numpat)*sizeof(UWORD))))
+	if(!(paraptr=(UWORD*)MikMod_malloc((of.numins+of.numpat)*sizeof(UWORD))))
 		return 0;
 
 	/* read the instrument+pattern parapointers */
@@ -323,10 +323,10 @@ static BOOL STX_Load(BOOL curious)
 	version=_mm_read_I_UWORD(modreader);
 	if(version==mh->patsize) {
 		version    = 0x10;
-		of.modtype = strdup("STMIK 0.2 (STM2STX 1.0)");
+		of.modtype = StrDup("STMIK 0.2 (STM2STX 1.0)");
 	} else {
 		version    = 0x11;
-		of.modtype = strdup("STMIK 0.2 (STM2STX 1.1)");
+		of.modtype = StrDup("STMIK 0.2 (STM2STX 1.1)");
 	}
 
 	/* read the order data */

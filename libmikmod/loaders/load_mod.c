@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_mod.c,v 1.2 2004/01/21 13:33:11 raph Exp $
+  $Id$
 
   Generic MOD loader (Protracker, StarTracker, FastTracker, etc)
 
@@ -181,15 +181,15 @@ static BOOL MOD_Test(void)
 
 static BOOL MOD_Init(void)
 {
-	if (!(mh = (MODULEHEADER *)_mm_malloc(sizeof(MODULEHEADER))))
+	if (!(mh = (MODULEHEADER *)MikMod_malloc(sizeof(MODULEHEADER))))
 		return 0;
 	return 1;
 }
 
 static void MOD_Cleanup(void)
 {
-	_mm_free(mh);
-	_mm_free(patbuf);
+	MikMod_free(mh);
+	MikMod_free(patbuf);
 }
 
 /*
@@ -317,7 +317,7 @@ static BOOL ML_LoadPatterns(void)
 		return 0;
 	
 	/* Allocate temporary buffer for loading and converting the patterns */
-	if (!(patbuf = (MODNOTE *)_mm_calloc(64U * of.numchn, sizeof(MODNOTE))))
+	if (!(patbuf = (MODNOTE *)MikMod_calloc(64U * of.numchn, sizeof(MODNOTE))))
 		return 0;
 
 	if (trekker && of.numchn == 8) {
@@ -476,7 +476,7 @@ static BOOL MOD_Load(BOOL curious)
 		q++;
 	}
 
-	of.modtype = strdup(descr);
+	of.modtype = StrDup(descr);
 
 	if (!ML_LoadPatterns())
 		return 0;

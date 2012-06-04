@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: sloader.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   Routines for loading samples. The sample loader utilizes the routines
   provided by the "registered" sample loader.
@@ -56,7 +56,7 @@ typedef struct ITPACK {
 BOOL SL_Init(SAMPLOAD* s)
 {
 	if(!sl_buffer)
-		if(!(sl_buffer=_mm_malloc(SLBUFSIZE*sizeof(SWORD)))) return 0;
+		if(!(sl_buffer=MikMod_malloc(SLBUFSIZE*sizeof(SWORD)))) return 0;
 
 	sl_rlength = s->length;
 	if(s->infmt & SF_16BITS) sl_rlength>>=1;
@@ -69,7 +69,7 @@ void SL_Exit(SAMPLOAD *s)
 {
 	if(sl_rlength>0) _mm_fseek(s->reader,sl_rlength,SEEK_CUR);
 	if(sl_buffer) {
-		free(sl_buffer);
+		MikMod_free(sl_buffer);
 		sl_buffer=NULL;
 	}
 }
@@ -145,7 +145,7 @@ static BOOL read_itcompr8(ITPACK* status,MREADER *reader,SWORD *sl_buffer,UWORD 
 	status->bufbits = bufbits;
 	status->last = last;
 	status->buf = buf;
-	return dest-sl_buffer;
+	return (dest-sl_buffer);
 }
 
 /* unpack a 16bit IT packed sample */
@@ -174,15 +174,15 @@ static BOOL read_itcompr16(ITPACK *status,MREADER *reader,SWORD *sl_buffer,UWORD
 			y=needbits<bufbits?needbits:bufbits;
 			x|=(buf &((1<<y)-1))<<havebits;
 			buf>>=y;
-			bufbits-=y;
-			needbits-=y;
-			havebits+=y;
+			bufbits-=(UWORD)y;
+			needbits-=(UWORD)y;
+			havebits+=(UWORD)y;
 		}
 		if (new_count) {
 			new_count = 0;
 			if (++x >= bits)
 				x++;
-			bits = x;
+			bits = (UWORD)x;
 			continue;
 		}
 		if (bits<7) {
@@ -196,13 +196,13 @@ static BOOL read_itcompr16(ITPACK *status,MREADER *reader,SWORD *sl_buffer,UWORD
 			if ((x>y)&&(x<=y+16)) {
 				if ((x-=y)>=bits)
 					x++;
-				bits = x;
+				bits = (UWORD)x;
 				continue;
 			}
 		}
 		else if (bits<18) {
 			if (x>=0x10000) {
-				bits=x-0x10000+1;
+				bits=(UWORD)(x-0x10000+1);
 				continue;
 			}
 		} else {
@@ -219,7 +219,7 @@ static BOOL read_itcompr16(ITPACK *status,MREADER *reader,SWORD *sl_buffer,UWORD
 	status->bufbits = bufbits;
 	status->last = last;
 	status->buf = buf;
-	return dest-sl_buffer;
+	return (dest-sl_buffer);
 }
 
 static BOOL SL_LoadInternal(void* buffer,UWORD infmt,UWORD outfmt,int scalefactor,ULONG length,MREADER* reader,BOOL dither)
@@ -299,7 +299,7 @@ static BOOL SL_LoadInternal(void* buffer,UWORD infmt,UWORD outfmt,int scalefacto
 				scaleval = 0;
 				for(u=scalefactor;u && t<stodo;u--,t++)
 					scaleval+=sl_buffer[t];
-				sl_buffer[idx++]=scaleval/(scalefactor-u);
+				sl_buffer[idx++]=(UWORD)(scaleval/(scalefactor-u));
 				length--;
 			}
 			stodo = idx;
@@ -316,7 +316,7 @@ static BOOL SL_LoadInternal(void* buffer,UWORD infmt,UWORD outfmt,int scalefacto
 				while(t<stodo && length) {
 					avgval=sl_buffer[t++];
 					avgval+=sl_buffer[t++];
-					sl_buffer[idx++]=avgval>>1;
+					sl_buffer[idx++]=(SWORD)(avgval>>1);
 					length-=2;
 				}
 				stodo = idx;
@@ -356,7 +356,7 @@ SAMPLOAD* SL_RegisterSample(SAMPLE* s,int type,MREADER* reader)
 		return NULL;
 	
 	/* Allocate and add structure to the END of the list */
-	if(!(news=(SAMPLOAD*)_mm_malloc(sizeof(SAMPLOAD)))) return NULL;
+	if(!(news=(SAMPLOAD*)MikMod_malloc(sizeof(SAMPLOAD)))) return NULL;
 
 	if(cruise) {
 		while(cruise->next) cruise=cruise->next;
@@ -382,7 +382,7 @@ static void FreeSampleList(SAMPLOAD* s)
 	while(s) {
 		old = s;
 		s = s->next;
-		free(old);
+		MikMod_free(old);
 	}
 }
 

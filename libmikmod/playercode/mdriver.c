@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mdriver.c,v 1.3 2004/02/18 13:29:19 raph Exp $
+  $Id$
 
   These routines are used to access the available soundcard drivers.
 
@@ -72,7 +72,7 @@ MIKMODAPI	UBYTE md_sndfxvolume    = 128;	/* volume of sound effects */
 			UBYTE md_hardchn=0,md_softchn=0;
 
 			void (*md_player)(void) = Player_HandleTick;
-static		BOOL  isplaying=0, initialized = 0;
+static volatile	BOOL  isplaying=0, initialized = 0;
 static		UBYTE *sfxinfo;
 static		int sfxpool;
 
@@ -174,7 +174,8 @@ ULONG MD_SampleLength(int type,SAMPLE* s)
 
 MIKMODAPI CHAR* MikMod_InfoDriver(void)
 {
-	int t,len=0;
+	int t;
+	size_t len=0;
 	MDRIVER *l;
 	CHAR *list=NULL;
 
@@ -184,12 +185,17 @@ MIKMODAPI CHAR* MikMod_InfoDriver(void)
 		len+=4+(l->next?1:0)+strlen(l->Version);
 
 	if(len)
-		if((list=_mm_malloc(len*sizeof(CHAR)))) {
+		if((list=MikMod_malloc(len*sizeof(CHAR)))) {
+			CHAR * list_end = list;
 			list[0]=0;
 			/* list all registered device drivers : */
 			for(t=1,l=firstdriver;l;l=l->next,t++)
-				sprintf(list,(l->next)?"%s%2d %s\n":"%s%2d %s",
-				    list,t,l->Version);
+			{
+				list_end += sprintf(list_end,
+					"%2d %s%s",
+					t,l->Version, ((l->next)?"\n":"")
+				);
+			}
 		}
 	MUTEX_UNLOCK(lists);
 	return list;
@@ -202,7 +208,13 @@ void _mm_registerdriver(struct MDRIVER* drv)
 	/* don't register a MISSING() driver */
 	if ((drv->Name) && (drv->Version)) {
 		if (cruise) {
-			while (cruise->next) cruise = cruise->next;
+			if ( cruise == drv )
+				return;
+			while(cruise->next) {
+				cruise = cruise->next;
+				if ( cruise == drv )
+					return;
+			}
 			cruise->next = drv;
 		} else
 			firstdriver = drv; 
@@ -487,6 +499,13 @@ MIKMODAPI ULONG Voice_RealVolume(SBYTE voice)
 	return result;
 }
 
+MikMod_callback_t vc_callback;
+
+MIKMODAPI void VC_SetCallback(MikMod_callback_t callback)
+{
+	vc_callback = callback;
+}
+
 static BOOL _mm_init(CHAR *cmdline)
 {
 	UWORD t;
@@ -565,8 +584,8 @@ void MikMod_Exit_internal(void)
 	md_numchn = md_sfxchn = md_sngchn = 0;
 	md_driver = &drv_nos;
 
-	if(sfxinfo) free(sfxinfo);
-	if(md_sample) free(md_sample);
+	if(sfxinfo) MikMod_free(sfxinfo);
+	if(md_sample) MikMod_free(md_sample);
 	md_sample  = NULL;
 	sfxinfo    = NULL;
 
@@ -645,8 +664,8 @@ BOOL MikMod_SetNumVoices_internal(int music, int sfx)
 		resume = 1;
 	}
 
-	if(sfxinfo) free(sfxinfo);
-	if(md_sample) free(md_sample);
+	if(sfxinfo) MikMod_free(sfxinfo);
+	if(md_sample) MikMod_free(md_sample);
 	md_sample  = NULL;
 	sfxinfo    = NULL;
 
@@ -666,9 +685,9 @@ BOOL MikMod_SetNumVoices_internal(int music, int sfx)
 	}
 
 	if(md_sngchn+md_sfxchn)
-		md_sample=(SAMPLE**)_mm_calloc(md_sngchn+md_sfxchn,sizeof(SAMPLE*));
+		md_sample=(SAMPLE**)MikMod_calloc(md_sngchn+md_sfxchn,sizeof(SAMPLE*));
 	if(md_sfxchn)
-		sfxinfo = (UBYTE *)_mm_calloc(md_sfxchn,sizeof(UBYTE));
+		sfxinfo = (UBYTE *)MikMod_calloc(md_sfxchn,sizeof(UBYTE));
 
 	/* make sure the player doesn't start with garbage */
 	for(t=oldchn;t<md_numchn;t++)  Voice_Stop_internal(t);
@@ -876,12 +895,12 @@ CHAR *MD_GetAtom(CHAR *atomname,CHAR *cmdline,BOOL implicit)
 
 			if(*ptr=='=') {
 				for(buf=++ptr;(*ptr)&&((*ptr)!=',');ptr++);
-				ret=_mm_malloc((1+ptr-buf)*sizeof(CHAR));
+				ret=MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
 				if(ret)
 					strncpy(ret,buf,ptr-buf);
 			} else if((*ptr==',')||(!*ptr)) {
 				if(implicit) {
-					ret=_mm_malloc((1+ptr-buf)*sizeof(CHAR));
+					ret=MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
 					if(ret)
 						strncpy(ret,buf,ptr-buf);
 				}

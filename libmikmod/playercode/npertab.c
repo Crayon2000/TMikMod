@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: npertab.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   MOD format period table.  Used by both the MOD and M15 (15-inst mod) Loaders.
 

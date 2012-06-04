@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_sun.c,v 1.3 2004/02/10 14:02:24 raph Exp $
+  $Id$
 
   Driver for output on the Sun audio device (/dev/audio).
   Also works under NetBSD and OpenBSD
@@ -180,15 +180,15 @@ static void Sun_CommandLine(CHAR *cmdline)
 		if (buf >= 7 && buf <= 17)
 			fragsize = 1 << buf;
 
-		free(ptr);
+		MikMod_free(ptr);
 	}
 
 	if ((ptr = MD_GetAtom("headphone", cmdline, 1))) {
 		port = AUDIO_HEADPHONE;
-		free(ptr);
+		MikMod_free(ptr);
 	} else if ((ptr = MD_GetAtom("speaker", cmdline, 1))) {
 		port = AUDIO_SPEAKER;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 }
 
@@ -233,7 +233,7 @@ static BOOL Sun_Init(void)
 		return 1;
 	}
 
-	if (!(audiobuffer = (SBYTE *)_mm_malloc(fragsize)))
+	if (!(audiobuffer = (SBYTE *)MikMod_malloc(fragsize)))
 		return 1;
 
 	play_precision = (md_mode & DMODE_16BITS) ? 16 : 8;
@@ -405,7 +405,7 @@ static BOOL Sun_Init(void)
 static void Sun_Exit(void)
 {
 	VC_Exit();
-	_mm_free(audiobuffer);
+	MikMod_free(audiobuffer);
 	if (sndfd >= 0) {
 		close(sndfd);
 		sndfd = -1;

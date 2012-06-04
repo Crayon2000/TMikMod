@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_gdm.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
+  $Id$
 
   General DigiMusic (GDM) module loader
 
@@ -136,16 +136,16 @@ BOOL GDM_Test(void)
 
 BOOL GDM_Init(void)
 {
-	if (!(gdmbuf=(GDMNOTE*)_mm_malloc(32*64*sizeof(GDMNOTE)))) return 0;
-	if (!(mh=(GDMHEADER*)_mm_malloc(sizeof(GDMHEADER)))) return 0;
+	if (!(gdmbuf=(GDMNOTE*)MikMod_malloc(32*64*sizeof(GDMNOTE)))) return 0;
+	if (!(mh=(GDMHEADER*)MikMod_malloc(sizeof(GDMHEADER)))) return 0;
 
 	return 1;
 }
 
 void GDM_Cleanup(void)
 {
-	_mm_free(mh);
-	_mm_free(gdmbuf);
+	MikMod_free(mh);
+	MikMod_free(gdmbuf);
 }
 
 BOOL GDM_ReadPattern(void)
@@ -389,7 +389,7 @@ BOOL GDM_Load(BOOL curious)
 	}
 
 	/* now we fill */
-	of.modtype=strdup(GDM_Version);
+	of.modtype=StrDup(GDM_Version);
 	of.modtype[18]=mh->majorver+'0';
 	of.modtype[20]=mh->minorver/10+'0';
 	of.modtype[21]=mh->minorver%10+'0';

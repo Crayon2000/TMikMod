@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_oss.c,v 1.4 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output on Linux and FreeBSD Open Sound System (OSS) (/dev/dsp) 
 
@@ -114,18 +114,18 @@ static void OSS_CommandLine(CHAR *cmdline)
 	if((ptr=MD_GetAtom("buffer",cmdline,0))) {
 		fragsize=atoi(ptr);
 		if((fragsize<7)||(fragsize>17)) fragsize=DEFAULT_FRAGSIZE;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 	if((ptr=MD_GetAtom("count",cmdline,0))) {
 		numfrags=atoi(ptr);
 		if((numfrags<2)||(numfrags>255)) numfrags=DEFAULT_NUMFRAGS;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 #endif
 	if((ptr=MD_GetAtom("card",cmdline,0))) {
 		card = atoi(ptr);
 		if((card<0)||(card>99)) card=DEFAULT_CARD;
-		free(ptr);
+		MikMod_free(ptr);
 	}
 }
 
@@ -160,7 +160,7 @@ static BOOL OSS_IsThere(void)
 	   in the kernel or sound hardware                                      */
 	int fd;
 
-	if((fd=open(OSS_GetDeviceName(),O_WRONLY))>=0) {
+	if((fd=open(OSS_GetDeviceName(),O_WRONLY|O_NONBLOCK))>=0) {
 		close(fd);
 		return 1;
 	}
@@ -245,13 +245,13 @@ static BOOL OSS_Init_internal(void)
 	/* This call fails on Linux/PPC */
 	if((ioctl(sndfd,SNDCTL_DSP_GETOSPACE,&buffinf)<0))
 		ioctl(sndfd,SNDCTL_DSP_GETBLKSIZE,&buffinf.fragsize);
-	if(!(audiobuffer=(SBYTE*)_mm_malloc(buffinf.fragsize)))
+	if(!(audiobuffer=(SBYTE*)MikMod_malloc(buffinf.fragsize)))
 		return 1;
 	
 	buffersize = buffinf.fragsize;
 #else
 	ioctl(sndfd,SNDCTL_DSP_GETBLKSIZE,&buffersize);
-	if(!(audiobuffer=(SBYTE*)_mm_malloc(buffersize)))
+	if(!(audiobuffer=(SBYTE*)MikMod_malloc(buffersize)))
 		return 1;
 #endif
 
@@ -293,7 +293,7 @@ static BOOL OSS_Init(void)
 static void OSS_Exit_internal(void)
 {
 	VC_Exit();
-	_mm_free(audiobuffer);
+	MikMod_free(audiobuffer);
 }
 
 static void OSS_Exit(void)
@@ -361,16 +361,11 @@ MIKMODAPI MDRIVER drv_oss={
 	0,255,
 	"oss",
 #ifdef SNDCTL_DSP_SETFRAGMENT
-        "buffer:r:7,17,14:Audio buffer log2 size\n"
-        "count:r:2,255,16:Audio buffer count\n",
-#else
-        NULL,
+	"buffer:r:7,17,14:Audio buffer log2 size\n"
+	"count:r:2,255,16:Audio buffer count\n"
 #endif	
-#ifdef SNDCTL_DSP_SETFRAGMENT
+	"card:r:0,99,0:Sound card id\n",
 	OSS_CommandLine,
-#else
-	NULL,
-#endif
 	OSS_IsThere,
 	VC_SampleLoad,
 	VC_SampleUnload,

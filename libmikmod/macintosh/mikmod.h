@@ -20,8 +20,6 @@
 
 /*==============================================================================
 
-  $Id: mikmod.h,v 1.12 2004/02/21 02:01:55 raph Exp $
-
   MikMod sound library include file
 
 ==============================================================================*/
@@ -712,6 +710,7 @@ MIKMODAPI extern struct MDRIVER drv_osx;	/* MacOS X CoreAudio Driver */
 
 MIKMODAPI extern BOOL  VC_Init(void);
 MIKMODAPI extern void  VC_Exit(void);
+MIKMODAPI extern void  VC_SetCallback(MikMod_callback_t callback);
 MIKMODAPI extern BOOL  VC_SetNumVoices(void);
 MIKMODAPI extern ULONG VC_SampleSpace(int);
 MIKMODAPI extern ULONG VC_SampleLength(int,SAMPLE*);

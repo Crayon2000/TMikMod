@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: drv_pipe.c,v 1.3 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output via a pipe to another command
 
@@ -71,7 +71,7 @@ static void pipe_CommandLine(CHAR *cmdline)
 	CHAR *ptr=MD_GetAtom("pipe",cmdline,0);
 
 	if(ptr) {
-		_mm_free(target);
+		MikMod_free(target);
 		target=ptr;
 	}
 }
@@ -131,7 +131,7 @@ static BOOL pipe_Init(void)
 #endif
 	if(!(pipeout=_mm_new_file_writer(pipefile)))
 		return 1;
-	if(!(audiobuffer=(SBYTE*)_mm_malloc(BUFFERSIZE)))
+	if(!(audiobuffer=(SBYTE*)MikMod_malloc(BUFFERSIZE)))
 		return 1;
 
 	md_mode|=DMODE_SOFT_MUSIC|DMODE_SOFT_SNDFX;
@@ -147,7 +147,7 @@ static void pipe_Exit(void)
 #endif
 
 	VC_Exit();
-	_mm_free(audiobuffer);
+	MikMod_free(audiobuffer);
 	if(pipeout) {
 		_mm_delete_file_writer(pipeout);
 		pipeout=NULL;

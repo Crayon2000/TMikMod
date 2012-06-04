@@ -20,7 +20,7 @@
   
 /*==============================================================================
 
-  $Id: drv_AF.c,v 1.2 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output on AF audio server.
 
@@ -75,7 +75,7 @@ static void AF_CommandLine(CHAR *cmdline)
 	CHAR *machine=MD_GetAtom("machine",cmdline,0);
 
 	if(machine) {
-		if(soundbox) free(soundbox);
+		if(soundbox) MikMod_free(soundbox);
 		soundbox=machine;
 	}
 }
@@ -137,10 +137,10 @@ static BOOL AF_Init(void)
 	md_mixfreq=srate;				/* set mixing freq */
 
 	if (md_mode&DMODE_STEREO) {
-		if (!(audiobuffer=(SBYTE*)_mm_malloc(2*2*AFFragmentSize))) 
+		if (!(audiobuffer=(SBYTE*)MikMod_malloc(2*2*AFFragmentSize))) 
 			return 1;
 	} else {
-		if (!(audiobuffer=(SBYTE*)_mm_malloc(2*AFFragmentSize))) 
+		if (!(audiobuffer=(SBYTE*)MikMod_malloc(2*AFFragmentSize))) 
 			return 1;
 	}
   
@@ -156,7 +156,7 @@ static BOOL AF_PlayStart(void)
 static void AF_Exit(void)
 {
 	VC_Exit();
-	_mm_free(audiobuffer);
+	MikMod_free(audiobuffer);
 	if (AFaud) {
 		AFCloseAudioConn(AFaud);
 		AFaud=NULL;

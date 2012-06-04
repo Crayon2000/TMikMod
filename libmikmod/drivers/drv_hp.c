@@ -20,7 +20,7 @@
   
 /*==============================================================================
 
-  $Id: drv_hp.c,v 1.2 2004/01/31 22:39:40 raph Exp $
+  $Id$
 
   Driver for output to HP 9000 series /dev/audio
 
@@ -66,12 +66,12 @@ static void HP_CommandLine(CHAR *cmdline)
 		if((buf<12)||(buf>19)) buf=BUFFERSIZE;
 		buffersize=1<<buf;
 
-		free(buffer);
+		MikMod_free(buffer);
 	}
 
 	if((buffer=MD_GetAtom("headphone",cmdline,1))) {
 		headphone=1;
-		free(buffer);
+		MikMod_free(buffer);
 	} else
 		headphone=0;
 }
@@ -137,7 +137,7 @@ static BOOL HP_Init(void)
 		return 1;
 	}
 
-	if (!(audiobuffer=(SBYTE*)_mm_malloc(buffersize))) return 1;
+	if (!(audiobuffer=(SBYTE*)MikMod_malloc(buffersize))) return 1;
 	
 	return VC_Init();
 }
@@ -151,7 +151,7 @@ static void HP_Exit(void)
 		fd=-1;
 	}
 	if (audiobuffer) {
-		free(audiobuffer);
+		MikMod_free(audiobuffer);
 		audiobuffer=NULL;
 	}
 }
