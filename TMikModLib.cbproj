@@ -45,6 +45,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<BCC_CPPCompileAlways>true</BCC_CPPCompileAlways>
 			<UsingDelphiRTL>true</UsingDelphiRTL>
 			<TLIB_PageSize>64</TLIB_PageSize>
 			<AllPackageLibs>rtl.lib</AllPackageLibs>
@@ -148,6 +149,9 @@
 			</CppCompile>
 			<CppCompile Include="libmikmod\loaders\load_gdm.c">
 				<BuildOrder>11</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="libmikmod\loaders\load_gt2.c">
+				<BuildOrder>48</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="libmikmod\loaders\load_imf.c">
 				<BuildOrder>12</BuildOrder>

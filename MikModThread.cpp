@@ -10,7 +10,7 @@
 /**
  * Constructor.
  */
-__fastcall TMikModThread::TMikModThread() : TThread(true)
+__fastcall TMikModThread::TMikModThread() : Classes::TThread(true)
 {
 }
 

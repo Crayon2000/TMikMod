@@ -28,7 +28,7 @@ enum TModuleDriver
 /**
  * TVoice class.
  */
-class TVoice : public TObject
+class TVoice : public System::TObject
 {
     typedef System::TObject inherited;
 

@@ -7,8 +7,10 @@
 namespace Mikmod
 {
 
-class TMikModThread : public TThread
+class TMikModThread : public Classes::TThread
 {
+    typedef Classes::TThread inherited;
+
 private:
 protected:
     void __fastcall Execute();

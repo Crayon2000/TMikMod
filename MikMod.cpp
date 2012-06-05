@@ -32,6 +32,7 @@ static long GST_READER_Tell(MREADER *reader);
  * Constructor.
  */
 __fastcall TVoice::TVoice(Int8 AVoiceNumber) :
+    System::TObject(),
     FVoiceNumber(AVoiceNumber)
 {
 }
@@ -130,7 +131,7 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
         {
             LException += " " + LError + ".";
         }
-        throw(Exception(LException), MikMod_errno);
+        throw Exception(LException, MikMod_errno);
     }
 
     // This should be at the end of the constructor in case an exception is thrown
