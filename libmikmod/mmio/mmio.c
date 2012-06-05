@@ -256,14 +256,14 @@ static BOOL _mm_MemReader_Eof(MREADER* reader)
 
 static BOOL _mm_MemReader_Read(MREADER* reader,void* ptr,size_t size)
 {
-	unsigned char *d=ptr;
+	unsigned char *d=(unsigned char*)ptr;
 	const unsigned char *s;
 	
 	if (!reader) { return 0; }
 
 	if (reader->Eof(reader)) { return 0; }
 
-	s = ((MMEMREADER*)reader)->buffer;
+	s = (unsigned char *)((MMEMREADER*)reader)->buffer;
 	s += ((MMEMREADER*)reader)->pos;
 
 	if ( ((MMEMREADER*)reader)->pos + size > ((MMEMREADER*)reader)->len) 

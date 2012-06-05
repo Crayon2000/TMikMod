@@ -336,30 +336,7 @@ static SLONGLONG MixSIMDStereoNormal(const SWORD* const srce,SLONG* dest,SLONGLO
 	
 	// Srce is always aligned ...
 
-#if defined HAVE_SSE2
-	remain = todo&3;	
-	{
-		__m128i v0 = _mm_set_epi16(0, vol[1], 
-								   0, vol[0], 
-								   0, vol[1], 
-								   0, vol[0]);
-		for(todo>>=2;todo; todo--)
-		{
-			SWORD s0 = GetSample(srce, index += increment);
-			SWORD s1 = GetSample(srce, index += increment);
-			SWORD s2 = GetSample(srce, index += increment);
-			SWORD s3 = GetSample(srce, index += increment);
-			__m128i v1 = _mm_set_epi16(0, s1, 0, s1, 0, s0, 0, s0);
-			__m128i v2 = _mm_set_epi16(0, s3, 0, s3, 0, s2, 0, s2);
-			__m128i v3 = _mm_load_si128((__m128i*)(dest+0));
-			__m128i v4 = _mm_load_si128((__m128i*)(dest+4));
-			_mm_store_si128((__m128i*)(dest+0), _mm_add_epi32(v3, _mm_madd_epi16(v0, v1)));
-			_mm_store_si128((__m128i*)(dest+4), _mm_add_epi32(v4, _mm_madd_epi16(v0, v2)));
-			dest+=8;				
-		}
-	}
-
-#elif defined HAVE_ALTIVEC
+#if defined HAVE_ALTIVEC
 	remain = todo&3;
 		remain = todo&3;
 	{
@@ -807,89 +784,7 @@ static void Mix32To8_Stereo(SBYTE* dste,const SLONG *srce,NATIVE count)
 	}
 }
 
-#if defined HAVE_SSE2
-#define SHIFT_MIX_TO_16 (BITSHIFT + 16 - 16)
-// TEST: Ok
-static void Mix32To16_Stereo_SIMD_4Tap(SWORD* dste, SLONG* srce, NATIVE count)
-{
-	int remain = count;
-
-	// Check unaligned dste buffer. srce is always aligned.
-	while(!IS_ALIGNED_16(dste))
-	{
-		Mix32To16_Stereo(dste, srce, SAMPLING_FACTOR);		
-		dste+=2;
-		srce+=8;
-		count--;
-	}
-	
-	// dste and srce aligned. srce is always aligned.
-	{
-		remain = count & 15;
-		// count / 2 for 1 sample
-
-		for(count>>=4;count;count--) 
-		{
-         // Load 32bit sample. 1st average
-		__m128i v0 = _mm_add_epi32(
-		_mm_srai_epi32(_mm_loadu_si128((__m128i*)(srce+0)), SHIFT_MIX_TO_16),
- 		_mm_srai_epi32(_mm_loadu_si128((__m128i*)(srce+4)), SHIFT_MIX_TO_16)
-		);  
-		// v0: s0.l+s2.l | s0.r+s2.r | s1.l+s3.l | s1.r+s3.r
-
-
-		// 2nd average (s0.l+s2.l+s1.l+s3.l / 4, s0.r+s2.r+s1.r+s3.r / 4). Upper 64bit is unused  (1 stereo sample)
-        __m128i v1 = _mm_srai_epi32(_mm_add_epi32(v0, mm_hiqq(v0)), 2);
-		// v1: s0.l+s2.l / 4 | s0.r+s2.r / 4 | s1.l+s3.l+s0.l+s2.l / 4 | s1.r+s3.r+s0.r+s2.r / 4
- 
-	
-		__m128i v2 = _mm_add_epi32(
-		_mm_srai_epi32(_mm_loadu_si128((__m128i*)(srce+8)), SHIFT_MIX_TO_16),
-  		_mm_srai_epi32(_mm_loadu_si128((__m128i*)(srce+12)), SHIFT_MIX_TO_16)
-		);
-		// v2: s4.l+s6.l | s4.r+s6.r | s5.l+s7.l | s5.r+s7.r
-
-        __m128i v3 = _mm_srai_epi32(_mm_add_epi32(v2, mm_hiqq(v2)), 2) ;  //Upper 64bit is unused
-		// v3: s4.l+s6.l /4 | s4.r+s6.r / 4| s5.l+s7.l+s4.l+s6.l / 4 | s5.r+s7.r+s4.r+s6.l / 4
-
-	    // pack two stereo samples in one
-        __m128i v4 = _mm_unpacklo_epi64(v1, v3); //   v4 = avg(s0,s1,s2,s3) | avg(s4,s5,s6,s7)
-		
-		__m128i v6;
-
-        // Load 32bit sample. 1st average (s0.l+s2.l, s0.r+s2.r, s1.l+s3.l, s1.r+s3.r)
-		v0 = _mm_add_epi32(
-		_mm_srai_epi32(_mm_loadu_si128((__m128i*)(srce+16)), SHIFT_MIX_TO_16),
- 		_mm_srai_epi32(_mm_loadu_si128((__m128i*)(srce+20)), SHIFT_MIX_TO_16)
-		);  //128bit = 2 stereo samples
-
-		// 2nd average (s0.l+s2.l+s1.l+s3.l / 4, s0.r+s2.r+s1.r+s3.r / 4). Upper 64bit is unused  (1 stereo sample)
-        v1 = _mm_srai_epi32(_mm_add_epi32(v0, mm_hiqq(v0)), 2);
-
-		v2 = _mm_add_epi32(
-		_mm_srai_epi32(_mm_loadu_si128((__m128i*)(srce+24)), SHIFT_MIX_TO_16),
-  		_mm_srai_epi32(_mm_loadu_si128((__m128i*)(srce+28)), SHIFT_MIX_TO_16)
-		);
-
-        v3 = _mm_srai_epi32(_mm_add_epi32(v2, mm_hiqq(v2)), 2);  //Upper 64bit is unused
-
-        // pack two stereo samples in one
-        v6 = _mm_unpacklo_epi64(v1, v3); //    v6 = avg(s8,s9,s10,s11) | avg(s12,s13,s14,s15)
-
-		_mm_store_si128((__m128i*)dste, _mm_packs_epi32(v4, v6));  // 4 interpolated stereo sample 32bit to 4 
-
-		dste+=8;
-		srce+=32; // 32 = 4 * 8
-		}
-	}
-
-	if (remain)
-	{
-		Mix32To16_Stereo(dste, srce, remain);
-	}
-}
-
-#elif defined HAVE_ALTIVEC
+#if defined HAVE_ALTIVEC
 #define SHIFT_MIX_TO_16 vec_splat_u32(BITSHIFT + 16 - 16)
 // TEST: Ok
 static void Mix32To16_Stereo_SIMD_4Tap(SWORD* dste, SLONG* srce, NATIVE count)
@@ -1216,7 +1111,7 @@ BOOL VC2_Init(void)
 
 	if(md_mode & DMODE_STEREO) {
 		Mix32toFP  = Mix32ToFP_Stereo;
-#if ((defined HAVE_ALTIVEC || defined HAVE_SSE2) && (SAMPLING_FACTOR == 4))
+#if ((defined HAVE_ALTIVEC) && (SAMPLING_FACTOR == 4))
 		if (md_mode & DMODE_SIMDMIXER)
 			Mix32to16  = Mix32To16_Stereo_SIMD_4Tap;
 		else
@@ -1310,7 +1205,7 @@ BOOL VC2_SetNumVoices(void)
 	if(!(vc_softchn=md_softchn)) return 0;
 
 	if(vinf) MikMod_free(vinf);
-	if(!(vinf=MikMod_calloc(sizeof(VINFO),vc_softchn))) return 1;
+	if(!(vinf=(VINFO*)MikMod_calloc(sizeof(VINFO),vc_softchn))) return 1;
 
 	for(t=0;t<vc_softchn;t++) {
 		vinf[t].frq=10000;

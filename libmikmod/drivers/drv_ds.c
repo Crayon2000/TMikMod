@@ -32,6 +32,8 @@
 
 */
 
+#define CINTERFACE 1
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -215,15 +217,16 @@ static BOOL DS_Init(void)
 		return 1;
 	}
 
+    _GUID TempGUID = IID_IDirectSoundNotify;
 	pSoundBuffer->lpVtbl->QueryInterface
-				(pSoundBuffer,&IID_IDirectSoundNotify,(LPVOID*)&pSoundBufferNotify);
+				(pSoundBuffer,TempGUID,(LPVOID*)&pSoundBufferNotify);
 	if (!pSoundBufferNotify) {
 		_mm_errno=MMERR_DS_NOTIFY;
 		return 1;
 	}
 
 	notifyUpdateHandle=CreateEvent
-				(NULL,FALSE,FALSE,"libmikmod DirectSound Driver positionNotify Event");
+				(NULL,FALSE,FALSE,L"libmikmod DirectSound Driver positionNotify Event");
 	if (!notifyUpdateHandle) {
 		_mm_errno=MMERR_DS_EVENT;
 		return 1;

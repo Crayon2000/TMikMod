@@ -550,7 +550,7 @@ BOOL IT_Load(BOOL curious)
 
 	/* read the order data */
 	if(!AllocPositions(mh->ordnum)) return 0;
-	if(!(origpositions=MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
+	if(!(origpositions=(unsigned short*)MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
 
 	for(t=0;t<mh->ordnum;t++) {
 		origpositions[t]=_mm_read_UBYTE(modreader);

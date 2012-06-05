@@ -185,7 +185,7 @@ MIKMODAPI CHAR* MikMod_InfoDriver(void)
 		len+=4+(l->next?1:0)+strlen(l->Version);
 
 	if(len)
-		if((list=MikMod_malloc(len*sizeof(CHAR)))) {
+		if((list=(char*)MikMod_malloc(len*sizeof(CHAR)))) {
 			CHAR * list_end = list;
 			list[0]=0;
 			/* list all registered device drivers : */
@@ -859,8 +859,8 @@ MIKMODAPI BOOL MikMod_InitThreads(void)
 		} else
 			result=1;
 #elif defined(WIN32)
-		if((!(_mm_mutex_lists=CreateMutex(NULL,FALSE,"libmikmod(lists)")))||
-		   (!(_mm_mutex_vars=CreateMutex(NULL,FALSE,"libmikmod(vars)"))))
+		if((!(_mm_mutex_lists=CreateMutex(NULL,FALSE,L"libmikmod(lists)")))||
+		   (!(_mm_mutex_vars=CreateMutex(NULL,FALSE,L"libmikmod(vars)"))))
 			result=0;
 		else
 			result=1;
@@ -895,12 +895,12 @@ CHAR *MD_GetAtom(CHAR *atomname,CHAR *cmdline,BOOL implicit)
 
 			if(*ptr=='=') {
 				for(buf=++ptr;(*ptr)&&((*ptr)!=',');ptr++);
-				ret=MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
+				ret=(char*)MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
 				if(ret)
 					strncpy(ret,buf,ptr-buf);
 			} else if((*ptr==',')||(!*ptr)) {
 				if(implicit) {
-					ret=MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
+					ret=(char*)MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
 					if(ret)
 						strncpy(ret,buf,ptr-buf);
 				}

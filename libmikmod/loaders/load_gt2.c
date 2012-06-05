@@ -194,7 +194,7 @@ typedef union GT_CHUNK
 
 GT_CHUNK *loadChunk(void)
 {	
-	GT_CHUNK *new_chunk = MikMod_malloc(sizeof(GT_CHUNK));
+	GT_CHUNK *new_chunk = (GT_CHUNK*)MikMod_malloc(sizeof(GT_CHUNK));
 
 	/* the file chunk id only use 3 bytes, others 4 */
 	_mm_read_UBYTES(new_chunk->id, 3, modreader);
@@ -228,7 +228,7 @@ GT_CHUNK *loadChunk(void)
 		_mm_read_M_UWORDS(&new_chunk->gt2.initial_tempo, 1, modreader);
 		_mm_read_M_UWORDS(&new_chunk->gt2.initial_master_volume, 1, modreader);
 		_mm_read_M_UWORDS(&new_chunk->gt2.num_voices, 1, modreader);
-		new_chunk->gt2.voice_pannings = MikMod_malloc(2*new_chunk->gt2.num_voices);
+		new_chunk->gt2.voice_pannings = (unsigned short*)MikMod_malloc(2*new_chunk->gt2.num_voices);
 		_mm_read_M_UWORDS(new_chunk->gt2.voice_pannings, new_chunk->gt2.num_voices, modreader);
 		return new_chunk;
 	}
@@ -236,7 +236,7 @@ GT_CHUNK *loadChunk(void)
 	if (!memcmp(new_chunk, "TVOL", 4)) { 
 		new_chunk->tvol.chunk_size = _mm_read_M_ULONG(modreader);
 		new_chunk->tvol.num_tracks = _mm_read_M_UWORD(modreader);
-		new_chunk->tvol.track_volumes = MikMod_malloc(new_chunk->tvol.num_tracks * 2);
+		new_chunk->tvol.track_volumes = (unsigned short*)MikMod_malloc(new_chunk->tvol.num_tracks * 2);
 		_mm_read_M_UWORDS(new_chunk->tvol.track_volumes, new_chunk->tvol.num_tracks, modreader);
 		return new_chunk;
 	}
@@ -244,7 +244,7 @@ GT_CHUNK *loadChunk(void)
 	if (!memcmp(new_chunk, "XCOM", 4)) { 
 		new_chunk->xcom.chunk_size = _mm_read_M_ULONG(modreader);
 		new_chunk->xcom.comment_len = _mm_read_M_ULONG(modreader);
-		new_chunk->xcom.comment = MikMod_malloc(new_chunk->xcom.comment_len + 1);
+		new_chunk->xcom.comment = (char*)MikMod_malloc(new_chunk->xcom.comment_len + 1);
 		_mm_read_UBYTES(new_chunk->xcom.comment, new_chunk->xcom.comment_len, modreader);
 		return new_chunk;
 	}
@@ -253,7 +253,7 @@ GT_CHUNK *loadChunk(void)
 		new_chunk->song.chunk_size = _mm_read_M_ULONG(modreader);
 		new_chunk->song.song_length = _mm_read_M_UWORD(modreader);
 		new_chunk->song.song_repeat_point = _mm_read_M_UWORD(modreader);
-		new_chunk->song.patterns = MikMod_malloc(2*new_chunk->song.song_length);
+		new_chunk->song.patterns = (unsigned short*)MikMod_malloc(2*new_chunk->song.song_length);
 		_mm_read_M_UWORDS(new_chunk->song.patterns, new_chunk->song.song_length, modreader);
 		return new_chunk;
 	}
@@ -273,7 +273,7 @@ GT_CHUNK *loadChunk(void)
 		new_chunk->patd.codage_version = _mm_read_M_UWORD(modreader);
 		new_chunk->patd.num_lines = _mm_read_M_UWORD(modreader);
 		new_chunk->patd.num_tracks = _mm_read_M_UWORD(modreader);
-		new_chunk->patd.notes = MikMod_malloc(5 * 
+		new_chunk->patd.notes = (GT_NOTE*)MikMod_malloc(5 *
 										new_chunk->patd.num_lines * 
 										new_chunk->patd.num_tracks);
 		_mm_read_UBYTES(new_chunk->patd.notes, 

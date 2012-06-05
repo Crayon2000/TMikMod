@@ -162,30 +162,7 @@ static size_t MixSIMDStereoNormal(const SWORD* srce, SLONG* dest, size_t index, 
 
 	// Srce is always aligned ...
 
-#if defined HAVE_SSE2
-	remain = todo&3;	
-	{
-		__m128i v0 = _mm_set_epi16(0, vol[1], 
-								   0, vol[0], 
-								   0, vol[1], 
-								   0, vol[0]);
-		for(todo>>=2;todo; todo--)
-		{
-			SWORD s0 = srce[(index += increment) >> FRACBITS];
-			SWORD s1 = srce[(index += increment) >> FRACBITS];
-			SWORD s2 = srce[(index += increment) >> FRACBITS];
-			SWORD s3 = srce[(index += increment) >> FRACBITS];
-			__m128i v1 = _mm_set_epi16(0, s1, 0, s1, 0, s0, 0, s0);
-			__m128i v2 = _mm_set_epi16(0, s3, 0, s3, 0, s2, 0, s2);
-			__m128i v3 = _mm_load_si128((__m128i*)(dest+0));
-			__m128i v4 = _mm_load_si128((__m128i*)(dest+4));
-			_mm_store_si128((__m128i*)(dest+0), _mm_add_epi32(v3, _mm_madd_epi16(v0, v1)));
-			_mm_store_si128((__m128i*)(dest+4), _mm_add_epi32(v4, _mm_madd_epi16(v0, v2)));
-			dest+=8;				
-		}
-	}
-
-#elif defined HAVE_ALTIVEC
+#if defined HAVE_ALTIVEC
 	remain = todo&3;
 	{
 		vector signed short r0 = vec_ld(0, vol);
@@ -836,7 +813,7 @@ static void Mix32To8(SBYTE* dste,const SLONG *srce,NATIVE count)
 	}
 }
 
-#if defined HAVE_ALTIVEC || defined HAVE_SSE2
+#if defined HAVE_ALTIVEC
 
 // Mix 32bit input to floating point. 32 samples per iteration
 // PC: ?, Mac OK
@@ -1190,7 +1167,7 @@ void VC1_WriteSamples(SBYTE* buf,ULONG todo)
 			}
 
 
-#if defined HAVE_ALTIVEC || defined HAVE_SSE2
+#if defined HAVE_ALTIVEC
 			if (md_mode & DMODE_SIMDMIXER)
 			{
 				if(vc_mode & DMODE_FLOAT)
@@ -1305,7 +1282,7 @@ BOOL VC1_SetNumVoices(void)
 	if(!(vc_softchn=md_softchn)) return 0;
 
 	if(vinf) MikMod_free(vinf);
-	if(!(vinf= MikMod_calloc(sizeof(VINFO),vc_softchn))) return 1;
+	if(!(vinf= (VINFO*)MikMod_calloc(sizeof(VINFO),vc_softchn))) return 1;
 
 	for(t=0;t<vc_softchn;t++) {
 		vinf[t].frq=10000;
