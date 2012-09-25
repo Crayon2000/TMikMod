@@ -1,319 +1,320 @@
-﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-		<PropertyGroup>
-			<ProjectGuid>{C5192207-5B8A-4129-B9B3-6E91C757BA80}</ProjectGuid>
-			<ProjectVersion>13.4</ProjectVersion>
-			<FrameworkType>None</FrameworkType>
-			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Debug</Config>
-			<Platform Condition="'$(Platform)'==''">Win32</Platform>
-			<TargetedPlatforms>5</TargetedPlatforms>
-			<AppType>StaticLibrary</AppType>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Base)'=='true') or '$(Base_OSX32)'!=''">
-			<Base_OSX32>true</Base_OSX32>
-			<CfgParent>Base</CfgParent>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
-			<Base_Win32>true</Base_Win32>
-			<CfgParent>Base</CfgParent>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
-			<Cfg_1>true</Cfg_1>
-			<CfgParent>Base</CfgParent>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Cfg_1)'=='true') or '$(Cfg_1_OSX32)'!=''">
-			<Cfg_1_OSX32>true</Cfg_1_OSX32>
-			<CfgParent>Cfg_1</CfgParent>
-			<Cfg_1>true</Cfg_1>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
-			<Cfg_2>true</Cfg_2>
-			<CfgParent>Base</CfgParent>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Cfg_2)'=='true') or '$(Cfg_2_OSX32)'!=''">
-			<Cfg_2_OSX32>true</Cfg_2_OSX32>
-			<CfgParent>Cfg_2</CfgParent>
-			<Cfg_2>true</Cfg_2>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Base)'!=''">
-			<UsingDelphiRTL>true</UsingDelphiRTL>
-			<TLIB_PageSize>64</TLIB_PageSize>
-			<AllPackageLibs>rtl.lib</AllPackageLibs>
-			<Multithreaded>true</Multithreaded>
-			<ILINK_LibraryPath>libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\win32\;libmikmod\include\;libmikmod\drivers\;$(BDS)\lib;$(ILINK_LibraryPath)</ILINK_LibraryPath>
-			<_TCHARMapping>wchar_t</_TCHARMapping>
-			<PackageImports>IPIndyImpl;bindcompfmx;fmx;rtl;dbrtl;IndySystem;DbxClientDriver;bindcomp;inetdb;DBXInterBaseDriver;DataSnapCommon;DataSnapClient;DataSnapServer;DataSnapProviderClient;xmlrtl;DbxCommonDriver;IndyProtocols;DBXMySQLDriver;dbxcds;bindengine;soaprtl;DBXOracleDriver;dsnap;DBXInformixDriver;IndyCore;fmxase;DBXFirebirdDriver;inet;fmxobj;inetdbxpress;DBXSybaseASADriver;fmxdae;dbexpress;DataSnapIndy10ServerTransport;$(PackageImports)</PackageImports>
-			<DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-			<IncludePath>libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\include\;libmikmod\drivers\;$(BDS)\include;$(BDS)\include\dinkumware;$(IncludePath)</IncludePath>
-			<ProjectType>CppStaticLibrary</ProjectType>
-			<Manifest_File>None</Manifest_File>
-			<VerInfo_Locale>3084</VerInfo_Locale>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0</VerInfo_Keys>
-			<Defines>HAVE_FCNTL_H;HAVE_LIMITS_H;_MSC_VER=1;$(Defines)</Defines>
-			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<IntermediateOutputDir>.\$(Platform)\$(Config)</IntermediateOutputDir>
-			<FinalOutputDir>.\$(Platform)\$(Config)</FinalOutputDir>
-			<BCC_wpar>false</BCC_wpar>
-			<BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
-			<BCC_ExtendedErrorInfo>true</BCC_ExtendedErrorInfo>
-			<ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\release\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Base_OSX32)'!=''">
-			<Defines>DRV_OSX;HAVE_UNISTD_H;$(Defines)</Defines>
-			<IncludePath>libmikmod\macintosh;libmikmod\macosx\;$(IncludePath)</IncludePath>
-			<VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName)</VerInfo_Keys>
-			<Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Base_Win32)'!=''">
-			<IncludePath>libmikmod\win32\;$(IncludePath)</IncludePath>
-			<Defines>WIN32;DRV_WIN;DRV_DS;HAVE_MALLOC_H;$(Defines)</Defines>
-			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-			<PackageImports>vcldbx;frx16;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;DBXSybaseASEDriver;ibxpress;vclimg;frxDB16;intrawebdb_120_160;fs16;TeeUI;FMXTee;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;bcbsmp;websnap;vclribbon;frxe16;VclSmp;fsDB16;vcl;DataSnapConnectors;CloudService;DBXMSSQLDriver;CodeSiteExpressPkg;FmxTeeUI;dsnapcon;vclx;webdsnap;bdertl;adortl;bcbie;$(PackageImports)</PackageImports>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Cfg_1)'!=''">
-			<BCC_OptimizeForSpeed>false</BCC_OptimizeForSpeed>
-			<BCC_DisableOptimizations>true</BCC_DisableOptimizations>
-			<DCC_Optimize>false</DCC_Optimize>
-			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
-			<Defines>_DEBUG;$(Defines)</Defines>
-			<BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
-			<BCC_UseRegisterVariables>None</BCC_UseRegisterVariables>
-			<DCC_Define>DEBUG</DCC_Define>
-			<BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
-			<TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
-			<BCC_StackFrames>true</BCC_StackFrames>
-			<ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
-			<TASM_Debugging>Full</TASM_Debugging>
-			<BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
-			<ILINK_LibraryPath>$(BDSLIB)\$(PLATFORM)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
-			<ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\debug\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Cfg_1_OSX32)'!=''">
-			<DCC_RemoteDebug>true</DCC_RemoteDebug>
-			<VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName)</VerInfo_Keys>
-			<Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Cfg_2)'!=''">
-			<Defines>NDEBUG;$(Defines)</Defines>
-			<TASM_Debugging>None</TASM_Debugging>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Cfg_2_OSX32)'!=''">
-			<DCC_RemoteDebug>true</DCC_RemoteDebug>
-		</PropertyGroup>
-		<ItemGroup>
-			<CppCompile Include="libmikmod\drivers\drv_ds.c">
-				<BuildOrder>3</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\drivers\drv_nos.c">
-				<BuildOrder>4</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\drivers\drv_osx.c">
-				<BuildOrder>46</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\drivers\drv_raw.c">
-				<BuildOrder>5</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\drivers\drv_stdout.c">
-				<BuildOrder>0</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\drivers\drv_wav.c">
-				<BuildOrder>1</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\drivers\drv_win.c">
-				<BuildOrder>2</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_669.c">
-				<BuildOrder>6</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_amf.c">
-				<BuildOrder>7</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_asy.c">
-				<BuildOrder>8</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_dsm.c">
-				<BuildOrder>9</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_far.c">
-				<BuildOrder>10</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_gdm.c">
-				<BuildOrder>11</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_gt2.c">
-				<BuildOrder>48</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_imf.c">
-				<BuildOrder>12</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_it.c">
-				<BuildOrder>13</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_m15.c">
-				<BuildOrder>14</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_med.c">
-				<BuildOrder>15</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_mod.c">
-				<BuildOrder>16</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_mtm.c">
-				<BuildOrder>17</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_okt.c">
-				<BuildOrder>18</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_s3m.c">
-				<BuildOrder>19</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_stm.c">
-				<BuildOrder>20</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_stx.c">
-				<BuildOrder>21</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_ult.c">
-				<BuildOrder>22</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_uni.c">
-				<BuildOrder>23</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\loaders\load_xm.c">
-				<BuildOrder>24</BuildOrder>
-			</CppCompile>
-			<None Include="libmikmod\loaders\Makefile.am"/>
-			<None Include="libmikmod\loaders\Makefile.in"/>
-			<CppCompile Include="libmikmod\mmio\mmalloc.c">
-				<BuildOrder>41</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\mmio\mmerror.c">
-				<BuildOrder>42</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\mmio\mmio.c">
-				<BuildOrder>43</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\mdreg.c">
-				<BuildOrder>27</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\mdriver.c">
-				<BuildOrder>28</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\mdulaw.c">
-				<BuildOrder>29</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\mloader.c">
-				<BuildOrder>30</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\mlreg.c">
-				<BuildOrder>31</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\mlutil.c">
-				<BuildOrder>32</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\mplayer.c">
-				<BuildOrder>33</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\munitrk.c">
-				<BuildOrder>34</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\mwav.c">
-				<BuildOrder>35</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\npertab.c">
-				<BuildOrder>36</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\sloader.c">
-				<BuildOrder>37</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\virtch.c">
-				<BuildOrder>39</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\virtch2.c">
-				<BuildOrder>38</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="libmikmod\playercode\virtch_common.c">
-				<BuildOrder>40</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="MikMod.cpp">
-				<DependentOn>MikMod.h</DependentOn>
-				<BuildOrder>44</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="MikModContnrs.cpp">
-				<DependentOn>MikModContnrs.h</DependentOn>
-				<BuildOrder>47</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="MikModThread.cpp">
-				<DependentOn>MikModThread.h</DependentOn>
-				<BuildOrder>45</BuildOrder>
-			</CppCompile>
-			<BuildConfiguration Include="Release">
-				<Key>Cfg_2</Key>
-				<CfgParent>Base</CfgParent>
-			</BuildConfiguration>
-			<BuildConfiguration Include="Base">
-				<Key>Base</Key>
-			</BuildConfiguration>
-			<BuildConfiguration Include="Debug">
-				<Key>Cfg_1</Key>
-				<CfgParent>Base</CfgParent>
-			</BuildConfiguration>
-		</ItemGroup>
-		<ProjectExtensions>
-			<Borland.Personality>CPlusPlusBuilder.Personality.12</Borland.Personality>
-			<Borland.ProjectType>CppStaticLibrary</Borland.ProjectType>
-			<BorlandProject>
-				<CPlusPlusBuilder.Personality>
-					<VersionInfo>
-						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
-						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
-						<VersionInfo Name="MajorVer">1</VersionInfo>
-						<VersionInfo Name="MinorVer">0</VersionInfo>
-						<VersionInfo Name="Release">0</VersionInfo>
-						<VersionInfo Name="Build">0</VersionInfo>
-						<VersionInfo Name="Debug">False</VersionInfo>
-						<VersionInfo Name="PreRelease">False</VersionInfo>
-						<VersionInfo Name="Special">False</VersionInfo>
-						<VersionInfo Name="Private">False</VersionInfo>
-						<VersionInfo Name="DLL">False</VersionInfo>
-						<VersionInfo Name="Locale">3084</VersionInfo>
-						<VersionInfo Name="CodePage">1252</VersionInfo>
-					</VersionInfo>
-					<VersionInfoKeys>
-						<VersionInfoKeys Name="CompanyName"/>
-						<VersionInfoKeys Name="FileDescription"/>
-						<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
-						<VersionInfoKeys Name="InternalName"/>
-						<VersionInfoKeys Name="LegalCopyright"/>
-						<VersionInfoKeys Name="LegalTrademarks"/>
-						<VersionInfoKeys Name="OriginalFilename"/>
-						<VersionInfoKeys Name="ProductName"/>
-						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
-						<VersionInfoKeys Name="Comments"/>
-					</VersionInfoKeys>
-					<ProjectProperties>
-						<ProjectProperties Name="AutoShowDeps">False</ProjectProperties>
-						<ProjectProperties Name="ManagePaths">True</ProjectProperties>
-						<ProjectProperties Name="VerifyPackages">True</ProjectProperties>
-					</ProjectProperties>
-				</CPlusPlusBuilder.Personality>
-				<Deployment/>
-				<Platforms>
-					<Platform value="OSX32">True</Platform>
-					<Platform value="Win32">True</Platform>
-				</Platforms>
-			</BorlandProject>
-			<ProjectFileVersion>12</ProjectFileVersion>
-		</ProjectExtensions>
-		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')" Project="$(BDS)\Bin\CodeGear.Cpp.Targets"/>
-		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
-	</Project>
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{C5192207-5B8A-4129-B9B3-6E91C757BA80}</ProjectGuid>
+        <ProjectVersion>14.3</ProjectVersion>
+        <FrameworkType>None</FrameworkType>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>5</TargetedPlatforms>
+        <AppType>StaticLibrary</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Base)'=='true') or '$(Base_OSX32)'!=''">
+        <Base_OSX32>true</Base_OSX32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Cfg_1)'=='true') or '$(Cfg_1_OSX32)'!=''">
+        <Cfg_1_OSX32>true</Cfg_1_OSX32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Cfg_2)'=='true') or '$(Cfg_2_OSX32)'!=''">
+        <Cfg_2_OSX32>true</Cfg_2_OSX32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <UsingDelphiRTL>true</UsingDelphiRTL>
+        <TLIB_PageSize>64</TLIB_PageSize>
+        <AllPackageLibs>rtl.lib</AllPackageLibs>
+        <Multithreaded>true</Multithreaded>
+        <ILINK_LibraryPath>libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\win32\;libmikmod\include\;libmikmod\drivers\;$(BDS)\lib;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <_TCHARMapping>wchar_t</_TCHARMapping>
+        <PackageImports>IPIndyImpl;bindcompfmx;fmx;rtl;dbrtl;IndySystem;DbxClientDriver;bindcomp;inetdb;DBXInterBaseDriver;DataSnapCommon;DataSnapClient;DataSnapServer;DataSnapProviderClient;xmlrtl;DbxCommonDriver;IndyProtocols;DBXMySQLDriver;dbxcds;bindengine;soaprtl;DBXOracleDriver;dsnap;DBXInformixDriver;IndyCore;fmxase;DBXFirebirdDriver;inet;fmxobj;inetdbxpress;DBXSybaseASADriver;fmxdae;dbexpress;DataSnapIndy10ServerTransport;$(PackageImports)</PackageImports>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <IncludePath>libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\include\;libmikmod\drivers\;$(BDS)\include;$(BDS)\include\dinkumware;$(IncludePath)</IncludePath>
+        <ProjectType>CppStaticLibrary</ProjectType>
+        <Manifest_File>None</Manifest_File>
+        <VerInfo_Locale>3084</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0</VerInfo_Keys>
+        <Defines>HAVE_FCNTL_H;HAVE_LIMITS_H;_MSC_VER=1;$(Defines)</Defines>
+        <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
+        <IntermediateOutputDir>.\$(Platform)\$(Config)</IntermediateOutputDir>
+        <FinalOutputDir>.\$(Platform)\$(Config)</FinalOutputDir>
+        <BCC_wpar>false</BCC_wpar>
+        <BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
+        <BCC_ExtendedErrorInfo>true</BCC_ExtendedErrorInfo>
+        <ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\release\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_OSX32)'!=''">
+        <Defines>DRV_OSX;HAVE_UNISTD_H;$(Defines)</Defines>
+        <IncludePath>libmikmod\macintosh;libmikmod\macosx\;$(IncludePath)</IncludePath>
+        <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName)</VerInfo_Keys>
+        <Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <IncludePath>libmikmod\win32\;$(IncludePath)</IncludePath>
+        <Defines>WIN32;DRV_WIN;DRV_DS;HAVE_MALLOC_H;$(Defines)</Defines>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <PackageImports>vcldbx;frx16;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;DBXSybaseASEDriver;ibxpress;vclimg;frxDB16;intrawebdb_120_160;fs16;TeeUI;FMXTee;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;bcbsmp;websnap;vclribbon;frxe16;VclSmp;fsDB16;vcl;DataSnapConnectors;CloudService;DBXMSSQLDriver;CodeSiteExpressPkg;FmxTeeUI;dsnapcon;vclx;webdsnap;bdertl;adortl;bcbie;$(PackageImports)</PackageImports>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <BCC_OptimizeForSpeed>false</BCC_OptimizeForSpeed>
+        <BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <Defines>_DEBUG;$(Defines)</Defines>
+        <BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
+        <BCC_UseRegisterVariables>None</BCC_UseRegisterVariables>
+        <DCC_Define>DEBUG</DCC_Define>
+        <BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+        <TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
+        <BCC_StackFrames>true</BCC_StackFrames>
+        <ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+        <TASM_Debugging>Full</TASM_Debugging>
+        <BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
+        <ILINK_LibraryPath>$(BDSLIB)\$(PLATFORM)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\debug\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_OSX32)'!=''">
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+        <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName)</VerInfo_Keys>
+        <Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <Defines>NDEBUG;$(Defines)</Defines>
+        <TASM_Debugging>None</TASM_Debugging>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_OSX32)'!=''">
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+    </PropertyGroup>
+    <ItemGroup>
+        <CppCompile Include="libmikmod\drivers\drv_ds.c">
+            <BuildOrder>3</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_nos.c">
+            <BuildOrder>4</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_osx.c">
+            <BuildOrder>46</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_raw.c">
+            <BuildOrder>5</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_stdout.c">
+            <BuildOrder>0</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_wav.c">
+            <BuildOrder>1</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_win.c">
+            <BuildOrder>2</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_669.c">
+            <BuildOrder>6</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_amf.c">
+            <BuildOrder>7</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_asy.c">
+            <BuildOrder>8</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_dsm.c">
+            <BuildOrder>9</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_far.c">
+            <BuildOrder>10</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_gdm.c">
+            <BuildOrder>11</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_gt2.c">
+            <BuildOrder>48</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_imf.c">
+            <BuildOrder>12</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_it.c">
+            <BuildOrder>13</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_m15.c">
+            <BuildOrder>14</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_med.c">
+            <BuildOrder>15</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_mod.c">
+            <BuildOrder>16</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_mtm.c">
+            <BuildOrder>17</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_okt.c">
+            <BuildOrder>18</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_s3m.c">
+            <BuildOrder>19</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_stm.c">
+            <BuildOrder>20</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_stx.c">
+            <BuildOrder>21</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_ult.c">
+            <BuildOrder>22</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_uni.c">
+            <BuildOrder>23</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_xm.c">
+            <BuildOrder>24</BuildOrder>
+        </CppCompile>
+        <None Include="libmikmod\loaders\Makefile.am"/>
+        <None Include="libmikmod\loaders\Makefile.in"/>
+        <CppCompile Include="libmikmod\mmio\mmalloc.c">
+            <BuildOrder>41</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\mmio\mmerror.c">
+            <BuildOrder>42</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\mmio\mmio.c">
+            <BuildOrder>43</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\mdreg.c">
+            <BuildOrder>27</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\mdriver.c">
+            <BuildOrder>28</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\mdulaw.c">
+            <BuildOrder>29</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\mloader.c">
+            <BuildOrder>30</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\mlreg.c">
+            <BuildOrder>31</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\mlutil.c">
+            <BuildOrder>32</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\mplayer.c">
+            <BuildOrder>33</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\munitrk.c">
+            <BuildOrder>34</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\mwav.c">
+            <BuildOrder>35</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\npertab.c">
+            <BuildOrder>36</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\sloader.c">
+            <BuildOrder>37</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\virtch.c">
+            <BuildOrder>39</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\virtch2.c">
+            <BuildOrder>38</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\playercode\virtch_common.c">
+            <BuildOrder>40</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="MikMod.cpp">
+            <DependentOn>MikMod.h</DependentOn>
+            <BuildOrder>44</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="MikModContnrs.cpp">
+            <DependentOn>MikModContnrs.h</DependentOn>
+            <BuildOrder>47</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="MikModThread.cpp">
+            <DependentOn>MikModThread.h</DependentOn>
+            <BuildOrder>45</BuildOrder>
+        </CppCompile>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>CPlusPlusBuilder.Personality.12</Borland.Personality>
+        <Borland.ProjectType>CppStaticLibrary</Borland.ProjectType>
+        <BorlandProject>
+            <CPlusPlusBuilder.Personality>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">1</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">0</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">3084</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription"/>
+                    <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright"/>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                </VersionInfoKeys>
+                <ProjectProperties>
+                    <ProjectProperties Name="AutoShowDeps">False</ProjectProperties>
+                    <ProjectProperties Name="ManagePaths">True</ProjectProperties>
+                    <ProjectProperties Name="VerifyPackages">True</ProjectProperties>
+                </ProjectProperties>
+            </CPlusPlusBuilder.Personality>
+            <Deployment/>
+            <Platforms>
+                <Platform value="OSX32">True</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')" Project="$(BDS)\Bin\CodeGear.Cpp.Targets"/>
+    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+</Project>
