@@ -47,7 +47,7 @@
 #include <string.h>
 
 #include "mikmod_internals.h"
-#include "mikmod.h"
+#include "../include/mikmod.h"
 
 /*
    Constant definitions
@@ -148,9 +148,12 @@ static size_t MixSIMDMonoNormal(const SWORD* srce,SLONG* dest,size_t index, size
 
 static size_t MixSIMDStereoNormal(const SWORD* srce, SLONG* dest, size_t index, size_t increment,size_t todo)
 {	
-	SWORD vol[8] = {vnf->lvolsel, vnf->rvolsel};
+	SLONG vol[2];
 	SWORD sample;
 	SLONG remain = todo;
+
+    vol[0] = vnf->lvolsel;
+    vol[1] = vnf->rvolsel;
 
 	// Dest can be misaligned ...
 	while(!IS_ALIGNED_16(dest)) {

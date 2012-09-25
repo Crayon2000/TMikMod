@@ -217,9 +217,8 @@ static BOOL DS_Init(void)
 		return 1;
 	}
 
-    _GUID TempGUID = IID_IDirectSoundNotify;
 	pSoundBuffer->lpVtbl->QueryInterface
-				(pSoundBuffer,TempGUID,(LPVOID*)&pSoundBufferNotify);
+				(pSoundBuffer,&IID_IDirectSoundNotify,(LPVOID*)&pSoundBufferNotify);
 	if (!pSoundBufferNotify) {
 		_mm_errno=MMERR_DS_NOTIFY;
 		return 1;

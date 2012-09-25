@@ -77,7 +77,7 @@ static BOOL RAW_IsThere(void)
 static BOOL RAW_Init(void)
 {
 #if defined unix || (defined __APPLE__ && defined __MACH__)
-	if(!MD_Access(filename?filename:FILENAME)) {
+	if(!MD_Access(filename?filename:(CHAR*)FILENAME)) {
 		_mm_errno=MMERR_OPENING_FILE;
 		return 1;
 	}

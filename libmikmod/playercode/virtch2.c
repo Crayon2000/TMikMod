@@ -45,7 +45,7 @@
 #include <string.h>
 
 #include "mikmod_internals.h"
-#include "mikmod.h"
+#include "../include/mikmod.h"
   
 /*
    Constant Definitions
@@ -320,11 +320,14 @@ static __inline SWORD GetSample(const SWORD* const srce, SLONGLONG index)
 }
 
 static SLONGLONG MixSIMDStereoNormal(const SWORD* const srce,SLONG* dest,SLONGLONG index,SLONGLONG increment,ULONG todo)
-{	
-	SWORD vol[8] = {vnf->lvolsel, vnf->rvolsel};
+{
+	SLONG vol[2];
 	SWORD s[8];
-	SWORD sample=0;	
+	SWORD sample=0;
 	SLONG remain = todo;
+
+    vol[0] = vnf->lvolsel;
+    vol[1] = vnf->rvolsel;
 
 	// Dest can be misaligned ...
 	while(!IS_ALIGNED_16(dest)) {

@@ -45,7 +45,6 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<BCC_CPPCompileAlways>true</BCC_CPPCompileAlways>
 			<UsingDelphiRTL>true</UsingDelphiRTL>
 			<TLIB_PageSize>64</TLIB_PageSize>
 			<AllPackageLibs>rtl.lib</AllPackageLibs>
@@ -69,8 +68,8 @@
 			<ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\release\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_OSX32)'!=''">
-			<Defines>DRV_OSX;$(Defines)</Defines>
-			<IncludePath>libmikmod\macosx\;$(IncludePath)</IncludePath>
+			<Defines>DRV_OSX;HAVE_UNISTD_H;$(Defines)</Defines>
+			<IncludePath>libmikmod\macintosh;libmikmod\macosx\;$(IncludePath)</IncludePath>
 			<VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName)</VerInfo_Keys>
 			<Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
 		</PropertyGroup>
