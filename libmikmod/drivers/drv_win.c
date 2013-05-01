@@ -42,7 +42,7 @@
 
 #include <windows.h>
 
-#pragma comment(lib,"winmm.lib")
+#pragma comment(lib,"winmm")
 
 #define NUMBUFFERS	6				/* number of buffers */
 #define BUFFERSIZE	120				/* buffer size in milliseconds */
