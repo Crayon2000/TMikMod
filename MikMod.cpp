@@ -11,7 +11,7 @@
 #pragma package(smart_init)
 
 #if defined(DRV_DS)
-#pragma link "dsound.lib"   // Needed for the DirectSound driver
+#pragma comment(lib, "dsound") // Needed for the DirectSound driver
 #endif                      // DRV_DS
 
 #define RT_RAWDATA 10 // Same has RT_RCDATA but works in OS X
@@ -96,18 +96,18 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
 {
     std::map<TModuleDriver, MDRIVER*> DriverList;
 #ifdef DRV_DS
-    DriverList[mdDirectSound] = &drv_ds;
+    DriverList[TModuleDriver::mdDirectSound] = &drv_ds;
 #endif /* DRV_DS */
 #ifdef DRV_WIN
-    DriverList[mdWindows] = &drv_win;
+    DriverList[TModuleDriver::mdWindows] = &drv_win;
 #endif /* DRV_WIN */
 #ifdef DRV_OSX
-    DriverList[mdMacOSX] = &drv_osx;
+    DriverList[TModuleDriver::mdMacOSX] = &drv_osx;
 #endif /* DRV_OSX */
-    DriverList[mdNoSound] = &drv_nos;
-    DriverList[mdRaw] = &drv_raw;
-    DriverList[mdStandardOutput] = &drv_stdout;
-    DriverList[mdWAV] = &drv_wav;
+    DriverList[TModuleDriver::mdNoSound] = &drv_nos;
+    DriverList[TModuleDriver::mdRaw] = &drv_raw;
+    DriverList[TModuleDriver::mdStandardOutput] = &drv_stdout;
+    DriverList[TModuleDriver::mdWAV] = &drv_wav;
 
     // Register a specific driver
     MikMod_RegisterDriver(DriverList[ADriver]);
@@ -117,7 +117,7 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     md_device = 1;
 
     AnsiString CommandLine;
-    if(ADriver == mdDirectSound)
+    if(ADriver == TModuleDriver::mdDirectSound)
     {
         CommandLine = "globalfocus"; // Play if window does not have the focus
     }

@@ -14,7 +14,7 @@ struct MODULE;
 /**
  * Module driver.
  */
-enum TModuleDriver
+enum class TModuleDriver : unsigned char
 {
     mdDirectSound,     /**< Win32 DirectSound driver. */
     mdWindows,         /**< Win32 multimedia API driver. */
@@ -76,7 +76,7 @@ protected:
     String __fastcall GetComment();
     TVoice* __fastcall GetVoice(int Index);
 public:
-    __fastcall TMikMod(TModuleDriver ADriver = mdNoSound);
+    __fastcall TMikMod(TModuleDriver ADriver = TModuleDriver::mdNoSound);
     virtual __fastcall ~TMikMod();
 
     void __fastcall LoadFromFile(const System::UnicodeString AFileName, int Maxchan, bool Curious = 0);

@@ -4,7 +4,7 @@
 #include "Main.h"
 #include "MikMod.h"
 //---------------------------------------------------------------------------
-#pragma link "TMikModLib.lib"
+#pragma comment(lib, "TMikModLib")
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 TForm1 *Form1;
@@ -13,7 +13,13 @@ TForm1 *Form1;
 __fastcall TForm1::TForm1(TComponent* Owner)
     : TForm(Owner), FMikMod(NULL)
 {
-    FMikMod = new TMikMod(mdWindows);
+    try
+    {
+        FMikMod = new TMikMod(TModuleDriver::mdWindows);
+    }
+    catch(...)
+    {
+    }
 }
 //---------------------------------------------------------------------------
 
