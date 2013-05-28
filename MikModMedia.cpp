@@ -1,16 +1,15 @@
 //---------------------------------------------------------------------------
-
 #pragma hdrstop
 
 #include "MikModMedia.h"
 #include "MikMod.h"
 //---------------------------------------------------------------------------
 #if defined(_WINDOWS_)
-#pragma link "TMikModLib.lib"
-#define MODULEDRIVER mdWindows
+#pragma comment(lib, "TMikModLib")
+#define MODULEDRIVER TModuleDriver::mdWindows
 #else
 #pragma link "TMikModLib.a"
-#define MODULEDRIVER mdMacOSX
+#define MODULEDRIVER TModuleDriver::mdMacOSX
 #endif
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
