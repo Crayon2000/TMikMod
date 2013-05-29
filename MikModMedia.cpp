@@ -26,7 +26,10 @@ void AutoRegMediaCodecClass()
 }
 #pragma startup AutoRegMediaCodecClass
 
-
+/**
+ * Creates a TMikModMedia from a given file.
+ * @param AFileName The parameter specifies the name of the file from which to create the TMikModMedia. 
+ */
 TMedia* __fastcall TMikModMediaCodec::CreateFromFile(const System::UnicodeString AFileName)
 {
     return new TMikModMedia(AFileName);
@@ -50,45 +53,75 @@ __fastcall TMikModMedia::~TMikModMedia(void)
     delete FMikMod;
 }
 
+/**
+ * Getter function for the Duration property.
+ */
 __int64 __fastcall TMikModMedia::GetDuration(void)
 {
-    return 0;
+    return FMikMod->NumberPos;
 }
-
+ 
+/**
+ * Getter function for the CurrentTime property.
+ */
 __int64 __fastcall TMikModMedia::GetCurrent(void)
 {
-    return 0;
+    return FMikMod->SongPosition;
 }
 
+/**
+ * Setter function for the CurrentTime property.
+ * @param Value Specifies the new value for CurrentTime.  
+ */
 void __fastcall TMikModMedia::SetCurrent(const __int64 Value)
 {
+    FMikMod->SongPosition = Value;
 }
 
+/**
+ * Getter function for the VideoSize property.
+ */
 System::Types::TPointF __fastcall TMikModMedia::GetVideoSize(void)
 {
     return TPointF(0, 0);
 }
 
+/**
+ * Getter function for the State property.
+ */
 TMediaState __fastcall TMikModMedia::GetMediaState(void)
 {
     return TMediaState::Unavailable;
 }
 
+/**
+ * Getter function for the Volume property. 
+ */
 float __fastcall TMikModMedia::GetVolume(void)
 {
     return FMikMod->Volume / 128.0f;
 }
 
+/**
+ * Setter function for the Volume property.
+ * @param Value Specifies the new value of Volume.
+ */
 void __fastcall TMikModMedia::SetVolume(const float Value)
 {
     FMikMod->Volume = Value * 128;
 }
 
+/**
+ * Plays the current media file.
+ */
 void __fastcall TMikModMedia::DoPlay(void)
 {
     FMikMod->Start();
 }
 
+/**
+ * Stops the current media from being played.
+ */
 void __fastcall TMikModMedia::DoStop(void)
 {
     FMikMod->Stop();

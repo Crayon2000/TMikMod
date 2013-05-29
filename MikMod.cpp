@@ -328,6 +328,32 @@ String __fastcall TMikMod::GetComment()
 }
 
 /**
+ * Returns the number of sound positions in the module.
+ */
+unsigned short __fastcall TMikMod::GetNumberPos()
+{
+    CheckIfOpen();
+    return FModule->numpos;
+}
+
+/**
+ * Returns the song position.
+ */
+unsigned short __fastcall TMikMod::GetPosition()
+{
+    CheckIfOpen();
+    return FModule->sngpos;
+}
+
+/**
+ * Set the song position.
+ */
+void __fastcall TMikMod::SetPosition(unsigned short APosition)
+{
+    Player_SetPosition(APosition);
+}
+
+/**
  * Get a voice at a certain position.
  * @param Index The number of the voice to get.
  * @return A pointer to the voice at Index.

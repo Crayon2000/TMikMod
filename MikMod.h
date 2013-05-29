@@ -74,6 +74,9 @@ protected:
     String __fastcall GetSongTitle();
     String __fastcall GetModType();
     String __fastcall GetComment();
+    unsigned short __fastcall GetNumberPos();
+    unsigned short __fastcall GetPosition();
+    void __fastcall SetPosition(unsigned short APosition);
     TVoice* __fastcall GetVoice(int Index);
 public:
     __fastcall TMikMod(TModuleDriver ADriver = TModuleDriver::mdNoSound);
@@ -91,6 +94,8 @@ public:
     __property String SongTitle = {read=GetSongTitle}; /**< Song title. */
     __property String ModuleType = {read=GetModType}; /**< Type of the module (which tracker format). */
     __property String Comment = {read=GetComment}; /**< Either the module comments, or NULL if the module doesn't have comments. */
+    __property unsigned short NumberPos = {read=GetNumberPos}; /**< Number of sound positions. */
+    __property unsigned short SongPosition = {read=GetPosition, write=SetPosition}; /**< Song position. */
     __property int VoiceCount = {read=FVoiceCount}; /**< Number of voice. */
     __property TVoice* Voices[int Index] = {read=GetVoice}; /**< Use Voices to obtain a pointer to a specific TVoice object in the array. */
 __published:
