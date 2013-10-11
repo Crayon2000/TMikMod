@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -74,7 +74,7 @@ typedef struct STMHEADER {
 	UBYTE ver_minor;
 	UBYTE inittempo;      /* initspeed= stm inittempo>>4  */
 	UBYTE numpat;         /* number of patterns  */
-	UBYTE globalvol;     
+	UBYTE globalvol;
 	UBYTE reserved[13];
 	STMSAMPLE sample[31]; /* STM sample data */
 	UBYTE patorder[128];  /* Docs say 64 - actually 128 */
@@ -90,7 +90,7 @@ static STMNOTE *stmbuf = NULL;
 static STMHEADER *mh = NULL;
 
 /* tracker identifiers */
-static CHAR* STM_Version[STM_NTRACKERS] = {
+static const CHAR * STM_Version[STM_NTRACKERS] = {
 	"Screamtracker 2",
 	"Converted by MOD2STM (STM format)",
 	"Wuzamod (STM format)"
@@ -98,7 +98,7 @@ static CHAR* STM_Version[STM_NTRACKERS] = {
 
 /*========== Loader code */
 
-BOOL STM_Test(void)
+static BOOL STM_Test(void)
 {
 	UBYTE str[44];
 	int t;
@@ -110,7 +110,7 @@ BOOL STM_Test(void)
 	/* Prevent false positives for S3M files */
 	if(!memcmp(str+40,"SCRM",4))
 		return 0;
-	
+
 	for (t=0;t<STM_NTRACKERS;t++)
 		if(!memcmp(str,STM_Signatures[t],8))
 			return 1;
@@ -118,7 +118,7 @@ BOOL STM_Test(void)
 	return 0;
 }
 
-BOOL STM_Init(void)
+static BOOL STM_Init(void)
 {
 	if(!(mh=(STMHEADER*)MikMod_malloc(sizeof(STMHEADER)))) return 0;
 	if(!(stmbuf=(STMNOTE*)MikMod_calloc(64U*4,sizeof(STMNOTE)))) return 0;
@@ -145,7 +145,7 @@ static void STM_ConvertNote(STMNOTE *n)
 
 	if((ins)&&(ins<32)) UniInstrument(ins-1);
 
-	/* special values of [SBYTE0] are handled here 
+	/* special values of [SBYTE0] are handled here
 	   we have no idea if these strange values will ever be encountered.
 	   but it appears as those stms sound correct. */
 	if((note==254)||(note==252)) {
@@ -249,9 +249,9 @@ static BOOL STM_LoadPatterns(void)
 	return 1;
 }
 
-BOOL STM_Load(BOOL curious)
+static BOOL STM_Load(BOOL curious)
 {
-	int t; 
+	int t;
 	ULONG MikMod_ISA; /* We must generate our own ISA, it's not stored in stm */
 	SAMPLE *q;
 
@@ -297,7 +297,7 @@ BOOL STM_Load(BOOL curious)
 	/* set module variables */
 	for(t=0;t<STM_NTRACKERS;t++)
 		if(!memcmp(mh->trackername,STM_Signatures[t],8)) break;
-	of.modtype   = StrDup(STM_Version[t]);
+	of.modtype   = MikMod_strdup(STM_Version[t]);
 	of.songname  = DupStr(mh->songname,20,1); /* make a cstr of songname */
 	of.numpat    = mh->numpat;
 	of.inittempo = 125;                     /* mh->inittempo+0x1c; */
@@ -330,7 +330,7 @@ BOOL STM_Load(BOOL curious)
 		q->speed      = (mh->sample[t].c2spd * 8363) / 8448;
 		q->volume     = mh->sample[t].volume;
 		q->length     = mh->sample[t].length;
-		if (/*(!mh->sample[t].volume)||*/(q->length==1)) q->length=0;
+		if (/*!mh->sample[t].volume || */q->length==1) q->length=0;
 		q->loopstart  = mh->sample[t].loopbeg;
 		q->loopend    = mh->sample[t].loopend;
 		q->seekpos    = MikMod_ISA;
@@ -347,7 +347,7 @@ BOOL STM_Load(BOOL curious)
 	return 1;
 }
 
-CHAR *STM_LoadTitle(void)
+static CHAR *STM_LoadTitle(void)
 {
 	CHAR s[20];
 
@@ -369,6 +369,5 @@ MIKMODAPI MLOADER load_stm={
 	STM_Cleanup,
 	STM_LoadTitle
 };
-
 
 /* ex:set ts=4: */

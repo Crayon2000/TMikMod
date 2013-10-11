@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -49,7 +49,7 @@
 
 #include "dossb.h"
 
-static void SB_CommandLine(CHAR *cmdline)
+static void SB_CommandLine(const CHAR *cmdline)
 {
 	char *ptr, *end;
 
@@ -76,7 +76,7 @@ static BOOL SB_IsThere(void)
 	return sb_detect();
 }
 
-static BOOL SB_Init(void)
+static int SB_Init(void)
 {
 	if (!sb_open()) {
 		_mm_errno = MMERR_INVALID_DEVICE;
@@ -148,7 +148,7 @@ static void SB_Update(void)
 	/* Do nothing: the real update is done during SB interrupts */
 }
 
-static BOOL SB_PlayStart (void)
+static int SB_PlayStart (void)
 {
 	if (VC_PlayStart())
 		return 1;
@@ -171,7 +171,7 @@ static BOOL SB_PlayStart (void)
 	return 0;
 }
 
-static BOOL SB_Reset(void)
+static int SB_Reset(void)
 {
 	sb_reset();
 	VC_Exit();
@@ -225,8 +225,9 @@ MDRIVER drv_sb =
 	VC_VoiceRealVolume
 };
 
-#else // DRV_SB
+#else /* DRV_SB */
 
+#include "mikmod_internals.h"
 MISSING(drv_sb);
 
 #endif

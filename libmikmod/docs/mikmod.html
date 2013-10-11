@@ -32,7 +32,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
 
 <h2 class="unnumbered">MikMod Sound Library</h2>
 
-<p>This&nbsp;manual&nbsp;documents&nbsp;the&nbsp;MikMod&nbsp;Sound&nbsp;Library,&nbsp;version&nbsp;3.2.0.<!-- /@w -->
+<p>This&nbsp;manual&nbsp;documents&nbsp;the&nbsp;MikMod&nbsp;Sound&nbsp;Library,&nbsp;version&nbsp;3.3.2.<!-- /@w -->
 
 <ul class="menu">
 <li><a accesskey="1" href="#Introduction">Introduction</a>:           What is MikMod ? 
@@ -634,8 +634,8 @@ driver. Registering the nosound driver first would not be a very good
 idea<small class="enddots">...</small>
 
    <p>You can get some printable information regarding the registered drivers with
-<code>MikMod_InfoDriver</code>; don't forget to call <code>free</code> on the returned
-string when you don't need it anymore.
+<code>MikMod_InfoDriver</code>; don't forget to call <code>MikMod_free</code> on the
+returned string when you don't need it anymore.
 
    <p>After you've registered your drivers, you can initialize the sound playback
 with <code>MikMod_Init</code>, passing specific information to the driver if
@@ -1012,13 +1012,13 @@ The <code>MDRIVER</code> structure is not meant to be used by anything else than
 core of the library, but its first four fields contain useful information for
 your programs:
      <dl>
-<dt><code>CHAR* Name</code><dd>Name of the driver, usually never more than 20 characters. 
-<br><dt><code>CHAR* Description</code><dd>Description of the driver, usually never more than 50 characters. 
+<dt><code>const CHAR* Name</code><dd>Name of the driver, usually never more than 20 characters. 
+<br><dt><code>const CHAR* Description</code><dd>Description of the driver, usually never more than 50 characters. 
 <br><dt><code>UBYTE HardVoiceLimit</code><dd>Maximum number of hardware voices for this driver, 0 if the driver has no
 hardware mixing support. 
 <br><dt><code>UBYTE SoftVoiceLimit</code><dd>Maximum number of software voices for this driver, 0 if the driver has no
 software mixing support. 
-<br><dt><code>CHAR* Alias</code><dd>A short name for the driver, without spaces, usually never more than 10
+<br><dt><code>const CHAR* Alias</code><dd>A short name for the driver, without spaces, usually never more than 10
 characters. 
 </dl>
 
@@ -1215,7 +1215,7 @@ The <code>MREADER</code> contains the following function pointers:
 meaning the start of the object being written. 
 <br><dt><code>long (*Tell)(struct MWRITER*);</code><dd>This function should have the same behaviour as <code>ftell</code>, with offset 0
 meaning the start of the object being written. 
-<br><dt><code>BOOL (*Write)(struct MWRITER*, void *dest, size_t length);</code><dd>This function should copy <code>length</code> bytes of data from <code>dest</code>, and
+<br><dt><code>BOOL (*Write)(struct MWRITER*, const void *src, size_t length);</code><dd>This function should copy <code>length</code> bytes of data from <code>src</code>, and
 return zero if an error occured, and any nonzero value otherwise. 
 <br><dt><code>BOOL (*Put)(struct MWRITER*, int data);</code><dd>This function should have the same behaviour as <code>fputc</code>. 
 </dl>
@@ -1304,6 +1304,8 @@ is the requested setting.
 <br><dt>&lsquo;<samp><span class="samp">MMERR_ULAW</span></samp>&rsquo;<dd>This error occurs when the sound device only supports uLaw output (which
 implies mono, 8 bit, and 8000 Hz sampling rate), which isn't the requested
 setting. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_NO_FLOAT32</span></samp>&rsquo;<dd>This error occurs when the sound device doesn't support 32 bit float
+sound output, which is the requested setting. 
 </dl>
 
 <h5 class="subsubsection">4.3.4.2 AudioFile Driver Specific Error</h5>
@@ -1443,6 +1445,22 @@ the required format (Linear PCM).
 <dt>&lsquo;<samp><span class="samp">MMERR_DOSSB_STARTDMA</span></samp>&rsquo;<dd>This error occurs if the driver failed to start the cyclic DMA transfer. 
 </dl>
 
+<h4 class="subsection">4.3.8 OpenAL Driver Specific Errors</h4>
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_CREATECTX</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to create a context during initialization. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_CTXCURRENT</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to set current context during initialization. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_GENBUFFERS</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to generate buffers during initialization. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_GENSOURCES</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to generate a source during initialization. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_SOURCE</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to set source parameters during initialization. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_QUEUEBUFFERS</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to queue buffers on a source. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_UNQUEUEBUFFERS</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to remove buffers from the queue. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_BUFFERDATA</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to fill a buffer with audio data. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_GETSOURCE</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to get source parameters. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_SOURCEPLAY</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to play the source. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OPENAL_SOURCESTOP</span></samp>&rsquo;<dd>This error occurs if OpenAL fails to stop the source. 
+</dl>
+
 <!-- ========================================================== Function reference -->
 <div class="node">
 <a name="Function-Reference"></a>
@@ -1479,7 +1497,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Function-Reference">Function Reference
 <p><a name="index-MikMod_005fActive-18"></a><code>BOOL MikMod_Active(void)</code>
      <dl>
 <dt><i>Description</i><dd>This function returns whether sound output is enabled or not. 
-<br><dt><i>Result</i><dt><i>0</i><dd>Sound output is disabled. 
+<br><dt><i>Result</i><br><dt><i>0</i><dd>Sound output is disabled. 
 <br><dt><i>1</i><dd>Sound output is enabled. 
 <br><dt><i>Notes</i><dd>Calls to <code>MikMod_Update</code> will be ignored when sound output is disabled. 
 <br><dt><i>See also</i><dd><code>MikMod_DisableOutput</code>, <code>MikMod_EnableOutput</code>. 
@@ -1496,11 +1514,11 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Function-Reference">Function Reference
 
 <h5 class="subsubsection">4.4.1.3 MikMod_EnableOutput</h5>
 
-   <p><a name="index-MikMod_005fEnableOutput-20"></a><code>BOOL MikMod_EnableOutput(void)</code>
+   <p><a name="index-MikMod_005fEnableOutput-20"></a><code>int MikMod_EnableOutput(void)</code>
      <dl>
 <dt><i>Description</i><dd>This function starts the sound mixing. 
-<br><dt><i>Result</i><dt><i>0</i><dd>Sound mixing is ready. 
-<dt><i>nonzero</i><dd>An error occurred during the operation. 
+<br><dt><i>Result</i><br><dt><i>0</i><dd>Sound mixing is ready. 
+<br><dt><i>nonzero</i><dd>An error occurred during the operation. 
 <br><dt><i>Notes</i><dd>Calls to <code>MikMod_Update</code> will be ignored when sound output is disabled. 
 <br><dt><i>See also</i><dd><code>MikMod_Active</code>, <code>MikMod_DisableOutput</code>. 
 </dl>
@@ -1550,14 +1568,14 @@ no longer necessary.
 
 <h5 class="subsubsection">4.4.1.8 MikMod_Init</h5>
 
-   <p><a name="index-MikMod_005fInit-25"></a><code>BOOL MikMod_Init(CHAR *parameters)</code>
+   <p><a name="index-MikMod_005fInit-25"></a><code>int MikMod_Init(const CHAR *parameters)</code>
      <dl>
 <dt><i>Description</i><dd>This function performs the library initialization, including the sound driver
 choice and configuration, and all the necessary memory allocations. 
-<br><dt><i>Parameters</i><dt><i>parameters</i><dd>Optional parameters given to the sound driver. These parameters are ignored if
+<br><dt><i>Parameters</i><br><dt><i>parameters</i><dd>Optional parameters given to the sound driver. These parameters are ignored if
 the value of <code>md_device</code> is zero (autodetection). 
-<br><dt><i>Result</i><dt><i>0</i><dd>Initialization was successful. 
-<dt><i>nonzero</i><dd>An error occurred during initialization. 
+<br><dt><i>Result</i><br><dt><i>0</i><dd>Initialization was successful. 
+<br><dt><i>nonzero</i><dd>An error occurred during initialization. 
 <br><dt><i>Notes</i><dd>When the initialization fails, the library uses the nosound sound driver to
 let other the other MikMod functions work without crashing the application. 
 <br><dt><i>See also</i><dd><code>MikMod_Exit</code>, <code>MikMod_InitThreads</code>, <code>MikMod_Reset</code>. 
@@ -1568,8 +1586,8 @@ let other the other MikMod functions work without crashing the application.
    <p><a name="index-MikMod_005fInitThreads-26"></a><code>BOOL MikMod_InitThreads(void)</code>
      <dl>
 <dt><i>Description</i><dd>This function returns whether libmikmod is thread-safe. 
-<br><dt><i>Result</i><dt><i>0</i><dd>The library is not thread-safe. 
-<dt><i>1</i><dd>The library is thread-safe. 
+<br><dt><i>Result</i><br><dt><i>0</i><dd>The library is not thread-safe. 
+<br><dt><i>1</i><dd>The library is thread-safe. 
 <br><dt><i>Notes</i><dd>This function should be called before any call to <code>MikMod_Lock</code> or
 <code>MikMod_Unlock</code> is made. 
 <br><dt><i>See also</i><dd><code>MikMod_Lock</code>, <code>MikMod_Unlock</code>. 
@@ -1614,7 +1632,7 @@ to <code>MikMod_Lock</code> in made.<br>
      <dl>
 <dt><i>Description</i><dd>This function adds the specified driver to the internal list of usable
 drivers. 
-<br><dt><i>Parameters</i><dt><i>newdriver</i><dd>A pointer to the <code>MDRIVER</code> structure identifying the driver. 
+<br><dt><i>Parameters</i><br><dt><i>newdriver</i><dd>A pointer to the <code>MDRIVER</code> structure identifying the driver. 
 <br><dt><i>Notes</i><dd>It is safe to register the same driver several times, although it will not
 be duplicated in the list.<br>
 You should register all the drivers you need before calling <code>MikMod_Init</code>. 
@@ -1628,7 +1646,7 @@ If you want to register all the available drivers, use
    <p><a name="index-MikMod_005fRegisterErrorHandler-31"></a><code>MikMod_handler_t MikMod_RegisterErrorHandler(MikMod_handler_t newhandler)</code>
      <dl>
 <dt><i>Description</i><dd>This function selects the function which should be called in case of error. 
-<br><dt><i>Parameters</i><dt><i>newhandler</i><dd>The new error callback function. 
+<br><dt><i>Parameters</i><br><dt><i>newhandler</i><dd>The new error callback function. 
 <br><dt><i>Result</i><dd>The previous error callback function, or <code>NULL</code> if there was none. 
 <br><dt><i>Notes</i><dd><code>MikMod_handler_t</code> is defined as <code>void(*function)(void)</code>, this means
 your error function has the following prototype:
@@ -1644,7 +1662,7 @@ your callback).
      <dl>
 <dt><i>Description</i><dd>This function adds the specified module loader to the internal list of usable
 module loaders. 
-<br><dt><i>Parameters</i><dt><i>newloader</i><dd>A pointer to the <code>MLOADER</code> structure identifying the loader. 
+<br><dt><i>Parameters</i><br><dt><i>newloader</i><dd>A pointer to the <code>MLOADER</code> structure identifying the loader. 
 <br><dt><i>Notes</i><dd>It is safe to register the same loader several times, although it will not be
 duplicated in the list.<br>
 You should register all the loaders you need before calling <code>Player_Load</code>
@@ -1661,7 +1679,7 @@ last.
      <dl>
 <dt><i>Description</i><dd>This function selects the function which should be used to process module
 playback. 
-<br><dt><i>Parameters</i><dt><i>newplayer</i><dd>The new playback function
+<br><dt><i>Parameters</i><br><dt><i>newplayer</i><dd>The new playback function
 <br><dt><i>Result</i><dd>The previous playback function. 
 <br><dt><i>Notes</i><dd><code>MikMod_player_t</code> is defined as <code>void(*function)(void)</code>, this means
 your player function has the following prototype:
@@ -1697,13 +1715,13 @@ anymore<small class="enddots">...</small>
 
 <h5 class="subsubsection">4.4.1.17 MikMod_Reset</h5>
 
-   <p><a name="index-MikMod_005fReset-34"></a><code>BOOL MikMod_Reset(CHAR *parameters)</code>
+   <p><a name="index-MikMod_005fReset-34"></a><code>int MikMod_Reset(const CHAR *parameters)</code>
      <dl>
 <dt><i>Description</i><dd>This function resets MikMod and reinitialize the sound hardware. 
 <br><dt><i>Parameters</i><dt><i>parameters</i><dd>Optional parameters given to the sound driver. If you set the value of
 <code>md_device</code> to zero (autodetect), these parameters are ignored. 
 <br><dt><i>Result</i><dt><i>0</i><dd>Reinitialization was successful. 
-<dt><i>nonzero</i><dd>An error occurred during reinitialization. 
+<br><dt><i>nonzero</i><dd>An error occurred during reinitialization. 
 <br><dt><i>Notes</i><dd>Use this function when you have changed the global configuration variables:
 <code>md_device</code> and <code>md_mixfreq</code>, or one of the <code>md_mode</code> flags
 which require sound reinitialization. Sound playback will continue as soon as
@@ -1713,14 +1731,14 @@ the driver is ready.
 
 <h5 class="subsubsection">4.4.1.18 MikMod_SetNumVoices</h5>
 
-   <p><a name="index-MikMod_005fSetNumVoices-35"></a><code>BOOL MikMod_SetNumVoices(int musicvoices, int samplevoices)</code>
+   <p><a name="index-MikMod_005fSetNumVoices-35"></a><code>int MikMod_SetNumVoices(int musicvoices, int samplevoices)</code>
      <dl>
 <dt><i>Description</i><dd>This function sets the number of mixed voices which can be used for music
 and sound effects playback. 
 <br><dt><i>Parameters</i><dt><i>musicvoices</i><dd>The number of voices to reserve for music playback. 
 <br><dt><i>samplevoices</i><dd>The number of voices to reserve for sound effects. 
 <br><dt><i>Result</i><dt><i>0</i><dd>Initialization was successful. 
-<dt><i>nonzero</i><dd>An error occurred during initialization. 
+<br><dt><i>nonzero</i><dd>An error occurred during initialization. 
 <br><dt><i>Notes</i><dd>A value of <code>-1</code> for any of the parameters will retain the current number
 of reserved voices.<br>
 The maximum number of voices vary from driver to driver (hardware drivers
@@ -1767,10 +1785,10 @@ you should do this before calling <code>MikMod_Update</code>.
 
 <h5 class="subsubsection">4.4.1.21 MikMod_strerror</h5>
 
-   <p><a name="index-MikMod_005fstrerror-38"></a><code>char* MikMod_strerror(int errno)</code>
+   <p><a name="index-MikMod_005fstrerror-38"></a><code>const char* MikMod_strerror(int errnum)</code>
      <dl>
 <dt><i>Description</i><dd>This function associates a descriptive message to an error code. 
-<br><dt><i>Parameters</i><dt><i>errno</i><dd>The MikMod error code. 
+<br><dt><i>Parameters</i><dt><i>errnum</i><dd>The MikMod error code. 
 <br><dt><i>Result</i><dd>A pointer to a string describing the error. 
 </dl>
 
@@ -1792,7 +1810,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Function-Reference">Function Reference
      <dl>
 <dt><i>Description</i><dd>This function returns whether the module player is active or not. 
 <br><dt><i>Result</i><dt><i>0</i><dd>No module is playing. 
-<dt><i>nonzero</i><dd>A module is currently playing. 
+<br><dt><i>nonzero</i><dd>A module is currently playing. 
 <br><dt><i>Notes</i><dd>This function will still report that the player is active if the playing module
 is paused. 
 <br><dt><i>See also</i><dd><code>Player_Paused</code>, <code>Player_TogglePause</code>, <code>Player_Start</code>, <code>Player_Stop</code>
@@ -1832,7 +1850,7 @@ playing.
 
 <h5 class="subsubsection">4.4.2.5 Player_Load</h5>
 
-   <p><a name="index-Player_005fLoad-43"></a><code>MODULE* Player_Load(CHAR* filename, int maxchan, BOOL curious)</code>
+   <p><a name="index-Player_005fLoad-43"></a><code>MODULE* Player_Load(const CHAR* filename, int maxchan, BOOL curious)</code>
      <dl>
 <dt><i>Description</i><dd>This function loads a music module. 
 <br><dt><i>Parameters</i><dt><i>filename</i><dd>The name of the module file. 
@@ -1879,7 +1897,7 @@ after the last &ldquo;official&rdquo; pattern.
 
 <h5 class="subsubsection">4.4.2.7 Player_LoadTitle</h5>
 
-   <p><a name="index-Player_005fLoadTitle-45"></a><code>MODULE* Player_LoadTitle(CHAR* filename)</code>
+   <p><a name="index-Player_005fLoadTitle-45"></a><code>MODULE* Player_LoadTitle(const CHAR* filename)</code>
      <dl>
 <dt><i>Description</i><dd>This function retrieves the title of a module file. 
 <br><dt><i>Parameters</i><dt><i>filename</i><dd>The name of the module file. 
@@ -1932,7 +1950,7 @@ range and are part of the range ; otherwise, if the operation is
 <dt><i>Description</i><dd>This function determines whether a module channel is muted or not. 
 <br><dt><i>Parameters</i><dt><i>channel</i><dd>The module channel to test (starting from zero). 
 <br><dt><i>Result</i><dt><i>0</i><dd>The channel is not muted. 
-<dt><i>1</i><dd>The channel is muted. 
+<br><dt><i>1</i><dd>The channel is muted. 
 <br><dt><i>See also</i><dd><code>Player_Mute</code>, <code>Player_ToggleMute</code>, <code>Player_Unmute</code>. 
 </dl>
 
@@ -2095,7 +2113,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Function-Reference">Function Reference
 
 <h5 class="subsubsection">4.4.3.2 Sample_Load</h5>
 
-   <p><a name="index-Sample_005fLoad-62"></a><code>SAMPLE* Sample_Load(CHAR* filename)</code>
+   <p><a name="index-Sample_005fLoad-62"></a><code>SAMPLE* Sample_Load(const CHAR* filename)</code>
      <dl>
 <dt><i>Description</i><dd>This function loads a sample. 
 <br><dt><i>Parameters</i><dt><i>filename</i><dd>The sample filename. 
@@ -2277,7 +2295,7 @@ stopping the playback, use <code>Voice_SetVolume(voice, 0)</code> instead.
 <dt><i>Description</i><dd>This function returns whether the voice is active or not. 
 <br><dt><i>Parameters</i><dt><i>voice</i><dd>The number of the voice to be checked (starting from zero). 
 <br><dt><i>Result</i><dt><i>0</i><dd>The voice is stopped or has no sample assigned. 
-<dt><i>nonzero</i><dd>The voice is playing a sample. 
+<br><dt><i>nonzero</i><dd>The voice is playing a sample. 
 <br><dt><i>Notes</i><dd>This function may not work with some drivers (especially for hardware mixed
 voices). In this case, its return value is undefined. 
 <br><dt><i>See also</i><dd><code>Voice_Stop</code>. 
@@ -2496,6 +2514,8 @@ This driver only supports software mixing. This driver is not tested yet.
 This driver only supports software mixing. 
 <br><dt><code>drv_mac</code><dd>This driver is only available under MacOS, and uses the &ldquo;Sound Manager&rdquo;.<br>
 This driver supports the Classic and Carbon environments, and does only software mixing. 
+<br><dt><code>drv_openal</code><dd>This driver is available for all platforms where &ldquo;OpenAL&rdquo; is supported, and uses the &ldquo;OpenAL&rdquo; api.<br>
+This driver only supports software mixing. 
 <br><dt><code>drv_os2</code><dd>This driver is only available under OS/2 version 3 and higher (Warp), and OS/2
 2.x with MMPM/2.<br>
 This driver only supports software mixing. 
@@ -2510,6 +2530,8 @@ driver to be compiled for your current kernel.<br>
 This driver only supports hardware mixing. 
 <br><dt><code>drv_sb</code><dd>This driver is only available under DOS, and supports the SoundBlaster/Pro/16/AWE32.<br>
 This driver only supports hardware mixing. This driver needs to be tested. 
+<br><dt><code>drv_sdl</code><dd>This driver is available for all platforms where &ldquo;SDL&rdquo; is supported, and uses the &ldquo;Simple DirectMedia Layer&rdquo; apis.<br>
+This driver only supports software mixing. 
 <br><dt><code>drv_sgi</code><dd>This driver is only available under IRIX, and uses the SGI audio library.<br>
 This driver only supports software mixing. 
 <br><dt><code>drv_sun</code><dd>This driver is only available under Unices which implement SunOS-like audio
@@ -2522,6 +2544,8 @@ This driver only supports hardware mixing. The DOS/DJGPP and OS/2 parts needs to
 This driver only supports software mixing. 
 <br><dt><code>drv_wss</code><dd>This driver is only available under DOS, and supports Windows Sound System compatible sound cards.<br>
 This driver only supports software mixing. This driver needs to be tested. 
+<br><dt><code>drv_xaudio2</code><dd>This driver is only available under Windows XP and newer Windows versions and uses the &ldquo;XAudio2&rdquo; 2.7 or 2.8 apis.<br>
+This driver only supports software mixing. 
 </dl>
 
 <div class="node">
@@ -2761,6 +2785,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Index">Index</a>
 <li><a href="#Error-Reference">4.3.5 MaxOS X Driver Specific Errors</a>
 <li><a href="#Error-Reference">4.3.6 Dos &ldquo;Windows Sound System&rdquo; Driver Specific Errors</a>
 <li><a href="#Error-Reference">4.3.7 Dos &ldquo;SoundBlaster&rdquo; Driver Specific Errors</a>
+<li><a href="#Error-Reference">4.3.8 OpenAL Driver Specific Errors</a>
 </li></ul>
 <li><a href="#Function-Reference">4.4 Function Reference</a>
 <ul>

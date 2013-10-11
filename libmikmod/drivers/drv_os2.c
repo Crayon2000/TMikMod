@@ -33,6 +33,12 @@
 
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef DRV_OS2
+
 #define INCL_DOS
 #define INCL_OS2MM
 #include <os2.h>
@@ -108,7 +114,7 @@ static	ULONG NextBuffer = 0;	/* next fragment to be filled */
 	ThreadID = 0;
 }
 
-static void OS2_CommandLine(CHAR *cmdline)
+static void OS2_CommandLine(const CHAR *cmdline)
 {
 	char *ptr;
 	int buf;
@@ -148,7 +154,7 @@ static BOOL OS2_IsPresent(void)
 	return 1;
 }
 
-static BOOL OS2_Init(void)
+static int OS2_Init(void)
 {
 	MCI_OPEN_PARMS mciOpenParms;
 	MCI_WAVE_SET_PARMS mciWaveSetParms;
@@ -294,7 +300,7 @@ static void OS2_Exit(void)
 	MikMod_free(AudioBuffer);
 }
 
-static BOOL OS2_PlayStart(void)
+static int OS2_PlayStart(void)
 {
 	MCI_PLAY_PARMS mciPlayParms;
 	int i;
@@ -343,7 +349,7 @@ MIKMODAPI MDRIVER drv_os2 = {
 	0,255,
 	"os2",
 	"device:r:0,8,0:Waveaudio device index to use (0 - default)\n"
-        "buffer:r:12,16:Audio buffer log2 size\n",
+		"buffer:r:12,16:Audio buffer log2 size\n",
 	OS2_CommandLine,
 	OS2_IsPresent,
 	VC_SampleLoad,
@@ -371,4 +377,10 @@ MIKMODAPI MDRIVER drv_os2 = {
 	VC_VoiceRealVolume
 };
 
+#else
+
+#include "mikmod_internals.h"
+MISSING(drv_os2);
+
+#endif
 /* ex:set ts=4: */

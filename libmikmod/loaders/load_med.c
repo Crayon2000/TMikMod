@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -159,7 +159,7 @@ static CHAR MED_Version[] = "OctaMED (MMDx)";
 
 /*========== Loader code */
 
-BOOL MED_Test(void)
+static BOOL MED_Test(void)
 {
 	UBYTE id[4];
 
@@ -170,7 +170,7 @@ BOOL MED_Test(void)
 	return 0;
 }
 
-BOOL MED_Init(void)
+static BOOL MED_Init(void)
 {
 	if (!(me = (MEDEXP *)MikMod_malloc(sizeof(MEDEXP))))
 		return 0;
@@ -181,7 +181,7 @@ BOOL MED_Init(void)
 	return 1;
 }
 
-void MED_Cleanup(void)
+static void MED_Cleanup(void)
 {
 	MikMod_free(me);
 	MikMod_free(mh);
@@ -426,7 +426,7 @@ static BOOL LoadMMD1Patterns(void)
 	return 1;
 }
 
-BOOL MED_Load(BOOL curious)
+static BOOL MED_Load(BOOL curious)
 {
 	int t;
 	ULONG sa[64];
@@ -571,7 +571,7 @@ BOOL MED_Load(BOOL curious)
 		of.flags |= UF_HIGHBPM;
 	}
 	MED_Version[12] = mh->id;
-	of.modtype = StrDup(MED_Version);
+	of.modtype = MikMod_strdup(MED_Version);
 	of.numchn = 0;				/* will be counted later */
 	of.numpat = ms->numblocks;
 	of.numpos = ms->songlen;
@@ -582,7 +582,7 @@ BOOL MED_Load(BOOL curious)
 		char *name;
 
 		_mm_fseek(modreader, me->songname, SEEK_SET);
-		name = (char*)MikMod_malloc(me->songnamelen);
+		name = MikMod_malloc(me->songnamelen);
 		_mm_read_UBYTES(name, me->songnamelen, modreader);
 		of.songname = DupStr(name, me->songnamelen, 1);
 		MikMod_free(name);
@@ -680,21 +680,21 @@ BOOL MED_Load(BOOL curious)
 	return 1;
 }
 
-CHAR *MED_LoadTitle(void)
+static CHAR *MED_LoadTitle(void)
 {
 	ULONG posit, namelen;
 	CHAR *name, *retvalue = NULL;
-	
+
 	_mm_fseek(modreader, 0x20, SEEK_SET);
 	posit = _mm_read_M_ULONG(modreader);
-	
+
 	if (posit) {
 		_mm_fseek(modreader, posit + 0x2C, SEEK_SET);
 		posit = _mm_read_M_ULONG(modreader);
 		namelen = _mm_read_M_ULONG(modreader);
 
 		_mm_fseek(modreader, posit, SEEK_SET);
-		name = (char*)MikMod_malloc(namelen);
+		name = MikMod_malloc(namelen);
 		_mm_read_UBYTES(name, namelen, modreader);
 		retvalue = DupStr(name, namelen, 1);
 		MikMod_free(name);

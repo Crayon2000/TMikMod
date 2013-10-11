@@ -1,27 +1,8 @@
   Hello folks !
 
 
-This is libmikmod, version 3.2.0-beta1, a portable sound library for DOS.
+This is libmikmod, version 3.3.2, a portable sound library for DOS.
 DOS support is new in this version, your comments and critics are welcome.
-
-
->> BETA WARNING
----------------
-
-This is a *beta* version of libmikmod. Although it should work fine on
-almost all systems, there are likely a few last-minute errors or typos
-in the source, and some parts have not received enough hours of testing yet.
-
-Also, please note that all features planned for the final 3.2.0 release are not
-available yet. Some structures or functions may change. This release is mainly
-intended to the libmikmod developers to share a common base for adding new
-features...
-
-The library programming documentation (in docs/) is mostly up-to-date... It
-lacks the Player_QueryVoices documentation, though.
-
-If you're not scared, then you can proceed and enjoy fewer bugs than in the
-previous version (-;
 
 
 >> BUILDING LIBMIKMOD
@@ -38,7 +19,7 @@ things manually ...
 
 If you have all proper tools installed, just type
 
-	make -fMakefile.dj
+	make -f Makefile.dj
 
 There is a catch if you have some PC-like GREP (i.e. Borland GREP) somewhere on
 your path before actual GNU grep... you can check this by just typing "grep".
@@ -116,21 +97,17 @@ people who will embed libmikmod in their application as a shared library.
 >> CONTACT AND DOWNLOAD INFO
 ----------------------------
 
-* email:
-  Please send all your libmikmod related e-mail to the maintainer, Raphael
-  Assenat, at:
-  mikmod@raphnet.net
+libmikmod home page is located at SourceForge:
 
-  Things related to the DOS port should also be forwarded to the DOS
-  ``portmaster'', Andrew Zabolotny, at:
-  bit@eltech.ru
+    http://mikmod.sourceforge.net/
+    http://sourceforge.net/projects/mikmod/
 
-  There's a mailing list for discussing the development of libmikmod (new
-  features, bugs, ideas...). Look for more information on the web site.
+There's a mailing list (mikmod-public) for discussing the development
+of MikMod (new features, bugs, ideas...) Look for more information on
+the web site.
 
-* web:
-  libmikmod home page is located at:
-    http://mikmod.raphnet.net
+Things related to the DOS port should also be forwarded to the DOS
+``portmaster'', Andrew Zabolotny, at: bit@eltech.ru
 
 
 >> LAST NOTES

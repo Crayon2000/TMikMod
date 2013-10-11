@@ -28,14 +28,11 @@
 
 #ifdef DRV_NAS
 
-/* FIXME: a hack: kill BOOL typedef */
-#ifndef WIN32
-#define WIN32
-#include <audio/Amd.h>
-#undef WIN32
-#endif
-
+/* !!! HACK: avoid BOOL typedef clash */
+#define BOOL NAS_BOOL
 #include <audio/audiolib.h>
+#undef BOOL /* HACK !!! */
+
 #include <errno.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
@@ -238,7 +235,7 @@ nas_init_server (struct my_info *i)
   return 0;
 }
 
-static BOOL
+static int
 NAS_init (void)
 {
   struct my_info *i;
@@ -268,12 +265,14 @@ static void
 NAS_exit (void)
 {
   struct my_info *i = nas_info;
-  AuServer *s = i->server;
+  AuServer *s;
 
   if (i == NULL)
     return;
 
   VC_Exit ();
+
+  s = i->server;
 
   AuUnregisterEventHandler (s, i->handler);
   AuDestroyFlow (s, i->sole_flow, NULL);
@@ -284,7 +283,7 @@ NAS_exit (void)
   nas_info = NULL;
 }
 
-static BOOL
+static int
 NAS_reset (void)
 {
   NAS_exit ();
@@ -293,7 +292,7 @@ NAS_reset (void)
 
 /*** Flow Control */
 
-static BOOL
+static int
 NAS_flow_start (void)
 {
   struct my_info *i = nas_info;
@@ -363,7 +362,7 @@ NAS_update (void)
 /*** Miscellaneous API routines */
 
 static void
-NAS_cmd_line (CHAR *s)
+NAS_cmd_line (const CHAR *s)
 {
   CHAR *p;
 

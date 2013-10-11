@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{59AF41C2-F0DE-4024-9670-FD069194EAA7}</ProjectGuid>
-        <ProjectVersion>14.4</ProjectVersion>
+        <ProjectVersion>15.1</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <MainSource>ModPlayerFmx.cpp</MainSource>
         <Base>True</Base>
@@ -92,6 +92,7 @@
         <ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\release\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_OSX32)'!=''">
+        <Icns_MainIcns>$(BDS)\bin\cbuilder_PROJECTICNS.icns</Icns_MainIcns>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true</VerInfo_Keys>
         <IncludePath>$(BDSINCLUDE)\osx\fmx;$(IncludePath)</IncludePath>
@@ -142,6 +143,7 @@
         <TASM_Debugging>None</TASM_Debugging>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_OSX32)'!=''">
+        <Icns_MainIcns>$(BDS)\bin\cbuilder_PROJECTICNS.icns</Icns_MainIcns>
         <Defines>NDEBUG;$(Defines)</Defines>
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
@@ -232,19 +234,13 @@
                 </Excluded_Packages>
             </CPlusPlusBuilder.Personality>
             <Deployment>
-                <DeployFile Condition="'$(DynamicRTL)'=='true'" LocalName="$(BDS)\Redist\osx32\libcgcrtl.dylib" Class="DependencyModule">
+                <DeployFile LocalName=".\OSX32\Debug\ModPlayerFmx.icns" Configuration="Debug" Class="ProjectOSXResource">
                     <Platform Name="OSX32"/>
                 </DeployFile>
-                <DeployFile Condition="'$(DynamicRTL)'=='true'" LocalName="$(BDS)\Redist\osx32\libcgstl.dylib" Class="DependencyModule">
-                    <Platform Name="OSX32"/>
-                </DeployFile>
-                <DeployFile LocalName=".\OSX32\Debug\ModPlayerFmx" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="OSX32"/>
-                </DeployFile>
-                <DeployFile Condition="'$(UsingDelphiRTL)'=='true'" LocalName="$(BDS)\bin\borlndmm.dll" Class="DependencyModule">
+                <DeployFile Condition="'$(DynamicRTL)'=='true' And '$(Multithreaded)'!='true'" LocalName="$(BDS)\bin\cc32120.dll" Class="DependencyModule">
                     <Platform Name="Win32"/>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\OSX32\bplfmx161.dylib" Configuration="Debug" Class="DependencyPackage">
+                <DeployFile Condition="'$(DynamicRTL)'=='true'" LocalName="$(BDS)\Redist\osx32\libcgcrtl.dylib" Class="DependencyModule">
                     <Platform Name="OSX32"/>
                 </DeployFile>
                 <DeployFile LocalName=".\OSX32\Debug\ModPlayerFmx.tds" Configuration="Debug" Class="DebugSymbols">
@@ -253,8 +249,20 @@
                         <RemoteName>ModPlayerFmx.tds</RemoteName>
                     </Platform>
                 </DeployFile>
+                <DeployFile Condition="'$(DynamicRTL)'=='true'" LocalName="$(BDS)\Redist\osx32\libcgstl.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32"/>
+                </DeployFile>
+                <DeployFile Condition="'$(UsingDelphiRTL)'=='true'" LocalName="$(BDS)\bin\borlndmm.dll" Class="DependencyModule">
+                    <Platform Name="Win32"/>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\OSX32\bplfmx161.dylib" Configuration="Debug" Class="DependencyPackage">
+                    <Platform Name="OSX32"/>
+                </DeployFile>
                 <DeployFile Condition="'$(DynamicRTL)'=='true' And '$(Multithreaded)'=='true'" LocalName="$(BDS)\bin\cc32120mt.dll" Class="DependencyModule">
                     <Platform Name="Win32"/>
+                </DeployFile>
+                <DeployFile LocalName=".\OSX32\Debug\ModPlayerFmx" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="OSX32"/>
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32"/>
@@ -262,16 +270,10 @@
                 <DeployFile LocalName="$(BDS)\Redist\OSX32\bplrtl160.dylib" Configuration="Debug" Class="DependencyPackage">
                     <Platform Name="OSX32"/>
                 </DeployFile>
-                <DeployFile Condition="'$(DynamicRTL)'=='true' And '$(Multithreaded)'!='true'" LocalName="$(BDS)\bin\cc32120.dll" Class="DependencyModule">
-                    <Platform Name="Win32"/>
-                </DeployFile>
                 <DeployFile LocalName=".\OSX32\Debug\ModPlayerFmx.info.plist" Configuration="Debug" Class="ProjectOSXInfoPList">
                     <Platform Name="OSX32">
                         <RemoteName>Info.plist</RemoteName>
                     </Platform>
-                </DeployFile>
-                <DeployFile LocalName=".\OSX32\Debug\ModPlayerFmx.icns" Configuration="Debug" Class="ProjectOSXResource">
-                    <Platform Name="OSX32"/>
                 </DeployFile>
                 <DeployClass Required="true" Name="ProjectOutput">
                     <Platform Name="OSX32">

@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -49,10 +49,10 @@
 
 #include "doswss.h"
 
-static void WSS_CommandLine(CHAR *cmdline)
+static void WSS_CommandLine(const CHAR *cmdline)
 {
 	char *ptr, *end;
-	
+
 	if ((ptr=MD_GetAtom("port",cmdline,0))) {
 		wss.port = strtol(ptr, &end, 16);
 		MikMod_free(ptr);
@@ -72,7 +72,7 @@ static BOOL WSS_IsThere(void)
 	return wss_detect();
 }
 
-static BOOL WSS_Init(void)
+static int WSS_Init(void)
 {
 	if (!wss_open()) {
 		_mm_errno = MMERR_INVALID_DEVICE;
@@ -131,7 +131,7 @@ static void WSS_Update(void)
 	/* Do nothing: the real update is done during SB interrupts */
 }
 
-static BOOL WSS_PlayStart(void)
+static int WSS_PlayStart(void)
 {
 	if (VC_PlayStart())
 		return 1;
@@ -154,7 +154,7 @@ static BOOL WSS_PlayStart(void)
 	return 0;
 }
 
-static BOOL WSS_Reset(void)
+static int WSS_Reset(void)
 {
 	wss_reset();
 	VC_Exit();
@@ -209,6 +209,7 @@ MDRIVER drv_wss =
 
 #else /* ifdef DRV_WSS */
 
+#include "mikmod_internals.h"
 MISSING(drv_wss);
 
 #endif

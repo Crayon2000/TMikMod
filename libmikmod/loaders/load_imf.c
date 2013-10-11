@@ -125,7 +125,7 @@ static	IMFHEADER *mh=NULL;
 
 /*========== Loader code */
 
-BOOL IMF_Test(void)
+static BOOL IMF_Test(void)
 {
 	UBYTE id[4];
 
@@ -135,7 +135,7 @@ BOOL IMF_Test(void)
 	return 0;
 }
 
-BOOL IMF_Init(void)
+static BOOL IMF_Init(void)
 {
 	if(!(imfpat=(IMFNOTE*)MikMod_malloc(32*256*sizeof(IMFNOTE)))) return 0;
 	if(!(mh=(IMFHEADER*)MikMod_malloc(sizeof(IMFHEADER)))) return 0;
@@ -143,7 +143,7 @@ BOOL IMF_Init(void)
 	return 1;
 }
 
-void IMF_Cleanup(void)
+static void IMF_Cleanup(void)
 {
 	FreeLinear();
 
@@ -377,7 +377,7 @@ static UBYTE* IMF_ConvertTrack(IMFNOTE* tr,UWORD rows)
 	return UniDup();
 }
 
-BOOL IMF_Load(BOOL curious)
+static BOOL IMF_Load(BOOL curious)
 {
 #define IMF_SMPINCR 64
 	int t,u,track=0,oldnumsmp;
@@ -409,7 +409,7 @@ BOOL IMF_Load(BOOL curious)
 
 	/* set module variables */
 	of.songname=DupStr(mh->songname,31,1);
-	of.modtype=StrDup(IMF_Version);
+	of.modtype=MikMod_strdup(IMF_Version);
 	of.numpat=mh->patnum;
 	of.numins=mh->insnum;
 	of.reppos=0;
@@ -515,9 +515,9 @@ BOOL IMF_Load(BOOL curious)
 		ih. name##beg=_mm_read_UBYTE(modreader);		\
 		ih. name##end=_mm_read_UBYTE(modreader);		\
 		ih. name##flg=_mm_read_UBYTE(modreader);		\
-		_mm_read_UBYTE(modreader);						\
-		_mm_read_UBYTE(modreader);						\
-		_mm_read_UBYTE(modreader)
+		_mm_skip_BYTE(modreader);						\
+		_mm_skip_BYTE(modreader);						\
+		_mm_skip_BYTE(modreader)
 #else
 #define IMF_FinishLoadingEnvelope(name)				\
 		ih. name/**/pts=_mm_read_UBYTE(modreader);	\
@@ -525,9 +525,9 @@ BOOL IMF_Load(BOOL curious)
 		ih. name/**/beg=_mm_read_UBYTE(modreader);	\
 		ih. name/**/end=_mm_read_UBYTE(modreader);	\
 		ih. name/**/flg=_mm_read_UBYTE(modreader);	\
-		_mm_read_UBYTE(modreader);					\
-		_mm_read_UBYTE(modreader);					\
-		_mm_read_UBYTE(modreader)
+		_mm_skip_BYTE(modreader);					\
+		_mm_skip_BYTE(modreader);					\
+		_mm_skip_BYTE(modreader)
 #endif
 
 		IMF_FinishLoadingEnvelope(vol);
@@ -540,7 +540,7 @@ BOOL IMF_Load(BOOL curious)
 		_mm_read_UBYTES(id,4,modreader);
 		/* Looks like Imago Orpheus forgets the signature for empty
 		   instruments following a multi-sample instrument... */
-		if(memcmp(id,"II10",4) && 
+		if(memcmp(id,"II10",4) &&
 		   (oldnumsmp && memcmp(id,"\x0\x0\x0\x0",4))) {
 			if(nextwav) MikMod_free(nextwav);
 			if(wh) MikMod_free(wh);
@@ -612,12 +612,12 @@ BOOL IMF_Load(BOOL curious)
 			/* allocate more room for sample information if necessary */
 			if(of.numsmp+u==wavcnt) {
 				wavcnt+=IMF_SMPINCR;
-				if(!(nextwav=(unsigned long*)MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))) {
+				if(!(nextwav=MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))) {
 					if(wh) MikMod_free(wh);
 					_mm_errno=MMERR_OUT_OF_MEMORY;
 					return 0;
 				}
-				if(!(wh=(IMFWAVHEADER*)MikMod_realloc(wh,wavcnt*sizeof(IMFWAVHEADER)))) {
+				if(!(wh=MikMod_realloc(wh,wavcnt*sizeof(IMFWAVHEADER)))) {
 					MikMod_free(nextwav);
 					_mm_errno=MMERR_OUT_OF_MEMORY;
 					return 0;
@@ -626,7 +626,7 @@ BOOL IMF_Load(BOOL curious)
 			}
 
 			_mm_read_string(s->samplename,13,modreader);
-			_mm_read_UBYTE(modreader);_mm_read_UBYTE(modreader);_mm_read_UBYTE(modreader);
+			_mm_skip_BYTE(modreader);_mm_skip_BYTE(modreader);_mm_skip_BYTE(modreader);
 			s->length    =_mm_read_I_ULONG(modreader);
 			s->loopstart =_mm_read_I_ULONG(modreader);
 			s->loopend   =_mm_read_I_ULONG(modreader);
@@ -712,7 +712,7 @@ BOOL IMF_Load(BOOL curious)
 	return 1;
 }
 
-CHAR *IMF_LoadTitle(void)
+static CHAR *IMF_LoadTitle(void)
 {
 	CHAR s[31];
 

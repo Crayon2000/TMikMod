@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -53,26 +53,42 @@ static	CHAR *filename=NULL;
 
 static void putheader(void)
 {
+	ULONG rflen = 36;
+	if (md_mode&DMODE_FLOAT)
+		rflen += 2 + 12; /* FmtExt + "fact" chunk sizes */
+	rflen += dumpsize;
+
 	_mm_fseek(wavout,0,SEEK_SET);
 	_mm_write_string("RIFF",wavout);
-	_mm_write_I_ULONG(dumpsize+44-8,wavout);	/* <AWE> must be smaller by 8! */
+	_mm_write_I_ULONG(rflen,wavout);
 	_mm_write_string("WAVEfmt ",wavout);
-	_mm_write_I_ULONG(16,wavout);	/* length of this RIFF block crap */
+	_mm_write_I_ULONG((md_mode&DMODE_FLOAT)?18:16,wavout);	/* length of this RIFF block crap */
 
-	_mm_write_I_UWORD(1, wavout);	/* microsoft format type */
+	_mm_write_I_UWORD((md_mode&DMODE_FLOAT)? 3:1,wavout);	/* WAVE_FORMAT_PCM :1, WAVE_FORMAT_IEEE_FLOAT :3 */
 	_mm_write_I_UWORD((md_mode&DMODE_STEREO)?2:1,wavout);
 	_mm_write_I_ULONG(md_mixfreq,wavout);
-	_mm_write_I_ULONG(md_mixfreq*((md_mode&DMODE_STEREO)?2:1)*
-	                  ((md_mode&DMODE_16BITS)?2:1),wavout);
+	_mm_write_I_ULONG(md_mixfreq *	((md_mode&DMODE_STEREO)?2:1) *
+					((md_mode&DMODE_FLOAT)? 4:
+					 (md_mode&DMODE_16BITS)?2:1), wavout);
 	/* block alignment (8/16 bit) */
-	_mm_write_I_UWORD(((md_mode&DMODE_16BITS)?2:1)* 
+	_mm_write_I_UWORD(((md_mode&DMODE_FLOAT)?4:(md_mode&DMODE_16BITS)?2:1)*
 	                  ((md_mode&DMODE_STEREO)?2:1),wavout);
-	_mm_write_I_UWORD((md_mode&DMODE_16BITS)?16:8,wavout);
+	_mm_write_I_UWORD((md_mode&DMODE_FLOAT)?32:(md_mode&DMODE_16BITS)?16:8,wavout);
+
+	if (md_mode&DMODE_FLOAT) {
+		_mm_write_I_UWORD(0,wavout);						/* 0 byte of FmtExt */
+		_mm_write_string("fact",wavout);
+		_mm_write_I_ULONG(4,wavout);
+		_mm_write_I_ULONG(dumpsize / ((md_mode&DMODE_STEREO)?2:1) /		/* # of samples written */
+					     ((md_mode&DMODE_FLOAT)? 4:
+					      (md_mode&DMODE_16BITS)?2:1), wavout);
+	}
+
 	_mm_write_string("data",wavout);
 	_mm_write_I_ULONG(dumpsize,wavout);
 }
 
-static void WAV_CommandLine(CHAR *cmdline)
+static void WAV_CommandLine(const CHAR *cmdline)
 {
 	CHAR *ptr=MD_GetAtom("file",cmdline,0);
 
@@ -87,9 +103,9 @@ static BOOL WAV_IsThere(void)
 	return 1;
 }
 
-static BOOL WAV_Init(void)
+static int WAV_Init(void)
 {
-#if defined unix || (defined __APPLE__ && defined __MACH__)
+#if (MIKMOD_UNIX)
 	if (!MD_Access(filename?filename:FILENAME)) {
 		_mm_errno=MMERR_OPENING_FILE;
 		return 1;
@@ -149,12 +165,18 @@ static void WAV_Update(void)
 
 	done=VC_WriteBytes(audiobuffer,BUFFERSIZE);
 
-/*    <AWE> Fix for 16bit samples on big endian systems:				*/
-/*	      Just swap bytes via "_mm_write_I_UWORDS ()" if we have 16 bit output.	*/
-        if (md_mode & DMODE_16BITS)		
-            _mm_write_I_UWORDS((UWORD *) audiobuffer,done>>1,wavout);       
-        else
-            _mm_write_UBYTES(audiobuffer,done,wavout);
+	if (md_mode & DMODE_FLOAT) {
+	/* O.S. - assuming same endian model for integer vs fp values	*/
+		_mm_write_I_ULONGS((ULONG *) audiobuffer,done>>2,wavout);
+	}
+	else if (md_mode & DMODE_16BITS) {
+	/* <AWE> Fix for 16bit samples on big endian systems: Just swap
+	 * bytes via "_mm_write_I_UWORDS ()" if we have 16 bit output.	*/
+		_mm_write_I_UWORDS((UWORD *) audiobuffer,done>>1,wavout);
+	}
+	else {
+		_mm_write_UBYTES(audiobuffer,done,wavout);
+	}
 	dumpsize+=done;
 }
 

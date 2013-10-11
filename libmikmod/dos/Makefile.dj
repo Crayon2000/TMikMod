@@ -17,9 +17,9 @@
 DEBUG = 0
 
 # The tools
-CC = gcc -c
-CFLAGS = -DHAVE_CONFIG_H $(INCLUDE)
-INCLUDE = -Iinclude -I../include -I../playercode
+CC = gcc
+CFLAGS = -DMIKMOD_BUILD -DHAVE_CONFIG_H $(INCLUDE)
+INCLUDE = -Iinclude -I../include
 AR = ar
 ARFLAGS = cr
 
@@ -34,7 +34,8 @@ SRCPATH = ../loaders ../mmio ../playercode
 OUT = out
 
 # MikMod drivers
-DRIVERS = drv_ultra drv_sb drv_wss drv_wav drv_raw drv_stdout drv_pipe drv_nos
+# stdout and pipe drivers are disabled: edit include/config.h to enable them.
+DRIVERS = drv_ultra drv_sb drv_wss drv_wav drv_aiff drv_raw drv_stdout drv_pipe drv_nos
 
 # SED script to update configuration files
 SED_CONFIG = \
@@ -47,7 +48,7 @@ vpath %.c $(SRCPATH) ../drivers src
 
 # Build rules
 $(OUT)/%.o: %.c
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 SRC = $(filter-out %mixer_core.c,$(wildcard $(addsuffix /*.c,$(SRCPATH)) \
   $(addsuffix .c,$(addprefix ../drivers/,$(DRIVERS))))) \
@@ -71,7 +72,7 @@ $(OUT):
 libmikmod.a: $(OBJ)
 	$(AR) $(ARFLAGS) $@ $^
 
-version.mak: ../configure.in
+version.mak: ../configure.ac
 	grep "LIBMIKMOD_.*_VERSION=" $< >$@
 
 include/mikmod.h include/mikmod_build.h: ../include/mikmod.h.in
@@ -120,6 +121,7 @@ out/drv_sb.o: include/config.h ../include/mikmod_internals.h include/dossb.h \
 out/drv_wss.o: include/config.h ../include/mikmod_internals.h \
   include/doswss.h include/dosdma.h include/dosirq.h
 out/drv_wav.o: include/config.h ../include/mikmod_internals.h
+out/drv_aiff.o: include/config.h ../include/mikmod_internals.h
 out/drv_raw.o: include/config.h ../include/mikmod_internals.h
 out/drv_stdout.o: include/config.h ../include/mikmod_internals.h
 out/drv_pipe.o: include/config.h ../include/mikmod_internals.h

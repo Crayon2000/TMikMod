@@ -1,33 +1,37 @@
 # Makefile template for use under win32
+# for Microsoft Visual C compiler (cl.exe) and nmake
+
+# For OpenAL support you need OpenAL 1.1 SDK, then add /DDRV_OPENAL
+# among your CFLAGS.
+# (See drv_openal.c for notes about OpenAL header location issues.)
 #
-# libmikmod subdirectory
-
-# Make utilities that can't be used :
-#   - Borland Make (complains that some command lines are too long)
-
-# Compilers that can't be used :
-#   - Borland C++ 4 (doesn't like DirectX header files)
+# For XAudio2 support you need xaudio2.h (DirectX SDK June 2010 has
+# xaudio2_7), then add /DDRV_XAUDIO2 among your CFLAGS. If you want
+# xaudio2_8 for Windows 8 then also add /DDRV_XAUDIO28 among CFLAGS
+# and make sure that xaudio2.h is from win8 sdk.
+#
+# For SSE2 support: add /DMIKMOD_SIMD among your CFLAGS
 
 # Your compiler here
 CC=cl
 # Compiler flags
-CFLAGS=/nologo /O2 /MTd /Zi /Fm /c /DWIN32 /DDRV_DS /DDRV_WIN /DHAVE_FCNTL_H /DHAVE_MALLOC_H /DHAVE_LIMITS_H
+CFLAGS=/nologo /O2 /MTd /Zi /Fm /c /DWIN32 /DMIKMOD_BUILD /DMIKMOD_STATIC /DDRV_DS /DDRV_WIN /DHAVE_FCNTL_H /DHAVE_MALLOC_H /DHAVE_LIMITS_H
 COMPILE=$(CC) $(CFLAGS) /I..\include /I.. /I..\win32
 
 .SUFFIXES:
 .SUFFIXES: .o .c
 
-LIBNAME=mikmod.lib
+LIBNAME=mikmod_static.lib
 
 
 LIBS=$(LIBNAME)
 
-DRIVER_OBJ=drv_ds.o drv_win.o
+DRIVER_OBJ=drv_ds.o drv_xaudio2.o drv_win.o
 
 OBJ=$(DRIVER_OBJ) \
-    drv_nos.o drv_raw.o drv_stdout.o drv_wav.o \
-    load_669.o load_amf.o load_dsm.o load_far.o load_gdm.o load_it.o  \
-    load_imf.o load_m15.o load_med.o load_mod.o load_mtm.o load_okt.o \
+    drv_openal.o drv_nos.o drv_aiff.o drv_raw.o drv_stdout.o drv_wav.o \
+    load_669.o load_amf.o load_asy.o load_dsm.o load_far.o load_gdm.o load_gt2.o \
+    load_it.o load_imf.o load_m15.o load_med.o load_mod.o load_mtm.o load_okt.o \
     load_s3m.o load_stm.o load_stx.o load_ult.o load_uni.o load_xm.o \
     mmalloc.o mmerror.o mmio.o \
     mdriver.o mdreg.o mloader.o mlreg.o mlutil.o mplayer.o munitrk.o mwav.o \
@@ -55,24 +59,36 @@ drv_ds.o:       ..\drivers\drv_ds.c \
 drv_nos.o:      ..\drivers\drv_nos.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\drivers\drv_nos.c
+drv_openal.o:   ..\drivers\drv_openal.c \
+	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
+	$(COMPILE) /Fo$@ ..\drivers\drv_openal.c
 drv_raw.o:      ..\drivers\drv_raw.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\drivers\drv_raw.c
 drv_stdout.o:   ..\drivers\drv_stdout.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\drivers\drv_stdout.c
+drv_aiff.o:      ..\drivers\drv_aiff.c \
+	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
+	$(COMPILE) /Fo$@ ..\drivers\drv_aiff.c
 drv_wav.o:      ..\drivers\drv_wav.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\drivers\drv_wav.c
 drv_win.o:       ..\drivers\drv_win.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\drivers\drv_win.c
+drv_xaudio2.o:   ..\drivers\drv_xaudio2.c \
+	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
+	$(COMPILE) /Fo$@ ..\drivers\drv_xaudio2.c
 load_669.o:     ..\loaders\load_669.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\loaders\load_669.c
 load_amf.o:     ..\loaders\load_amf.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\loaders\load_amf.c
+load_asy.o:     ..\loaders\load_asy.c \
+	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
+	$(COMPILE) /Fo$@ ..\loaders\load_asy.c
 load_dsm.o:     ..\loaders\load_dsm.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\loaders\load_dsm.c
@@ -82,6 +98,9 @@ load_far.o:     ..\loaders\load_far.c \
 load_gdm.o:     ..\loaders\load_gdm.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\loaders\load_gdm.c
+load_gt2.o:     ..\loaders\load_gt2.c \
+	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
+	$(COMPILE) /Fo$@ ..\loaders\load_gt2.c
 load_it.o:      ..\loaders\load_it.c \
 	                ..\win32\mikmod_build.h ..\include\mikmod_internals.h
 	$(COMPILE) /Fo$@ ..\loaders\load_it.c

@@ -1,3 +1,77 @@
+Summary of changes between libmikmod 3.2.0 and libmikmod 3.3.2 ():
+==========================================================================
+
+libmikmod 3.3.2 was released on 05-Oct-2013.
+
+This is a serious bug fix release after the previous 3.2.0 series, with
+some additional new features. All who are using libmikmod-3.2.0 (or the
+interim 3.3.1-beta) must upgrade to the new libmikmod-3.3.2 version.
+
+THANKS
+
+- Paul Spark <sparkynz74@gmail.com> for Microsoft Visual C 6.0 fixes.
+- Ozkan Sezer: many changes.
+
+NEW FEATURES
+
+- New CMake build system.
+- Updated configury, support for cross-compilation, support for building
+  in a separate directory, support latest autotools.
+- New SDL driver - works both with SDL-1.2.x and with SDL2, supports
+  floating point output if compiled against SDL2.
+- New OpenAL driver, originally suggested by 'kervala', with fixes and
+  updates and with floating point output support.
+- The multi-platform SDL and OpenAL drivers, if they are compiled, have
+  priority over OS-specific hw drivers for MikMod_RegisterAllDrivers().
+- New windows xaudio2 driver, originally suggested by 'honza.c', with
+  updates, xaudio2.8 support and with floating point output support.
+- ALSA driver now supports only the contemporary ALSA 1.0.x versions.
+  All of the ancient ALSA 0.3.x-0.4.x code were removed.
+- Floating point output mode support for ALSA, OSS, Direct Sound, WinMM
+  drivers and for WAV file writer.
+- The pipe and stdout drivers are now configurable
+- Raw file-writer now has the lowest priority among the file-writers.
+- GCC elf and macho symbol visibility attributes now supported.
+- Windows: dllexport/dllimport attributes work properly for MinGW[-w64],
+  as well as windows compilers. Static builds using MSVC, LCC, etc are
+  now named mikmod_static.lib. When compiling against static libmikmod,
+  MIKMOD_STATIC should be defined so that dllimport wouldn't be assumed.
+
+BUGFIXES
+
+- ALSA fixes from Fedora.
+- ALSA fixes for "Write error: File descriptor in bad state" crashes,
+  e.g. RedHat bug #915121. Now works stable.
+- ESD (esound) updates from Fedora. Add esd back to configury which was
+  removed in 3.2.0b3, now requiring >= 0.2.18.
+- Minor OSS fixes.
+- The NAS driver now actually compiles.
+- 64 bit detection fixes.
+- Fix BOOL type use all over the source.
+- Several const correctness fixes.
+- Fixes for CVE-2007-6720 and CVE-2009-0179.
+- mmio: memreader fixes and updates.
+- Fixes for access violations introduced in 3.2.0b3.
+- Fixes for broken memory allocation wrappers introduced in 3.2.0b3.
+- Fix MikMod_strerror() might read beyond end of a static array.
+- Fix looping volume in Player_SetVolume(), based on an old patch by
+  Yi-Huang Han.
+- XM loader now reads songlength amount of orders from the file and
+  then seeks to mh->headersize+60 (sf.net bug #10.)
+- Fix "unclick" code to consider loop lengths shorter than 16: fixes
+  crashes seen with several xm files (sf.net bug #12, mpd bug #3425.)
+- Mac OS X: new standalone makefile with cross-compilation support.
+- DJGPP build fixes.
+- Windows: fixes/updates, win64 fully supported. MinGW[-w64] fully
+  supported along with MSVC and LCC. new standalone MinGW makefile with
+  cross-compilation support.
+- SIMD (AltiVec and SSE2) option is now disabled by default. Can be
+  enabled by --enable-simd configury option, similarly with cmake. (the
+  standalone makefiles or project files are added instructions on how to
+  enable the feature if required.)
+- Many compiler warning fixes, other small cleanups.
+
+
 Summary of changes between libmikmod 3.1.11 and libmikmod 3.2.0 (Xorigad):
 ==========================================================================
 
@@ -13,7 +87,7 @@ THANKS
 - Anders F Björklund <afb@algonet.se>, for updates, fixes and tests on
   Mac Platforms and rpm support.
 - Ivan Shmakov, for the NAS audio driver.
-- Various downstream patch writers (from Mandriva, SuSE, Red Hat/Fedora, 
+- Various downstream patch writers (from Mandriva, SuSE, Red Hat/Fedora,
 Debian, etc.)
 - P. Martin - the macports maintainer for some patches.
 - Stéphan Kochen for two patches: one to change MDRIVER fields to "const",
@@ -28,10 +102,10 @@ NEW FEATURES
   as used in crusader games.
 - New function 'Player_QueryVoices' added, which is used to return
   dynamic channel information about the module player. (Mikmod 3.2.2 uses
-  it for it's dynamic panels).
-- Mixing with floating point output. The MacOSX CoreAudio driver uses it. 
+  it for its dynamic panels).
+- Mixing with floating point output. The MacOSX CoreAudio driver uses it.
   Thanks goes to Anders F Björklund for implementing this.
-- AIFF disk writer driver.  
+- AIFF disk writer driver.
 - RPM support. To build a rpm, download the tar.gz, and run this:
    % rpmbuild -tb libmikmod-3.2.0-beta2.tar.gz
 - New NAS driver (Network Audio System). Tested with nasd and NCD X terminals.
@@ -69,7 +143,7 @@ BUGFIXES
 - Apply the libmikmod-CVE-2007-6720.patch (from Mandriva/Mageia).
 - Implement a fix for sprintf-of-list
     - sprintf(list, "%sSOMETHING", list) does not work as expected and
-    suffers from the 
+    suffers from the
     http://en.wikipedia.org/wiki/Schlemiel_the_Painter%27s_algorithm
     syndrome.
 - Apply a patch for non-blocking opening of the OSS driver. (from Mandriva/Mageia).
@@ -168,7 +242,7 @@ BUGFIXES
 - ProTracker effect F (change speed or bpm) should now be correctly handled
   when its value is 32, depending on the module type (some formats will use
   it as a speed value, others as a bpm value).
-  
+
 - XM playback stopped when reaching pattern 255 in the order list.
 
 - Corrupted envelopes in XM instruments are detected and some repair is
@@ -237,10 +311,10 @@ THANKS
 
 - Many thanks to ``UFO'', Thomas Neumann, James Kehl and Vito Caputo for their
   help, code and feedback.
-  
+
 - Special thanks to Gerd Rausch, for writing both the Linux sam9407 driver and
   the associated Mikmod driver. Nice work !
-  
+
 - Thanks to Bastien Nocera for letting me do some tests under Linux/PPC.
 
 
@@ -250,20 +324,20 @@ BUGFIXES
   case, the first envelope point was correct, the remaining half points were
   bogus, and the other half completely random. This fix is definitely worth
   the upgrade.
- 
+
 - In MOD files, effect 0xc (set channel volume) with effect parameter 0xff was
   misplayed as a note cut.
-  
+
 - In MOD files too, effects 0x1, 0x2 and 0x3 (portamentos) with effect
   parameter 0x00 were using the command memory, but these commands do not have
   effect memory for MOD files.
-  
+
 - The Wuzamod check for STM modules wasn't present in 3.1.8, despite what the
   release notes said )-:
- 
+
 - Enabling the envelope (with an effect) for a sample with no associated
   envelope would cause immediate coredumps. Now fixed.
-  
+
 - Panning was ignored in GDM modules.
 
 - Sample rate was incorrect for STM and STX modules.
@@ -283,11 +357,11 @@ NEW FEATURES
 
 - Due to popular request, the function Player_LoadTitleFP() has been added to
   the library.
-  
+
 - Under Unix systems, make targets "check" and "uninstall" have been added.
   However, due to a bug in automake, "make uninstall" will only work correctly
   with the next release of automake (or the current CVS tree).
-  
+
 - New output driver for sam9407-based soundcards under Linux, featuring
   hardware playback.
 
@@ -464,7 +538,7 @@ NEW FEATURES
   parameters to the drivers. This makes libmikmod 3.1.7 incompatible with the
   previous versions, but updated libmikmod-based players will be released soon.
   The shared library version has increased (now 2.0). This number scheme is
-  going to be as crazy as ncurses' one... 
+  going to be as crazy as ncurses' one...
 
 
 PLATFORM SPECIFIC

@@ -23,8 +23,14 @@
 /* Define if you have the ANSI C header files.  */
 #define STDC_HEADERS 1
 
+/* Define if you want support for output to stdout */
+#define DRV_STDOUT 1
+
 /* Define if your system supports binary pipes (i.e. Unix) */
 /* #undef DRV_PIPE */
+
+/* Define if you want a .aiff file writer driver */
+#define DRV_AIFF 1
 
 /* Define if the AudioFile driver is compiled */
 /* #undef DRV_AF */
@@ -36,6 +42,8 @@
 /* #undef DRV_ESD */
 /* Define if the HP-UX audio driver is compiled */
 /* #undef DRV_HP */
+/* Define if the OpenAL driver is compiled */
+/* #undef DRV_OPENAL */
 /* Define if the Open Sound System driver is compiled */
 /* #undef DRV_OSS */
 /* Define if the Linux SAM9407 driver is compiled */
@@ -55,9 +63,9 @@
 /* Define if you want a debug version of the library */
 /* #undef MIKMOD_DEBUG */
 /* Define if you want runtime dynamic linking of ALSA and EsounD drivers */
-#define MIKMOD_DYNAMIC 1
+/* #undef MIKMOD_DYNAMIC */
 /* Define if your system provides POSIX.4 threads */
-/*#undef HAVE_PTHREAD */
+/* #undef HAVE_PTHREAD */
 
 /* Define if your system is SunOS 4.* */
 /* #undef SUNOS */
@@ -66,8 +74,6 @@
 /* Define if your system defines random(3) and srandom(3) in math.h instead
    of stdlib.h */
 /* #undef SRANDOM_IN_MATH_H */
-/* Define if EsounD driver depends on ALSA */
-/* #undef MIKMOD_DYNAMIC_ESD_NEEDS_ALSA */
 /* Define if your system has RTLD_GLOBAL defined in <dlfcn.h> */
 /* #undef  HAVE_RTLD_GLOBAL */
 /* Define if your system needs leading underscore to function names in dlsym() calls */
@@ -108,6 +114,9 @@
 
 /* Define if you have the <libgus.h> header file.  */
 /* #undef HAVE_LIBGUS_H */
+
+/* Define if you have the <limits.h> header file. */
+#define HAVE_LIMITS_H 1
 
 /* Define if you have the <machine/soundcard.h> header file.  */
 /* #undef HAVE_MACHINE_SOUNDCARD_H */
@@ -152,5 +161,4 @@
 #define PACKAGE "libmikmod"
 
 /* Version number of package */
-#define VERSION "3.2.0"
-
+#define VERSION "3.3.2"

@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -59,7 +59,7 @@ typedef struct XMHEADER {
 	UWORD numchn;          /* Number of channels (2,4,6,8,10,...,32) */
 	UWORD numpat;          /* Number of patterns (max 256) */
 	UWORD numins;          /* Number of instruments (max 128) */
-	UWORD flags;       
+	UWORD flags;
 	UWORD tempo;           /* Default tempo */
 	UWORD bpm;             /* Default BPM */
 	UBYTE orders[256];     /* Pattern order table  */
@@ -129,14 +129,14 @@ typedef struct XMNOTE {
 static	XMNOTE *xmpat=NULL;
 static	XMHEADER *mh=NULL;
 
-/* increment unit for sample array MikMod_reallocation */
+/* increment unit for sample array reallocation */
 #define XM_SMPINCR 64
 static	ULONG *nextwav=NULL;
 static	XMWAVHEADER *wh=NULL,*s=NULL;
 
 /*========== Loader code */
 
-BOOL XM_Test(void)
+static BOOL XM_Test(void)
 {
 	UBYTE id[38];
 
@@ -146,13 +146,13 @@ BOOL XM_Test(void)
 	return 0;
 }
 
-BOOL XM_Init(void)
+static BOOL XM_Init(void)
 {
 	if(!(mh=(XMHEADER *)MikMod_malloc(sizeof(XMHEADER)))) return 0;
 	return 1;
 }
 
-void XM_Cleanup(void)
+static void XM_Cleanup(void)
 {
 	MikMod_free(mh);
 }
@@ -359,8 +359,8 @@ static BOOL LoadPatterns(BOOL dummypat)
 				return 0;
 
 			/* when packsize is 0, don't try to load a pattern.. it's empty. */
-			if(ph.packsize) 
-				for(u=0;u<ph.numrows;u++) 
+			if(ph.packsize)
+				for(u=0;u<ph.numrows;u++)
 					for(v=0;v<of.numchn;v++) {
 						if(!ph.packsize) break;
 
@@ -500,7 +500,11 @@ static BOOL LoadInstruments(void)
 
 				/* read the remainder of the header
 				   (2 bytes for 1.03, 22 for 1.04) */
-				if (headend>=_mm_ftell(modreader)) for(u=headend-_mm_ftell(modreader);u;u--) _mm_read_UBYTE(modreader);
+				if (headend>=_mm_ftell(modreader)) {
+					for(u=headend-_mm_ftell(modreader);u;u--) {
+						_mm_skip_BYTE(modreader);
+					}
+				}
 
 				/* we can't trust the envelope point count here, as some
 				   modules have incorrect values (K_OSPACE.XM reports 32 volume
@@ -560,7 +564,7 @@ static BOOL LoadInstruments(void)
 																			\
 				if ((d-> name/**/flg&EF_ON)&&(d-> name/**/pts<2))			\
 					d-> name/**/flg&=~EF_ON
-#endif			
+#endif
 
 				XM_ProcessEnvelope(vol);
 				XM_ProcessEnvelope(pan);
@@ -580,12 +584,12 @@ static BOOL LoadInstruments(void)
 					/* Allocate more room for sample information if necessary */
 					if(of.numsmp+u==wavcnt) {
 						wavcnt+=XM_SMPINCR;
-						if(!(nextwav=(unsigned long*)MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))){
+						if(!(nextwav=MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))){
 							if(wh) { MikMod_free(wh);wh=NULL; }
 							_mm_errno = MMERR_OUT_OF_MEMORY;
 							return 0;
 						}
-						if(!(wh=(XMWAVHEADER*)MikMod_realloc(wh,wavcnt*sizeof(XMWAVHEADER)))) {
+						if(!(wh=MikMod_realloc(wh,wavcnt*sizeof(XMWAVHEADER)))) {
 							MikMod_free(nextwav);nextwav=NULL;
 							_mm_errno = MMERR_OUT_OF_MEMORY;
 							return 0;
@@ -611,7 +615,8 @@ static BOOL LoadInstruments(void)
 					nextwav[of.numsmp+u]=next;
 					next+=s->length;
 
-					if(_mm_eof(modreader)) {
+					/* last instrument is at the end of file in version 0x0104 */
+					if(_mm_eof(modreader) && (mh->version<0x0104 || t<of.numins-1)) {
 						MikMod_free(nextwav);MikMod_free(wh);
 						nextwav=NULL;wh=NULL;
 						_mm_errno = MMERR_LOADING_SAMPLEINFO;
@@ -634,7 +639,9 @@ static BOOL LoadInstruments(void)
 					break;
 				}
 				_mm_fseek(modreader,ck,SEEK_SET);
-				for(u=headend-_mm_ftell(modreader);u;u--) _mm_read_UBYTE(modreader);
+				for(u=headend-_mm_ftell(modreader);u;u--) {
+					_mm_skip_BYTE(modreader);
+				}
 
 				/* last instrument is at the end of file in version 0x0104 */
 				if(_mm_eof(modreader) && (mh->version<0x0104 || t<of.numins-1)) {
@@ -658,7 +665,7 @@ static BOOL LoadInstruments(void)
 	return 1;
 }
 
-BOOL XM_Load(BOOL curious)
+static BOOL XM_Load(BOOL curious)
 {
 	INSTRUMENT *d;
 	SAMPLE *q;
@@ -684,23 +691,25 @@ BOOL XM_Load(BOOL curious)
 	mh->flags       =_mm_read_I_UWORD(modreader);
 	mh->tempo       =_mm_read_I_UWORD(modreader);
 	mh->bpm         =_mm_read_I_UWORD(modreader);
-	if(!mh->bpm) {
+	if(!mh->bpm || mh->songlength > 256) {
 		_mm_errno=MMERR_NOT_A_MODULE;
 		return 0;
 	}
-	_mm_read_UBYTES(mh->orders,mh->headersize-20,modreader);
-
-	if(_mm_eof(modreader)) {
+/*	_mm_read_UBYTES(mh->orders,256,modreader);*/
+/*	_mm_read_UBYTES(mh->orders,mh->headersize-20,modreader);*/
+	_mm_read_UBYTES(mh->orders,mh->songlength,modreader);
+	if(_mm_fseek(modreader, mh->headersize+60, SEEK_SET) ||
+	   _mm_eof(modreader)) {
 		_mm_errno = MMERR_LOADING_HEADER;
 		return 0;
 	}
 
 	/* set module variables */
-	of.initspeed = mh->tempo;         
+	of.initspeed = mh->tempo;
 	of.inittempo = mh->bpm;
 	strncpy(tracker,mh->trackername,20);tracker[20]=0;
 	for(t=20;(tracker[t]<=' ')&&(t>=0);t--) tracker[t]=0;
-	
+
 	/* some modules have the tracker name empty */
 	if (!tracker[0])
 		strcpy(tracker,"Unknown tracker");
@@ -712,7 +721,7 @@ BOOL XM_Load(BOOL curious)
 	sprintf(modtype,"%s (XM format %d.%02d)",
 	                tracker,mh->version>>8,mh->version&0xff);
 #endif
-	of.modtype   = StrDup(modtype);
+	of.modtype   = MikMod_strdup(modtype);
 	of.numchn    = mh->numchn;
 	of.numpat    = mh->numpat;
 	of.numtrk    = (UWORD)of.numpat*of.numchn;   /* get number of channels */
@@ -804,14 +813,14 @@ BOOL XM_Load(BOOL curious)
 	return 1;
 }
 
-CHAR *XM_LoadTitle(void)
+static CHAR *XM_LoadTitle(void)
 {
-	CHAR s[21];
+	CHAR str[21];
 
 	_mm_fseek(modreader,17,SEEK_SET);
-	if(!_mm_read_UBYTES(s,21,modreader)) return NULL;
+	if(!_mm_read_UBYTES(str, 21, modreader)) return NULL;
 
-	return(DupStr(s,21,1));
+	return(DupStr(str,21,1));
 }
 
 /*========== Loader information */

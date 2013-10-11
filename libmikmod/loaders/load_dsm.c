@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -89,9 +89,9 @@ typedef struct DSMNOTE {
 
 /*========== Loader variables */
 
-static	CHAR* SONGID="SONG";
-static	CHAR* INSTID="INST";
-static	CHAR* PATTID="PATT";
+static	const CHAR* SONGID="SONG";
+static	const CHAR* INSTID="INST";
+static	const CHAR* PATTID="PATT";
 
 static	UBYTE blockid[4];
 static	ULONG blockln;
@@ -105,7 +105,7 @@ static	unsigned char DSMSIG[4+4]={'R','I','F','F','D','S','M','F'};
 
 /*========== Loader code */
 
-BOOL DSM_Test(void)
+static BOOL DSM_Test(void)
 {
 	UBYTE id[12];
 
@@ -115,14 +115,14 @@ BOOL DSM_Test(void)
 	return 0;
 }
 
-BOOL DSM_Init(void)
+static BOOL DSM_Init(void)
 {
 	if(!(dsmbuf=(DSMNOTE *)MikMod_malloc(DSM_MAXCHAN*64*sizeof(DSMNOTE)))) return 0;
 	if(!(mh=(DSMSONG *)MikMod_calloc(1,sizeof(DSMSONG)))) return 0;
 	return 1;
 }
 
-void DSM_Cleanup(void)
+static void DSM_Cleanup(void)
 {
 	MikMod_free(dsmbuf);
 	MikMod_free(mh);
@@ -133,7 +133,7 @@ static BOOL GetBlockHeader(void)
 	/* make sure we're at the right position for reading the
 	   next riff block, no matter how many bytes read */
 	_mm_fseek(modreader, blocklp+blockln, SEEK_SET);
-   
+
 	while(1) {
 		_mm_read_UBYTES(blockid,4,modreader);
 		blockln=_mm_read_I_ULONG(modreader);
@@ -231,7 +231,7 @@ static UBYTE *DSM_ConvertTrack(DSMNOTE *tr)
 	return UniDup();
 }
 
-BOOL DSM_Load(BOOL curious)
+static BOOL DSM_Load(BOOL curious)
 {
 	int t;
 	DSMINST s;
@@ -265,7 +265,7 @@ BOOL DSM_Load(BOOL curious)
 	/* set module variables */
 	of.initspeed=mh->speed;
 	of.inittempo=mh->bpm;
-	of.modtype=StrDup(DSM_Version);
+	of.modtype=MikMod_strdup(DSM_Version);
 	of.numchn=mh->numtrk;
 	of.numpat=mh->numpat;
 	of.numtrk=of.numchn*of.numpat;
@@ -337,13 +337,13 @@ BOOL DSM_Load(BOOL curious)
 	return 1;
 }
 
-CHAR *DSM_LoadTitle(void)
+static CHAR *DSM_LoadTitle(void)
 {
 	CHAR s[28];
 
 	_mm_fseek(modreader,12,SEEK_SET);
 	if(!_mm_read_UBYTES(s,28,modreader)) return NULL;
-   
+
 	return(DupStr(s,28,1));
 }
 

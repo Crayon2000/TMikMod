@@ -4,7 +4,9 @@
 #define STDC_HEADERS
 
 /* Define if your system supports binary pipes (i.e. Unix) */
-#define DRV_PIPE
+/*#define DRV_PIPE*/
+/* Define if you want support for output to stdout */
+/*#define DRV_STDOUT*/
 
 /* Define if the Gravis UltraSound driver is compiled */
 #define DRV_ULTRA
@@ -28,6 +30,9 @@
 /* Define if you have the <fcntl.h> header file.  */
 #define HAVE_FCNTL_H
 
+/* Define if you have the <limits.h> header file. */
+#define HAVE_LIMITS_H
+
 /* Define if you have the <malloc.h> header file.  */
 #define HAVE_MALLOC_H
 
@@ -36,3 +41,4 @@
 
 /* Define if you have the <unistd.h> header file.  */
 #define HAVE_UNISTD_H
+

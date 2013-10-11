@@ -7,8 +7,6 @@
 
   MikMod Sound Library Documentation
 
-  $Id$
-
 @end ignore
 @c comment this during modifications
 @finalout
@@ -18,8 +16,8 @@
 
 @syncodeindex tp vr
 @set documentation-version 1.3
-@set documentation-date April 2004
-@set library-version 3.2.0
+@set documentation-date October 2013
+@set library-version 3.3.2
 @set authorname Miodrag Vallat
 @set authoraddress miod@@mikmod.org
 
@@ -45,7 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 @c ========================================================== Title page
 @titlepage
-@title{MikMod Sound Library}
+@title MikMod Sound Library
 @subtitle Documentation edition @value{documentation-version}
 @subtitle @value{documentation-date}
 @author @value{authorname}
@@ -684,8 +682,8 @@ driver. Registering the nosound driver first would not be a very good
 idea@enddots{}
 
 You can get some printable information regarding the registered drivers with
-@code{MikMod_InfoDriver}; don't forget to call @code{free} on the returned
-string when you don't need it anymore.
+@code{MikMod_InfoDriver}; don't forget to call @code{MikMod_free} on the
+returned string when you don't need it anymore.
 
 After you've registered your drivers, you can initialize the sound playback
 with @code{MikMod_Init}, passing specific information to the driver if
@@ -1092,9 +1090,9 @@ The @code{MDRIVER} structure is not meant to be used by anything else than the
 core of the library, but its first four fields contain useful information for
 your programs:
 @table @code
-@item CHAR* Name
+@item const CHAR* Name
 Name of the driver, usually never more than 20 characters.
-@item CHAR* Description
+@item const CHAR* Description
 Description of the driver, usually never more than 50 characters.
 @item UBYTE HardVoiceLimit
 Maximum number of hardware voices for this driver, 0 if the driver has no
@@ -1102,7 +1100,7 @@ hardware mixing support.
 @item UBYTE SoftVoiceLimit
 Maximum number of software voices for this driver, 0 if the driver has no
 software mixing support.
-@item CHAR* Alias
+@item const CHAR* Alias
 A short name for the driver, without spaces, usually never more than 10
 characters.
 @end table
@@ -1368,8 +1366,8 @@ meaning the start of the object being written.
 @item long (*Tell)(struct MWRITER*);
 This function should have the same behaviour as @code{ftell}, with offset 0
 meaning the start of the object being written.
-@item BOOL (*Write)(struct MWRITER*, void *dest, size_t length);
-This function should copy @code{length} bytes of data from @code{dest}, and
+@item BOOL (*Write)(struct MWRITER*, const void *src, size_t length);
+This function should copy @code{length} bytes of data from @code{src}, and
 return zero if an error occured, and any nonzero value otherwise.
 @item BOOL (*Put)(struct MWRITER*, int data);
 This function should have the same behaviour as @code{fputc}.
@@ -1476,6 +1474,9 @@ is the requested setting.
 This error occurs when the sound device only supports uLaw output (which
 implies mono, 8 bit, and 8000 Hz sampling rate), which isn't the requested
 setting.
+@item MMERR_NO_FLOAT32
+This error occurs when the sound device doesn't support 32 bit float
+sound output, which is the requested setting.
 @end table
 @ifnottex
 @subsubsection AudioFile Driver Specific Error
@@ -1707,6 +1708,36 @@ Dos ``SoundBlaster'' Driver Specific Errors
 @item MMERR_DOSSB_STARTDMA
 This error occurs if the driver failed to start the cyclic DMA transfer.
 @end table
+@ifnottex
+@subsection OpenAL Driver Specific Errors
+@end ifnottex
+@iftex
+OpenAL Driver Specific Errors
+@end iftex
+@table @samp
+@item MMERR_OPENAL_CREATECTX
+This error occurs if OpenAL fails to create a context during initialization.
+@item MMERR_OPENAL_CTXCURRENT
+This error occurs if OpenAL fails to set current context during initialization.
+@item MMERR_OPENAL_GENBUFFERS
+This error occurs if OpenAL fails to generate buffers during initialization.
+@item MMERR_OPENAL_GENSOURCES
+This error occurs if OpenAL fails to generate a source during initialization.
+@item MMERR_OPENAL_SOURCE
+This error occurs if OpenAL fails to set source parameters during initialization.
+@item MMERR_OPENAL_QUEUEBUFFERS
+This error occurs if OpenAL fails to queue buffers on a source.
+@item MMERR_OPENAL_UNQUEUEBUFFERS
+This error occurs if OpenAL fails to remove buffers from the queue.
+@item MMERR_OPENAL_BUFFERDATA
+This error occurs if OpenAL fails to fill a buffer with audio data.
+@item MMERR_OPENAL_GETSOURCE
+This error occurs if OpenAL fails to get source parameters.
+@item MMERR_OPENAL_SOURCEPLAY
+This error occurs if OpenAL fails to play the source.
+@item MMERR_OPENAL_SOURCESTOP
+This error occurs if OpenAL fails to stop the source.
+@end table
 
 
 @c ========================================================== Function reference
@@ -1732,7 +1763,7 @@ This error occurs if the driver failed to start the cyclic DMA transfer.
 @item Description
 This function returns whether sound output is enabled or not.
 @item Result
-@itemx 0
+@item 0
 Sound output is disabled.
 @item 1
 Sound output is enabled.
@@ -1760,14 +1791,14 @@ Calls to @code{MikMod_Update} will be ignored when sound output is disabled.
 @subsubsection MikMod_EnableOutput
 @end ifnottex
 @findex MikMod_EnableOutput
-@code{BOOL MikMod_EnableOutput(void)}
+@code{int MikMod_EnableOutput(void)}
 @table @i
 @item Description
 This function starts the sound mixing.
 @item Result
-@itemx 0
+@item 0
 Sound mixing is ready.
-@itemx nonzero
+@item nonzero
 An error occurred during the operation.
 @item Notes
 Calls to @code{MikMod_Update} will be ignored when sound output is disabled.
@@ -1842,19 +1873,19 @@ no longer necessary.
 @subsubsection MikMod_Init
 @end ifnottex
 @findex MikMod_Init
-@code{BOOL MikMod_Init(CHAR *parameters)}
+@code{int MikMod_Init(const CHAR *parameters)}
 @table @i
 @item Description
 This function performs the library initialization, including the sound driver
 choice and configuration, and all the necessary memory allocations.
 @item Parameters
-@itemx parameters
+@item parameters
 Optional parameters given to the sound driver. These parameters are ignored if
 the value of @code{md_device} is zero (autodetection).
 @item Result
-@itemx 0
+@item 0
 Initialization was successful.
-@itemx nonzero
+@item nonzero
 An error occurred during initialization.
 @item Notes
 When the initialization fails, the library uses the nosound sound driver to
@@ -1872,9 +1903,9 @@ let other the other MikMod functions work without crashing the application.
 @item Description
 This function returns whether libmikmod is thread-safe.
 @item Result
-@itemx 0
+@item 0
 The library is not thread-safe.
-@itemx 1
+@item 1
 The library is thread-safe.
 @item Notes
 This function should be called before any call to @code{MikMod_Lock} or
@@ -1939,7 +1970,7 @@ This function registers all the available module loaders.
 This function adds the specified driver to the internal list of usable
 drivers.
 @item Parameters
-@itemx newdriver
+@item newdriver
 A pointer to the @code{MDRIVER} structure identifying the driver.
 @item Notes
 It is safe to register the same driver several times, although it will not
@@ -1960,7 +1991,7 @@ If you want to register all the available drivers, use
 @item Description
 This function selects the function which should be called in case of error.
 @item Parameters
-@itemx newhandler
+@item newhandler
 The new error callback function.
 @item Result
 The previous error callback function, or @code{NULL} if there was none.
@@ -1983,7 +2014,7 @@ your callback).
 This function adds the specified module loader to the internal list of usable
 module loaders.
 @item Parameters
-@itemx newloader
+@item newloader
 A pointer to the @code{MLOADER} structure identifying the loader.
 @item Notes
 It is safe to register the same loader several times, although it will not be
@@ -2007,7 +2038,7 @@ last.
 This function selects the function which should be used to process module
 playback.
 @item Parameters
-@itemx newplayer
+@item newplayer
 The new playback function
 @item Result
 The previous playback function.
@@ -2049,7 +2080,7 @@ anymore@enddots{}
 @subsubsection MikMod_Reset
 @end ifnottex
 @findex MikMod_Reset
-@code{BOOL MikMod_Reset(CHAR *parameters)}
+@code{int MikMod_Reset(const CHAR *parameters)}
 @table @i
 @item Description
 This function resets MikMod and reinitialize the sound hardware.
@@ -2060,7 +2091,7 @@ Optional parameters given to the sound driver. If you set the value of
 @item Result
 @itemx 0
 Reinitialization was successful.
-@itemx nonzero
+@item nonzero
 An error occurred during reinitialization.
 @item Notes
 Use this function when you have changed the global configuration variables:
@@ -2075,7 +2106,7 @@ the driver is ready.
 @subsubsection MikMod_SetNumVoices
 @end ifnottex
 @findex MikMod_SetNumVoices
-@code{BOOL MikMod_SetNumVoices(int musicvoices, int samplevoices)}
+@code{int MikMod_SetNumVoices(int musicvoices, int samplevoices)}
 @table @i
 @item Description
 This function sets the number of mixed voices which can be used for music
@@ -2088,7 +2119,7 @@ The number of voices to reserve for sound effects.
 @item Result
 @itemx 0
 Initialization was successful.
-@itemx nonzero
+@item nonzero
 An error occurred during initialization.
 @item Notes
 A value of @code{-1} for any of the parameters will retain the current number
@@ -2149,12 +2180,12 @@ you should do this before calling @code{MikMod_Update}.
 @subsubsection MikMod_strerror
 @end ifnottex
 @findex MikMod_strerror
-@code{char* MikMod_strerror(int errno)}
+@code{const char* MikMod_strerror(int errnum)}
 @table @i
 @item Description
 This function associates a descriptive message to an error code.
 @item Parameters
-@itemx errno
+@itemx errnum
 The MikMod error code.
 @item Result
 A pointer to a string describing the error.
@@ -2175,7 +2206,7 @@ This function returns whether the module player is active or not.
 @item Result
 @itemx 0
 No module is playing.
-@itemx nonzero
+@item nonzero
 A module is currently playing.
 @item Notes
 This function will still report that the player is active if the playing module
@@ -2239,7 +2270,7 @@ playing.
 @subsubsection Player_Load
 @end ifnottex
 @findex Player_Load
-@code{MODULE* Player_Load(CHAR* filename, int maxchan, BOOL curious)}
+@code{MODULE* Player_Load(const CHAR* filename, int maxchan, BOOL curious)}
 @table @i
 @item Description
 This function loads a music module.
@@ -2306,7 +2337,7 @@ after the last ``official'' pattern.
 @subsubsection Player_LoadTitle
 @end ifnottex
 @findex Player_LoadTitle
-@code{MODULE* Player_LoadTitle(CHAR* filename)}
+@code{MODULE* Player_LoadTitle(const CHAR* filename)}
 @table @i
 @item Description
 This function retrieves the title of a module file.
@@ -2388,7 +2419,7 @@ The module channel to test (starting from zero).
 @item Result
 @itemx 0
 The channel is not muted.
-@itemx 1
+@item 1
 The channel is muted.
 @item See also
 @code{Player_Mute}, @code{Player_ToggleMute}, @code{Player_Unmute}.
@@ -2626,7 +2657,7 @@ The sample to free.
 @subsubsection Sample_Load
 @end ifnottex
 @findex Sample_Load
-@code{SAMPLE* Sample_Load(CHAR* filename)}
+@code{SAMPLE* Sample_Load(const CHAR* filename)}
 @table @i
 @item Description
 This function loads a sample.
@@ -2905,7 +2936,7 @@ The number of the voice to be checked (starting from zero).
 @item Result
 @itemx 0
 The voice is stopped or has no sample assigned.
-@itemx nonzero
+@item nonzero
 The voice is playing a sample.
 @item Notes
 This function may not work with some drivers (especially for hardware mixed
@@ -3106,6 +3137,9 @@ This driver only supports software mixing.
 @item drv_mac
 This driver is only available under MacOS, and uses the ``Sound Manager''.@*
 This driver supports the Classic and Carbon environments, and does only software mixing.
+@item drv_openal
+This driver is available for all platforms where ``OpenAL'' is supported, and uses the ``OpenAL'' api.@*
+This driver only supports software mixing.
 @item drv_os2
 This driver is only available under OS/2 version 3 and higher (Warp), and OS/2
 2.x with MMPM/2.@*
@@ -3125,6 +3159,9 @@ This driver only supports hardware mixing.
 @item drv_sb
 This driver is only available under DOS, and supports the SoundBlaster/Pro/16/AWE32.@*
 This driver only supports hardware mixing. This driver needs to be tested.
+@item drv_sdl
+This driver is available for all platforms where ``SDL'' is supported, and uses the ``Simple DirectMedia Layer'' apis.@*
+This driver only supports software mixing.
 @item drv_sgi
 This driver is only available under IRIX, and uses the SGI audio library.@*
 This driver only supports software mixing.
@@ -3142,6 +3179,9 @@ This driver only supports software mixing.
 @item drv_wss
 This driver is only available under DOS, and supports Windows Sound System compatible sound cards.@*
 This driver only supports software mixing. This driver needs to be tested.
+@item drv_xaudio2
+This driver is only available under Windows XP and newer Windows versions and uses the ``XAudio2'' 2.7 or 2.8 apis.@*
+This driver only supports software mixing.
 @end table
 
 @node Disk Writer Drivers, Other Drivers, Hardware Drivers, Driver Reference

@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -40,7 +40,7 @@
 
 #include "mikmod_internals.h"
 
-CHAR *_mm_errmsg[MMERR_MAX+1] =
+static const char *_mm_errmsg[MMERR_MAX+1] =
 {
 /* No error */
 
@@ -175,14 +175,32 @@ CHAR *_mm_errmsg[MMERR_MAX+1] =
 	"WSS_STARTDMA",
 	"SB_STARTDMA",
 
+/* float32 output */
+
+	"This driver doesn't support 32 bit float output",
+
+/* OpenAL driver errors */
+
+	"Could not create context",
+	"Could not make context current",
+	"Could not create buffers",
+	"Could not create sources",
+	"Could not change source parameters",
+	"Could not queue buffers",
+	"Could not unqueue buffers",
+	"Could not copy buffer data",
+	"Could not get source parameters",
+	"Could not play source",
+	"Could not stop source",
+
 /* Invalid error */
 
 	"Invalid error code"
 };
 
-MIKMODAPI char *MikMod_strerror(int code)
+MIKMODAPI const char *MikMod_strerror(int code)
 {
-	if ((code<0)||(code>MMERR_MAX)) code=MMERR_MAX+1;
+	if ((code<0)||(code>MMERR_MAX)) code=MMERR_MAX;
 	return _mm_errmsg[code];
 }
 
@@ -191,7 +209,7 @@ MikMod_handler_t _mm_errorhandler = NULL;
 MIKMODAPI int  _mm_errno = 0;
 MIKMODAPI BOOL _mm_critical = 0;
 
-MikMod_handler_t _mm_registererrorhandler(MikMod_handler_t proc)
+static MikMod_handler_t _mm_registererrorhandler(MikMod_handler_t proc)
 {
 	MikMod_handler_t oldproc=_mm_errorhandler;
 

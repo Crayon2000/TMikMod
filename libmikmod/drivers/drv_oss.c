@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -22,7 +22,7 @@
 
   $Id$
 
-  Driver for output on Linux and FreeBSD Open Sound System (OSS) (/dev/dsp) 
+  Driver for output on Linux and FreeBSD Open Sound System (OSS) (/dev/dsp)
 
 ==============================================================================*/
 
@@ -88,6 +88,15 @@
 #endif
 #endif
 
+/* Compatibility with OSS 4.x: AFMT_FLOAT is documented
+   as "not recommended" on the OSS website.  This post
+   on the OSS mailing lists says: "In general AFMT_FLOAT
+   is not supported by OSS except in some special cases."
+   (http://sf.net/p/opensound/mailman/message/28840674/) */
+#ifndef AFMT_FLOAT
+#define AFMT_FLOAT 0x00004000
+#endif
+
 static	int sndfd=-1;
 static	SBYTE *audiobuffer=NULL;
 static	int buffersize;
@@ -106,7 +115,7 @@ static	int numfrags=DEFAULT_NUMFRAGS;
 
 #endif
 
-static void OSS_CommandLine(CHAR *cmdline)
+static void OSS_CommandLine(const CHAR *cmdline)
 {
 	CHAR *ptr;
 
@@ -132,7 +141,7 @@ static void OSS_CommandLine(CHAR *cmdline)
 static char *OSS_GetDeviceName(void)
 {
 	static char sounddevice[20];
-	
+
 	/* First test for devfs enabled Linux sound devices */
 	if (card)
 		sprintf(sounddevice,"/dev/sound/dsp%d",card);
@@ -149,7 +158,7 @@ static char *OSS_GetDeviceName(void)
 		if(access("/dev/dsp0",F_OK))
 			strcpy(sounddevice,"/dev/dsp");
 	}
-	
+
 	return sounddevice;
 }
 
@@ -167,11 +176,11 @@ static BOOL OSS_IsThere(void)
 	return (errno==EACCES?1:0);
 }
 
-static BOOL OSS_Init_internal(void)
+static int OSS_Init_internal(void)
 {
 	int play_stereo,play_rate;
 	int orig_precision,orig_stereo;
-	long formats;
+	int formats;
 #if SOUND_VERSION >= 301
 	audio_buf_info buffinf;
 #endif
@@ -186,10 +195,15 @@ static BOOL OSS_Init_internal(void)
 	formats=AFMT_S16_NE|AFMT_U8;
 #endif
 
-	orig_precision=play_precision=(md_mode&DMODE_16BITS)?AFMT_S16_NE:AFMT_U8;
+	orig_precision=play_precision=(md_mode&DMODE_FLOAT)? AFMT_FLOAT :
+					(md_mode&DMODE_16BITS)? AFMT_S16_NE : AFMT_U8;
 
     /* Device does not support the format we would prefer... */
     if(!(formats & play_precision)) {
+        if(play_precision==AFMT_FLOAT) {
+            _mm_errno=MMERR_NO_FLOAT32;
+            return 1;
+        }
         /* We could try 8 bit sound if available */
         if(play_precision==AFMT_S16_NE &&(formats&AFMT_U8)) {
             _mm_errno=MMERR_8BIT_ONLY;
@@ -247,7 +261,7 @@ static BOOL OSS_Init_internal(void)
 		ioctl(sndfd,SNDCTL_DSP_GETBLKSIZE,&buffinf.fragsize);
 	if(!(audiobuffer=(SBYTE*)MikMod_malloc(buffinf.fragsize)))
 		return 1;
-	
+
 	buffersize = buffinf.fragsize;
 #else
 	ioctl(sndfd,SNDCTL_DSP_GETBLKSIZE,&buffersize);
@@ -258,7 +272,7 @@ static BOOL OSS_Init_internal(void)
 	return VC_Init();
 }
 
-static BOOL OSS_Init(void)
+static int OSS_Init(void)
 {
 #ifdef SNDCTL_DSP_SETFRAGMENT
 	int fragmentsize;
@@ -280,7 +294,7 @@ static BOOL OSS_Init(void)
 	}
 
 	fragmentsize=(numfrags<<16)|fragsize;
-	
+
 	if(ioctl(sndfd,SNDCTL_DSP_SETFRAGMENT,&fragmentsize)<0) {
 		_mm_errno=MMERR_OSS_SETFRAGMENT;
 		return 1;
@@ -310,7 +324,7 @@ static void OSS_PlayStop(void)
 {
 	VC_PlayStop();
 
-	ioctl(sndfd,SNDCTL_DSP_POST);
+	ioctl(sndfd,SNDCTL_DSP_POST,0);
 }
 
 static void OSS_Update(void)
@@ -333,7 +347,7 @@ static void OSS_Update(void)
 						   buffinf.bytes:buffinf.fragsize);
 #ifdef AFMT_MU_LAW
 		if (play_precision==AFMT_MU_LAW)
-			unsignedtoulaw(audiobuffer,done);
+			unsignedtoulaw((char *)audiobuffer,done);
 #endif
 		write(sndfd,audiobuffer,done);
 	}
@@ -347,10 +361,10 @@ static void OSS_Update(void)
 #endif
 }
 
-static BOOL OSS_Reset(void)
+static int OSS_Reset(void)
 {
 	OSS_Exit_internal();
-	ioctl(sndfd,SNDCTL_DSP_RESET);
+	ioctl(sndfd,SNDCTL_DSP_RESET,0);
 	return OSS_Init_internal();
 }
 
@@ -363,7 +377,7 @@ MIKMODAPI MDRIVER drv_oss={
 #ifdef SNDCTL_DSP_SETFRAGMENT
 	"buffer:r:7,17,14:Audio buffer log2 size\n"
 	"count:r:2,255,16:Audio buffer count\n"
-#endif	
+#endif
 	"card:r:0,99,0:Sound card id\n",
 	OSS_CommandLine,
 	OSS_IsThere,

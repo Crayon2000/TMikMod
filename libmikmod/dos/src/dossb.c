@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -47,7 +47,23 @@
 __sb_state sb;
 
 /* Wait for SoundBlaster for some time */
-volatile void __sb_wait()
+#if !defined(__GNUC__) || (__GNUC__ < 3) || (__GNUC__ == 3 && __GNUC_MINOR__ == 0)
+# define _func_noinline volatile /* match original code */
+# define _func_noclone
+#else
+/* avoid warnings from newer gcc:
+ * "function definition has qualified void return type" and
+ * function return types not compatible due to 'volatile' */
+# define _func_noinline __attribute__((__noinline__))
+# if (__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 5)
+#  define _func_noclone
+# else
+#  define _func_noclone __attribute__((__noclone__))
+# endif
+#endif
+_func_noinline
+_func_noclone
+ void __sb_wait()
 {
 	inportb(SB_DSP_RESET);
 	inportb(SB_DSP_RESET);

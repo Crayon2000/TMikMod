@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{C5192207-5B8A-4129-B9B3-6E91C757BA80}</ProjectGuid>
-        <ProjectVersion>14.4</ProjectVersion>
+        <ProjectVersion>15.1</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
@@ -103,7 +103,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <IncludePath>libmikmod\win32\;$(IncludePath)</IncludePath>
-        <Defines>WIN32;DRV_WIN;DRV_DS;HAVE_MALLOC_H;HAVE_FCNTL_H;HAVE_LIMITS_H;_MSC_VER=1;$(Defines)</Defines>
+        <Defines>WIN32;DRV_WIN;DRV_DS;HAVE_MALLOC_H;HAVE_FCNTL_H;HAVE_LIMITS_H;_MSC_VER=1;MIKMOD_STATIC;$(Defines)</Defines>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <PackageImports>vcldbx;frx16;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;DBXSybaseASEDriver;ibxpress;vclimg;frxDB16;intrawebdb_120_160;fs16;TeeUI;FMXTee;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;bcbsmp;websnap;vclribbon;frxe16;VclSmp;fsDB16;vcl;DataSnapConnectors;CloudService;DBXMSSQLDriver;CodeSiteExpressPkg;FmxTeeUI;dsnapcon;vclx;webdsnap;bdertl;adortl;bcbie;$(PackageImports)</PackageImports>
     </PropertyGroup>

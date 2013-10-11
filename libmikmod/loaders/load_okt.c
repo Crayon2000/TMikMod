@@ -74,7 +74,7 @@ static OKTNOTE *okttrk = NULL;
 
 /*========== Loader code */
 
-BOOL OKT_Test(void)
+static BOOL OKT_Test(void)
 {
 	CHAR id[8];
 
@@ -203,7 +203,7 @@ static BOOL OKT_doSAMP(int len)
 		s.len = _mm_read_M_ULONG(modreader);
 		s.loopbeg = _mm_read_M_UWORD(modreader) * 2;
 		s.looplen = _mm_read_M_UWORD(modreader) * 2;
-		_mm_read_UBYTE(modreader);
+		_mm_skip_BYTE(modreader);
 		s.volume = _mm_read_UBYTE(modreader);
 		_mm_read_M_UWORD(modreader);
 
@@ -322,7 +322,7 @@ static void OKT_doSBOD(int insnum)
 	of.samples[insnum].seekpos = _mm_ftell(modreader);
 }
 
-BOOL OKT_Load(BOOL curious)
+static BOOL OKT_Load(BOOL curious)
 {
 	UBYTE id[4];
 	ULONG len;
@@ -333,24 +333,24 @@ BOOL OKT_Load(BOOL curious)
 
 	/* skip OKTALYZER header */
 	_mm_fseek(modreader, 8, SEEK_SET);
-	of.songname = StrDup("");
+	of.songname = MikMod_strdup("");
 
-	of.modtype = StrDup("Amiga Oktalyzer");
+	of.modtype = MikMod_strdup("Amiga Oktalyzer");
 	of.numpos = of.reppos = 0;
-	
+
 	/* default values */
 	of.initspeed = 6;
 	of.inittempo = 125;
-	
+
 	while (1) {
 		/* read block header */
 		_mm_read_UBYTES(id, 4, modreader);
 		len = _mm_read_M_ULONG(modreader);
-		
+
 		if (_mm_eof(modreader))
 			break;
 		fp = _mm_ftell(modreader);
-		
+
 		if (!memcmp(id, "CMOD", 4)) {
 			if (!seen_cmod) {
 				OKT_doCMOD();
@@ -439,9 +439,9 @@ BOOL OKT_Load(BOOL curious)
 	return 1;
 }
 
-CHAR *OKT_LoadTitle(void)
+static CHAR *OKT_LoadTitle(void)
 {
-	return StrDup("");
+	return MikMod_strdup("");
 }
 
 /*========== Loader information */

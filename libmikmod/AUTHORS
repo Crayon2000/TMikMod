@@ -16,25 +16,28 @@ libmikmod main authors
   Revived the project after many years of inactivity, in 2004. Former
   maintainer.
 * Shlomi Fish <shlomif@shlomifish.org> ( http://www.shlomifish.org/ ).
-  Took over maintenance after many years of inactivity, in 2012. Current
-  maintainer.
+  Took over maintenance after many years of inactivity, in 2012.
+* Ozkan Sezer <sezero@users.sourceforge.net>
+  Took over maintenance in 2013. (current maintainer.)
 
 Previous Unix maintainers
 -------------------------
 
-* Steve McIntyre <steven@chiark.greenend.org.uk>
+* Steve McIntyre <steve@einval.com>
   maintained MikMod'Unix version 2. Used to maintain the Debian package
   for MikMod.
 * Peter Amstutz <tetron@student.umass.edu>
   maintained MikMod'Unix version 3 up to version 3.0.3.
-  
+
 General contributors
 --------------------
 
 * Arne de Bruijn <arne@knoware.nl>
   wrote the compressed IT sample support.
 * Shlomi Fish <shlomif@shlomifish.org>
-  wrote the Java port, bug fixes.
+  wrote the Java port, bug fixes, CMake build system.
+* Ozkan Sezer <sezero@users.sourceforge.net>
+  overall bug fixes, configury updates.
 * Juan Linietsky <coding@reduz.com.ar>
   overall bug fixes.
 * Claudio Matsuoka <claudio@helllabs.org>
@@ -94,6 +97,8 @@ Contributors on the Windows side
   created the DirectSound driver.
 * Bjornar Henden <bhenden@online.no>
   created the Multimedia API windows driver.
+* Paul Spark <sparkynz74@gmail.com>
+  created the SDL windows driver and made changes to build with MSVC++ 6.
 
 Contributors on the Dos side
 ----------------------------
@@ -129,6 +134,5 @@ Contributors on the BeOS side
 * Thomas Neumann <tneumann@polycode.dk>
   integrated libmikmod into his BeOS APlayer, and contributed many bug fixes.
 
--- 
-If your name is missing, don't hesitate to remind me at
-<mikmod@mikmod.raphnet.net>
+--
+If your name is missing, don't hesitate to remind the current maintainer.

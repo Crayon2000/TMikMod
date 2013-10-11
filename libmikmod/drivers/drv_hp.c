@@ -6,18 +6,18 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 	02111-1307, USA.
 */
-  
+
 /*==============================================================================
 
   $Id$
@@ -56,7 +56,7 @@ static	SBYTE *audiobuffer=NULL;
 static	int buffersize=1<<BUFFERSIZE;
 static	int headphone=0;
 
-static void HP_CommandLine(CHAR *cmdline)
+static void HP_CommandLine(const CHAR *cmdline)
 {
 	char *buffer=MD_GetAtom("buffer",cmdline,0);
 
@@ -87,10 +87,10 @@ static BOOL HP_IsThere(void)
 	return (errno==EACCES?1:0);
 }
 
-static BOOL HP_Init(void)
+static int HP_Init(void)
 {
 	int flags;
-	
+
 	if (!(md_mode&DMODE_16BITS)) {
 		_mm_errno=MMERR_16BIT_ONLY;
 		return 1;
@@ -110,24 +110,24 @@ static BOOL HP_Init(void)
 		_mm_errno=MMERR_NON_BLOCK;
 		return 1;
 	}
-	
+
 	if (ioctl(fd,AUDIO_SET_DATA_FORMAT,AUDIO_FORMAT_LINEAR16BIT)) {
 		_mm_errno=MMERR_HP_SETSAMPLESIZE;
 		return 1;
 	}
-	
+
 	if (ioctl(fd,AUDIO_SET_SAMPLE_RATE,md_mixfreq)) {
 		_mm_errno=MMERR_HP_SETSPEED;
 		return 1;
 	}
-	
+
 	if (ioctl(fd,AUDIO_SET_CHANNELS,(md_mode&DMODE_STEREO)?2:1)) {
 		_mm_errno=MMERR_HP_CHANNELS;
 		return 1;
 	}
-	
+
 	if (ioctl(fd,AUDIO_SET_OUTPUT,
-	             headphone?AUDIO_OUT_HEADPHONE:AUDIO_OUT_SPEAKER)) {
+		     headphone?AUDIO_OUT_HEADPHONE:AUDIO_OUT_SPEAKER)) {
 		_mm_errno=MMERR_HP_AUDIO_OUTPUT;
 		return 1;
 	}
@@ -138,7 +138,7 @@ static BOOL HP_Init(void)
 	}
 
 	if (!(audiobuffer=(SBYTE*)MikMod_malloc(buffersize))) return 1;
-	
+
 	return VC_Init();
 }
 
@@ -168,7 +168,7 @@ MIKMODAPI MDRIVER drv_hp={
 	0,255,
 	"hp",
 	"buffer:r:12,19,15:Audio buffer log2 size\n"
-        "headphone:b:0:Use headphone\n",
+		"headphone:b:0:Use headphone\n",
 	HP_CommandLine,
 	HP_IsThere,
 	VC_SampleLoad,
@@ -199,7 +199,7 @@ MIKMODAPI MDRIVER drv_hp={
 #else
 
 MISSING(drv_hp);
-		
+
 #endif
 
 /* ex:set ts=4: */

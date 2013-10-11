@@ -42,17 +42,31 @@
 
 #include <windows.h>
 
-#pragma comment(lib,"winmm")
+#if defined(_MSC_VER)
+#pragma comment(lib,"winmm.lib")
+#if (_MSC_VER < 1300)
+typedef DWORD DWORD_PTR;
+#endif
+#endif
+
+/* PF_XMMI64_INSTRUCTIONS_AVAILABLE not in all SDKs. */
+#ifndef PF_XMMI64_INSTRUCTIONS_AVAILABLE
+#define PF_XMMI64_INSTRUCTIONS_AVAILABLE 10
+#endif
+
+#ifndef WAVE_FORMAT_IEEE_FLOAT
+#define WAVE_FORMAT_IEEE_FLOAT 0x0003
+#endif
 
 #define NUMBUFFERS	6				/* number of buffers */
 #define BUFFERSIZE	120				/* buffer size in milliseconds */
 
-HWAVEOUT	hwaveout;
-WAVEHDR		header[NUMBUFFERS];
-LPSTR		buffer[NUMBUFFERS];		/* pointers to buffers */
-WORD		buffersout;				/* number of buffers playing/about to be played */
-WORD		nextbuffer;				/* next buffer to be mixed */
-ULONG		buffersize;				/* buffer size in bytes */
+static HWAVEOUT	hwaveout;
+static WAVEHDR	header[NUMBUFFERS];
+static HPSTR	buffer[NUMBUFFERS];		/* pointers to buffers */
+static WORD	buffersout;				/* number of buffers playing/about to be played */
+static WORD	nextbuffer;				/* next buffer to be mixed */
+static ULONG	buffersize;				/* buffer size in bytes */
 
 /* converts Windows error to libmikmod error */
 static int WIN_GetError(MMRESULT mmr)
@@ -80,28 +94,29 @@ static BOOL WIN_IsThere(void)
 	return waveOutGetNumDevs()>0?1:0;
 }
 
-static void CALLBACK WIN_CallBack(HWAVEOUT hwo,UINT uMsg,DWORD dwInstance,DWORD dwParam1,DWORD dwParam2)
+static void CALLBACK WIN_CallBack(HWAVEOUT hwo,UINT uMsg,DWORD_PTR dwInstance,DWORD_PTR dwParam1,DWORD_PTR dwParam2)
 {
 	if (uMsg==WOM_DONE) --buffersout;
 }
-  
-static BOOL WIN_Init(void)
+
+static int WIN_Init(void)
 {
 	WAVEFORMATEX	wfe;
 	WORD			samplesize;
 	MMRESULT		mmr;
-	int				n;
+	int		n;
 
 	samplesize=1;
 	if (md_mode&DMODE_STEREO) samplesize<<=1;
-	if (md_mode&DMODE_16BITS) samplesize<<=1;
+	if (md_mode&DMODE_FLOAT) samplesize<<=2;
+	else if (md_mode&DMODE_16BITS) samplesize<<=1;
 
-	wfe.wFormatTag=WAVE_FORMAT_PCM;
+	wfe.wFormatTag=(md_mode&DMODE_FLOAT)? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
 	wfe.nChannels=md_mode&DMODE_STEREO?2:1;
 	wfe.nSamplesPerSec=md_mixfreq;
 	wfe.nAvgBytesPerSec=md_mixfreq*samplesize;
 	wfe.nBlockAlign=samplesize;
-	wfe.wBitsPerSample=md_mode&DMODE_16BITS?16:8;
+	wfe.wBitsPerSample=(md_mode&DMODE_FLOAT)?32:(md_mode&DMODE_16BITS)?16:8;
 	wfe.cbSize=sizeof(wfe);
 
 	mmr=waveOutOpen(&hwaveout,WAVE_MAPPER,&wfe,(DWORD_PTR)WIN_CallBack,0,CALLBACK_FUNCTION);
@@ -113,7 +128,7 @@ static BOOL WIN_Init(void)
 	buffersize=md_mixfreq*samplesize*BUFFERSIZE/1000;
 
 	for (n=0;n<NUMBUFFERS;n++) {
-		buffer[n]=(char*)MikMod_malloc(buffersize);
+		buffer[n]=MikMod_malloc(buffersize);
 		header[n].lpData=buffer[n];
 		header[n].dwBufferLength=buffersize;
 		mmr=waveOutPrepareHeader(hwaveout,&header[n],sizeof(WAVEHDR));
@@ -127,11 +142,12 @@ static BOOL WIN_Init(void)
 	}
 
 	md_mode|=DMODE_SOFT_MUSIC|DMODE_SOFT_SNDFX;
-	// This test only works on Windows XP or later
-	if (IsProcessorFeaturePresent(PF_XMMI64_INSTRUCTIONS_AVAILABLE))
-	{
+#if defined HAVE_SSE2
+	/* This test only works on Windows XP or later */
+	if (IsProcessorFeaturePresent(PF_XMMI64_INSTRUCTIONS_AVAILABLE)) {
 		md_mode|=DMODE_SIMDMIXER;
 	}
+#endif
 	buffersout=nextbuffer=0;
 	return VC_Init();
 }
@@ -157,7 +173,7 @@ static void WIN_Update(void)
 	ULONG done;
 
 	while (buffersout<NUMBUFFERS) {
-		done=VC_WriteBytes(buffer[nextbuffer],buffersize);
+		done=VC_WriteBytes((SBYTE*)buffer[nextbuffer],buffersize);
 		if (!done) break;
 		header[nextbuffer].dwBufferLength=done;
 		waveOutWrite(hwaveout,&header[nextbuffer],sizeof(WAVEHDR));

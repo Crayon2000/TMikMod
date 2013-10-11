@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -32,8 +32,6 @@
 
 */
 
-#define CINTERFACE 1
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -48,7 +46,7 @@
 #define INITGUID
 #include <dsound.h>
 
-/* Not in compilers <= MSVC 6 */
+/* PF_XMMI64_INSTRUCTIONS_AVAILABLE not in all SDKs */
 #ifndef PF_XMMI64_INSTRUCTIONS_AVAILABLE
 #define PF_XMMI64_INSTRUCTIONS_AVAILABLE 10
 #endif
@@ -61,6 +59,10 @@
 						  DSBCAPS_CTRL3D )
 #endif
 
+#ifndef WAVE_FORMAT_IEEE_FLOAT
+#define WAVE_FORMAT_IEEE_FLOAT 0x0003
+#endif
+
 /* size of each buffer */
 #define FRAGSIZE 16
 /* buffer count */
@@ -70,7 +72,7 @@ static LPDIRECTSOUND pSoundCard = NULL;
 static LPDIRECTSOUNDBUFFER pPrimarySoundBuffer = NULL, pSoundBuffer = NULL;
 static LPDIRECTSOUNDNOTIFY pSoundBufferNotify = NULL;
 
-static HANDLE notifyUpdateHandle = 0, updateBufferHandle = 0;
+static HANDLE notifyUpdateHandle = NULL, updateBufferHandle = NULL;
 static BOOL threadInUse = FALSE;
 static int fragsize=1<<FRAGSIZE;
 static DWORD controlflags = DSBCAPS_CTRLALL & ~DSBCAPS_GLOBALFOCUS;
@@ -78,10 +80,8 @@ static DWORD controlflags = DSBCAPS_CTRLALL & ~DSBCAPS_GLOBALFOCUS;
 #define SAFE_RELEASE(p) \
 	do { \
 		if (p) { \
-			if ((p)->lpVtbl) { \
-				(p)->lpVtbl->Release(p); \
-				(p) = NULL;	\
-			} \
+			(p)->lpVtbl->Release((p)); \
+			(p) = NULL; \
 		} \
 	} while (0)
 
@@ -106,7 +106,7 @@ static DWORD WINAPI updateBufferProc(LPVOID lpParameter)
 
 			if (pSoundBuffer->lpVtbl->Lock
 						(pSoundBuffer,start,fragsize,&pBlock1,&blockBytes1,
-						 &pBlock2,&blockBytes2,0)==DSERR_BUFFERLOST) {	
+						 &pBlock2,&blockBytes2,0)==DSERR_BUFFERLOST) {
 				pSoundBuffer->lpVtbl->Restore(pSoundBuffer);
 				pSoundBuffer->lpVtbl->Lock
 						(pSoundBuffer,start,fragsize,&pBlock1,&blockBytes1,
@@ -124,7 +124,7 @@ static DWORD WINAPI updateBufferProc(LPVOID lpParameter)
 					VC_WriteBytes((SBYTE*)pBlock2,(ULONG)blockBytes2);
 			}
 			MUTEX_UNLOCK(vars);
-			
+
 			pSoundBuffer->lpVtbl->Unlock
 						(pSoundBuffer,pBlock1,blockBytes1,pBlock2,blockBytes2);
 		}
@@ -132,7 +132,7 @@ static DWORD WINAPI updateBufferProc(LPVOID lpParameter)
 	return 0;
 }
 
-static void DS_CommandLine(CHAR *cmdline)
+static void DS_CommandLine(const CHAR *cmdline)
 {
 	CHAR *ptr=MD_GetAtom("buffer",cmdline,0);
 
@@ -144,7 +144,7 @@ static void DS_CommandLine(CHAR *cmdline)
 
 		MikMod_free(ptr);
 	}
-	
+
 	if ((ptr=MD_GetAtom("globalfocus",cmdline,1))) {
 		controlflags |= DSBCAPS_GLOBALFOCUS;
 		MikMod_free(ptr);
@@ -160,12 +160,13 @@ static BOOL DS_IsPresent(void)
 	return 1;
 }
 
-static BOOL DS_Init(void)
+static int DS_Init(void)
 {
 	DSBUFFERDESC soundBufferFormat;
 	WAVEFORMATEX pcmwf;
 	DSBPOSITIONNOTIFY positionNotifications[2];
 	DWORD updateBufferThreadID;
+	LPVOID p = NULL;
 
 	if (DirectSoundCreate(NULL,&pSoundCard,NULL)!=DS_OK) {
 		_mm_errno=MMERR_OPENING_AUDIO;
@@ -179,10 +180,10 @@ static BOOL DS_Init(void)
 	}
 
 	memset(&soundBufferFormat,0,sizeof(DSBUFFERDESC));
-    soundBufferFormat.dwSize       =sizeof(DSBUFFERDESC);
-    soundBufferFormat.dwFlags      =DSBCAPS_PRIMARYBUFFER;
-    soundBufferFormat.dwBufferBytes=0;
-    soundBufferFormat.lpwfxFormat  =NULL;
+	soundBufferFormat.dwSize = sizeof(DSBUFFERDESC);
+	soundBufferFormat.dwFlags = DSBCAPS_PRIMARYBUFFER;
+	soundBufferFormat.dwBufferBytes = 0;
+	soundBufferFormat.lpwfxFormat = NULL;
 
 	if (pSoundCard->lpVtbl->CreateSoundBuffer
 				(pSoundCard,&soundBufferFormat,&pPrimarySoundBuffer,NULL)!=DS_OK) {
@@ -191,41 +192,40 @@ static BOOL DS_Init(void)
 	}
 
 	memset(&pcmwf,0,sizeof(WAVEFORMATEX));
-	pcmwf.wFormatTag     =WAVE_FORMAT_PCM;
+	pcmwf.wFormatTag     =(md_mode&DMODE_FLOAT)? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
 	pcmwf.nChannels      =(md_mode&DMODE_STEREO)?2:1;
 	pcmwf.nSamplesPerSec =md_mixfreq;
-	pcmwf.wBitsPerSample =(md_mode&DMODE_16BITS)?16:8;
+	pcmwf.wBitsPerSample =(md_mode&DMODE_FLOAT)?32:(md_mode&DMODE_16BITS)?16:8;
 	pcmwf.nBlockAlign    =(pcmwf.wBitsPerSample * pcmwf.nChannels) / 8;
 	pcmwf.nAvgBytesPerSec=pcmwf.nSamplesPerSec*pcmwf.nBlockAlign;
 
-    if (pPrimarySoundBuffer->lpVtbl->SetFormat
-				(pPrimarySoundBuffer,&pcmwf)!=DS_OK) {
+	if (pPrimarySoundBuffer->lpVtbl->SetFormat(pPrimarySoundBuffer,&pcmwf)!=DS_OK) {
 		_mm_errno=MMERR_DS_FORMAT;
 		return 1;
 	}
-    pPrimarySoundBuffer->lpVtbl->Play(pPrimarySoundBuffer,0,0,DSBPLAY_LOOPING);
+	pPrimarySoundBuffer->lpVtbl->Play(pPrimarySoundBuffer,0,0,DSBPLAY_LOOPING);
 
 	memset(&soundBufferFormat,0,sizeof(DSBUFFERDESC));
-    soundBufferFormat.dwSize       =sizeof(DSBUFFERDESC);
-    soundBufferFormat.dwFlags      =controlflags|DSBCAPS_GETCURRENTPOSITION2 ;
-    soundBufferFormat.dwBufferBytes=fragsize*UPDATES;
-    soundBufferFormat.lpwfxFormat  =&pcmwf;
-	
+	soundBufferFormat.dwSize	=sizeof(DSBUFFERDESC);
+	soundBufferFormat.dwFlags	=controlflags|DSBCAPS_GETCURRENTPOSITION2 ;
+	soundBufferFormat.dwBufferBytes =fragsize*UPDATES;
+	soundBufferFormat.lpwfxFormat	=&pcmwf;
+
 	if (pSoundCard->lpVtbl->CreateSoundBuffer
 				(pSoundCard,&soundBufferFormat,&pSoundBuffer,NULL)!=DS_OK) {
 		_mm_errno=MMERR_DS_BUFFER;
 		return 1;
 	}
 
-	pSoundBuffer->lpVtbl->QueryInterface
-				(pSoundBuffer,&IID_IDirectSoundNotify,(LPVOID*)&pSoundBufferNotify);
-	if (!pSoundBufferNotify) {
+	pSoundBuffer->lpVtbl->QueryInterface(pSoundBuffer,&IID_IDirectSoundNotify,&p);
+	if (!p) {
 		_mm_errno=MMERR_DS_NOTIFY;
 		return 1;
 	}
+	pSoundBufferNotify = (LPDIRECTSOUNDNOTIFY) p;
 
 	notifyUpdateHandle=CreateEvent
-				(NULL,FALSE,FALSE,L"libmikmod DirectSound Driver positionNotify Event");
+				(NULL,FALSE,FALSE,"libmikmod DirectSound Driver positionNotify Event");
 	if (!notifyUpdateHandle) {
 		_mm_errno=MMERR_DS_EVENT;
 		return 1;
@@ -249,10 +249,12 @@ static BOOL DS_Init(void)
 		return 1;
 	}
 
-	if (IsProcessorFeaturePresent(PF_XMMI64_INSTRUCTIONS_AVAILABLE))
-	{
+#if defined HAVE_SSE2
+	/* this test only works on Windows XP or later */
+	if (IsProcessorFeaturePresent(PF_XMMI64_INSTRUCTIONS_AVAILABLE)) {
 		md_mode|=DMODE_SIMDMIXER;
 	}
+#endif
 	return VC_Init();
 }
 
@@ -261,7 +263,6 @@ static void DS_Exit(void)
 	DWORD statusInfo;
 
 	if(updateBufferHandle) {
-
 		/* Signal thread to exit and wait for the exit */
 		if (threadInUse) {
 			threadInUse = 0;
@@ -272,11 +273,11 @@ static void DS_Exit(void)
 		}
 
 		CloseHandle(updateBufferHandle),
-		updateBufferHandle = 0;
+		updateBufferHandle = NULL;
 	}
 	if (notifyUpdateHandle) {
 		CloseHandle(notifyUpdateHandle),
-		notifyUpdateHandle = 0;
+		notifyUpdateHandle = NULL;
 	}
 
 	SAFE_RELEASE(pSoundBufferNotify);
@@ -312,12 +313,10 @@ static void DS_Update(void)
 	if (do_update && pSoundBuffer) {
 		do_update = 0;
 
-		if (pSoundBuffer->lpVtbl->Lock (pSoundBuffer, 0, fragsize,
-										&block, &bBytes, NULL, NULL, 0)
-				== DSERR_BUFFERLOST) {
+		if (pSoundBuffer->lpVtbl->Lock (pSoundBuffer, 0, fragsize, &block, &bBytes, NULL, NULL, 0)
+											== DSERR_BUFFERLOST) {
 			pSoundBuffer->lpVtbl->Restore (pSoundBuffer);
-			pSoundBuffer->lpVtbl->Lock (pSoundBuffer, 0, fragsize,
-										&block, &bBytes, NULL, NULL, 0);
+			pSoundBuffer->lpVtbl->Lock (pSoundBuffer, 0, fragsize, &block, &bBytes, NULL, NULL, 0);
 		}
 
 		if (Player_Paused_internal()) {
@@ -344,7 +343,7 @@ static void DS_PlayStop(void)
 	VC_PlayStop();
 }
 
-static BOOL DS_PlayStart(void)
+static int DS_PlayStart(void)
 {
 	do_update = 1;
 	return VC_PlayStart();
@@ -358,7 +357,7 @@ MIKMODAPI MDRIVER drv_ds=
 	0,255,
 	"ds",
 	"buffer:r:12,19,16:Audio buffer log2 size\n"
-        "globalfocus:b:0:Play if window does not have the focus\n",
+		"globalfocus:b:0:Play if window does not have the focus\n",
 	DS_CommandLine,
 	DS_IsPresent,
 	VC_SampleLoad,

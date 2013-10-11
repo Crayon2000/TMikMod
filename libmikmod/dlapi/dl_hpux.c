@@ -14,13 +14,15 @@
  * disk is dead and I don't have the system tapes...
  */
 
-#include <dl.h>
-#include <malloc.h>
-#include <string.h>
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"	/* const */
 #endif
+
+#ifdef MIKMOD_DLAPI_HP
+
+#include <dl.h>
+#include <malloc.h>
+#include <string.h>
 
 #include "dlfcn.h"
 
@@ -34,7 +36,7 @@ void *dlopen(const char *name, int flags)
 
 	/* By convention, libmikmod will look for "foo.so" while on HP-UX the
 	   name would be "foo.sl". Change the last letter here. */
-	library = strdup(name);
+	library = MikMod_strdup(name);
 	library[strlen(library) - 1] = 'l';
 
 	handle = shl_load(library,
@@ -61,4 +63,5 @@ void *dlsym(void *handle, const char *sym)
 	return NULL;
 }
 
+#endif
 /* ex:set ts=4: */

@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -88,7 +88,7 @@ static AMFNOTE *track = NULL;
 
 /*========== Loader code */
 
-BOOL AMF_Test(void)
+static BOOL AMF_Test(void)
 {
 	UBYTE id[3],ver;
 
@@ -100,7 +100,7 @@ BOOL AMF_Test(void)
 	return 0;
 }
 
-BOOL AMF_Init(void)
+static BOOL AMF_Init(void)
 {
 	if(!(mh=(AMFHEADER*)MikMod_malloc(sizeof(AMFHEADER)))) return 0;
 	if(!(track=(AMFNOTE*)MikMod_calloc(64,sizeof(AMFNOTE)))) return 0;
@@ -108,13 +108,13 @@ BOOL AMF_Init(void)
 	return 1;
 }
 
-void AMF_Cleanup(void)
+static void AMF_Cleanup(void)
 {
 	MikMod_free(mh);
 	MikMod_free(track);
 }
 
-static BOOL AMF_UnpackTrack(MREADER* modreader)
+static BOOL AMF_UnpackTrack(MREADER* r)
 {
 	ULONG tracksize;
 	UBYTE row,cmd;
@@ -124,20 +124,20 @@ static BOOL AMF_UnpackTrack(MREADER* modreader)
 	memset(track,0,64*sizeof(AMFNOTE));
 
 	/* read packed track */
-	if (modreader) {
-		tracksize=_mm_read_I_UWORD(modreader);
-		tracksize+=((ULONG)_mm_read_UBYTE(modreader))<<16;
+	if (r) {
+		tracksize=_mm_read_I_UWORD(r);
+		tracksize+=((ULONG)_mm_read_UBYTE(r))<<16;
 		if (tracksize)
 			while(tracksize--) {
-				row=_mm_read_UBYTE(modreader);
-				cmd=_mm_read_UBYTE(modreader);
-				arg=_mm_read_SBYTE(modreader);
+				row=_mm_read_UBYTE(r);
+				cmd=_mm_read_UBYTE(r);
+				arg=_mm_read_SBYTE(r);
 				/* unexpected end of track */
 				if(!tracksize) {
 					if((row==0xff)&&(cmd==0xff)&&(arg==-1))
 						break;
 					/* the last triplet should be FF FF FF, but this is not
-					   always the case... maybe a bug in m2amf ? 
+					   always the case... maybe a bug in m2amf ?
 					else
 						return 0;
 					*/
@@ -164,7 +164,7 @@ static BOOL AMF_UnpackTrack(MREADER* modreader)
 				  if (cmd==0x83) {
 					/* volume without note */
 					track[row].volume=(UBYTE)arg+1;
-				} else 
+				} else
 				  if (cmd==0xff) {
 					/* apparently, some M2AMF version fail to estimate the
 					   size of the compressed patterns correctly, and end
@@ -322,7 +322,7 @@ static UBYTE* AMF_ConvertTrack(void)
 					of.flags |= UF_PANNING;
 					break;
 			}
-			
+
 		}
 		if (track[row].volume) UniVolEffect(VOL_VOLUME,track[row].volume-1);
 		UniNewline();
@@ -330,7 +330,7 @@ static UBYTE* AMF_ConvertTrack(void)
 	return UniDup();
 }
 
-BOOL AMF_Load(BOOL curious)
+static BOOL AMF_Load(BOOL curious)
 {
 	int t,u,realtrackcnt,realsmpcnt,defaultpanning;
 	AMFSAMPLE s;
@@ -384,7 +384,7 @@ BOOL AMF_Load(BOOL curious)
 	of.inittempo = mh->songbpm;
 	AMF_Version[AMFTEXTLEN-3]='0'+(mh->version/10);
 	AMF_Version[AMFTEXTLEN-1]='0'+(mh->version%10);
-	of.modtype   = StrDup(AMF_Version);
+	of.modtype   = MikMod_strdup(AMF_Version);
 	of.numchn    = mh->numchannels;
 	of.numtrk    = mh->numorders*mh->numchannels;
 	if (mh->numtracks>of.numtrk)
@@ -398,7 +398,7 @@ BOOL AMF_Load(BOOL curious)
 	/* XXX whenever possible, we should try to determine the original format.
 	   Here we assume it was S3M-style wrt bpmlimit... */
 	of.bpmlimit = 32;
-	
+
 	/*
 	 * Play with the panning table. Although the AMF format embeds a
 	 * panning table, if the module was a MOD or an S3M with default
@@ -473,7 +473,7 @@ BOOL AMF_Load(BOOL curious)
 		}
 
 		if(_mm_eof(modreader)) {
-			_mm_errno = MMERR_LOADING_SAMPLEINFO; 
+			_mm_errno = MMERR_LOADING_SAMPLEINFO;
 			return 0;
 		}
 
@@ -491,7 +491,7 @@ BOOL AMF_Load(BOOL curious)
 	}
 
 	/* read track table */
-	if(!(track_remap=(unsigned short*)MikMod_calloc(mh->numtracks+1,sizeof(UWORD))))
+	if(!(track_remap=MikMod_calloc(mh->numtracks+1,sizeof(UWORD))))
 		return 0;
 	_mm_read_I_UWORDS(track_remap+1,mh->numtracks,modreader);
 	if(_mm_eof(modreader)) {
@@ -539,11 +539,11 @@ BOOL AMF_Load(BOOL curious)
 		q->seekpos=samplepos;
 		samplepos+=q->length;
 	}
-		
+
 	return 1;
 }
 
-CHAR *AMF_LoadTitle(void)
+static CHAR *AMF_LoadTitle(void)
 {
 	CHAR s[32];
 
