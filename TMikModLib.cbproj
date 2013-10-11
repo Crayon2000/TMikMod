@@ -6,7 +6,7 @@
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <TargetedPlatforms>5</TargetedPlatforms>
+        <TargetedPlatforms>7</TargetedPlatforms>
         <AppType>StaticLibrary</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -108,7 +108,9 @@
         <PackageImports>vcldbx;frx16;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;DBXSybaseASEDriver;ibxpress;vclimg;frxDB16;intrawebdb_120_160;fs16;TeeUI;FMXTee;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;bcbsmp;websnap;vclribbon;frxe16;VclSmp;fsDB16;vcl;DataSnapConnectors;CloudService;DBXMSSQLDriver;CodeSiteExpressPkg;FmxTeeUI;dsnapcon;vclx;webdsnap;bdertl;adortl;bcbie;$(PackageImports)</PackageImports>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <Defines>HAVE_FCNTL_H;HAVE_LIMITS_H;_MSC_VER=1;$(Defines)</Defines>
+        <IncludePath>libmikmod\win32\;$(IncludePath)</IncludePath>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <Defines>DRV_WIN;DRV_DS;HAVE_MALLOC_H;HAVE_FCNTL_H;HAVE_LIMITS_H;_MSC_VER=1;MIKMOD_STATIC;$(Defines)</Defines>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <BCC_OptimizeForSpeed>false</BCC_OptimizeForSpeed>
@@ -353,7 +355,7 @@
             <Platforms>
                 <Platform value="OSX32">True</Platform>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">False</Platform>
+                <Platform value="Win64">True</Platform>
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

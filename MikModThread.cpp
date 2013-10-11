@@ -12,6 +12,7 @@
  */
 __fastcall TMikModThread::TMikModThread() : Classes::TThread(true)
 {
+    TThread::CurrentThread->NameThreadForDebugging(System::AnsiString("TMikModThread"), TThread::CurrentThread->ThreadID);
 }
 
 /**
