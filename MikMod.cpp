@@ -166,7 +166,7 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
         UnLoad();
     }
     FModule = AModule;
-    FModule->wrap = true;    // The module will restart when it's finished
+    FModule->wrap = true; // The module will restart when it's finished
 
     MikMod_Lock();
     FVoiceCount = md_numchn;

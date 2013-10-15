@@ -12,7 +12,6 @@
  */
 __fastcall TMikModThread::TMikModThread() : Classes::TThread(true)
 {
-    TThread::CurrentThread->NameThreadForDebugging(System::AnsiString("TMikModThread"), TThread::CurrentThread->ThreadID);
 }
 
 /**
@@ -21,6 +20,7 @@ __fastcall TMikModThread::TMikModThread() : Classes::TThread(true)
  */
 void __fastcall TMikModThread::Execute()
 {
+    TThread::CurrentThread->NameThreadForDebugging(System::AnsiString("TMikModThread"), TThread::CurrentThread->ThreadID);
     while(!Terminated)
     {
         if(Player_Active())
