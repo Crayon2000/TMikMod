@@ -2,10 +2,10 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
 
-AC_INIT([libmikmod],[3.3.2])
+AC_INIT([libmikmod],[3.3.3])
 LIBMIKMOD_MAJOR_VERSION=3
 LIBMIKMOD_MINOR_VERSION=3
-LIBMIKMOD_MICRO_VERSION=2
+LIBMIKMOD_MICRO_VERSION=3
 LIBMIKMOD_VERSION=$LIBMIKMOD_MAJOR_VERSION.$LIBMIKMOD_MINOR_VERSION.$LIBMIKMOD_MICRO_VERSION
 
 AM_INIT_AUTOMAKE([1.10 foreign subdir-objects])
@@ -20,9 +20,9 @@ AM_MAINTAINER_MODE
 # - interfaces added/removed/changed -> increment CURRENT, REVISION = 0
 # - interfaces added -> increment AGE
 # - interfaces removed -> AGE = 0
-MIKMOD_LT_CURRENT=4
+MIKMOD_LT_CURRENT=5
 MIKMOD_LT_REVISION=0
-MIKMOD_LT_AGE=1
+MIKMOD_LT_AGE=2
 
 AC_SUBST(MIKMOD_LT_CURRENT)
 AC_SUBST(MIKMOD_LT_REVISION)
@@ -296,7 +296,7 @@ else
 	libmikmod_threads=no
 fi])
 
-AC_ARG_ENABLE([simd], [AS_HELP_STRING([--enable-simd],[include SIMD (AltiVec or SSE2) mixer optimizations [default=no]])],
+AC_ARG_ENABLE([simd], [AS_HELP_STRING([--enable-simd],[include SIMD (AltiVec or SSE2) mixer optimizations (Unstable!) [default=no]])],
 [if test "$enableval" = "yes"
 then
   libmikmod_simd=yes
@@ -1116,7 +1116,7 @@ esac
 # see if we set libmikmod_simd properly
 case $libmikmod_simd in
 altivec|sse2)
-	AC_DEFINE([MIKMOD_SIMD], 1, [Define if you want to use SIMD (AltiVec or SSE2) optimizations])
+	AC_DEFINE([MIKMOD_SIMD], 1, [Define if you want to use SIMD (AltiVec or SSE2) optimizations (Unstable!)])
 	;;
 *)
 	libmikmod_simd=no

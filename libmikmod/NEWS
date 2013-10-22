@@ -1,3 +1,34 @@
+Summary of changes between libmikmod 3.3.2 and libmikmod 3.3.3 ():
+==========================================================================
+
+libmikmod 3.3.3 was released on 15-Oct-2013.
+This is a bug fix/maintenance release, with a new umx loader as the
+new feature.
+
+- New loader to load modules contained in UMX files from games like
+  Unreal, DeusEx, etc. (Developers: custom MREADER implementations
+  must respect the 'iobase' field for umx loading to work for them.
+  see the splayMEM example app source.)
+- AIFF file writer now silently ignores and clears float output mode.
+- Fixed a small memory leak in samples freeing (thanks to S. Michel.)
+- Fixed calling the previous position while at position 0 resulting
+  in an invalid read. (noticed while running mikmod under valgrind.)
+- Memory reader now fills the available bytes to destination buffer
+  when a short read is happening, while still returning false.
+- Memory reader now respects the iobase value of the reader struct.
+  (doesn't change normal behavior, but may help with new features.)
+- Updated simpleplayMEM example application.
+- Fix return types for MREADER->Seek and MWRITER->Put to be int, and
+  not BOOL. (identical functionality but non-misleading.)
+- Documentation fixes with relation to free()/MikMod_free().
+- Marked the SIMD (SSE2/AltiVec) option as unstable in the makefiles
+  and configury/cmake: not recommended until it is fixed properly.
+- Provided new Visual Studio 6 and Visual Studio 2005 project files.
+  The latter imports into newer Visual Studio versions, e.g. VS2012.
+- Fixed some driver version signatures which I missed changing in the
+  previous release. (cosmetic change.)
+
+
 Summary of changes between libmikmod 3.2.0 and libmikmod 3.3.2 ():
 ==========================================================================
 

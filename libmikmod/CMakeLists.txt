@@ -24,7 +24,7 @@
 # (This copyright notice applies only to this file)
 
 PROJECT(libmikmod C)
-SET(VERSION "3.3.2")
+SET(VERSION "3.3.3")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 LIST(APPEND CMAKE_MODULE_PATH "${libmikmod_SOURCE_DIR}/cmake")
 
@@ -111,7 +111,7 @@ SET (ENABLE_SDL 0 CACHE BOOL "Include the SDL driver")
 SET (ENABLE_STDOUT 1 CACHE BOOL "Support for output to stdout")
 SET (ENABLE_PIPE 1 CACHE BOOL "Support for output via a pipe to another command")
 SET (ENABLE_DL 0 CACHE BOOL "Load ALSA and Ultra Drivers at Runtime")
-SET (ENABLE_SIMD 0 CACHE BOOL "Use SIMD (AltiVec or SSE2) optimizations")
+SET (ENABLE_SIMD 0 CACHE BOOL "Use SIMD (AltiVec or SSE2) optimizations (Unstable!)")
 SET (ENABLE_THREADS 1 CACHE BOOL "build a thread-safe version of libmikmod")
 SET (ENABLE_RPATH "1" CACHE BOOL "Whether to use an rpath when linking" )
 SET (ENABLE_STATIC "1" CACHE BOOL "Whether to build the static library (which takes more time)" )
@@ -275,7 +275,6 @@ ADD_DEFINITIONS("-DHAVE_CONFIG_H")
 # always define MIKMOD_BUILD when building libmikmod
 ADD_DEFINITIONS("-DMIKMOD_BUILD")
 
-
 SET (MIKMOD_LIB_MODULES
     drivers/drv_AF.c
     drivers/drv_aiff.c
@@ -321,6 +320,7 @@ SET (MIKMOD_LIB_MODULES
     loaders/load_stm.c
     loaders/load_stx.c
     loaders/load_ult.c
+    loaders/load_umx.c
     loaders/load_uni.c
     loaders/load_xm.c
     mmio/mmalloc.c
@@ -372,7 +372,7 @@ IF (ENABLE_STATIC)
 ENDIF (ENABLE_STATIC)
 
 SET_TARGET_PROPERTIES(mikmod
-    PROPERTIES VERSION 3.1.0 SOVERSION 3
+    PROPERTIES VERSION 3.2.0 SOVERSION 3
     )
 IF(WIN32)
     SET_TARGET_PROPERTIES(mikmod

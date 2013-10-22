@@ -29,7 +29,7 @@ File: mikmod.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
 MikMod Sound Library
 ********************
 
-This manual documents the MikMod Sound Library, version 3.3.2.
+This manual documents the MikMod Sound Library, version 3.3.3.
 
 * Menu:
 
@@ -713,15 +713,16 @@ fully reliable, so other modules might be mistaken as 15 instrument MOD
 files.
 
    You can get some printable information regarding the registered
-loaders with `MikMod_InfoLoader'; don't forget to call `free' on the
-returned string when you don't need it anymore.
+loaders with `MikMod_InfoLoader'; don't forget to call `MikMod_free' on
+the returned string when you don't need it anymore.
 
    Note that, contrary to the sound drivers, you can register module
 loaders at any time, it doesn't matter.
 
    For playlists, you might be interested in knowing the module title
 first, and `Player_LoadTitle' will give you this information. Don't
-forget to `free' the returned text when you don't need it anymore.
+forget to call `MikMod_free' on the returned text when you don't need
+it anymore.
 
    You can load a module either with `Player_Load' and the name of the
 module, or with `Player_LoadFP' and an open `FILE*' pointer. These
@@ -1271,7 +1272,7 @@ well. You can play with the following fields:
 
 The `MREADER' contains the following function pointers:
 
-`BOOL (*Seek)(struct MREADER*, long offset, int whence)'
+`int (*Seek)(struct MREADER*, long offset, int whence)'
      This function should have the same behaviour as `fseek', with
      offset 0 meaning the start of the object (module, sample) being
      loaded.
@@ -1292,15 +1293,23 @@ The `MREADER' contains the following function pointers:
 `BOOL (*Eof)(struct MREADER*)'
      This function should have the same behaviour as `feof'.
 
+`long iobase'
+     Data start base offset. Managed by libmikmod, do not manipulate.
+
+`long prev_iobase'
+     Data start base offset, previous value. Managed by libmikmod, do
+     not manipulate.
+
    For an example of how to build an `MREADER' object, please refer to
-the `MFILEREADER' object in file `mmio/mmio.c' in the library sources.
+the `MFILEREADER' and `MMEMREADER' objects in file `mmio/mmio.c' in the
+library source, as well as the `splayMEM' example application.
 
 4.2.6 MWRITER
 -------------
 
-The `MREADER' contains the following function pointers:
+The `MWRITER' contains the following function pointers:
 
-`BOOL (*Seek)(struct MWRITER*, long offset, int whence);'
+`int (*Seek)(struct MWRITER*, long offset, int whence);'
      This function should have the same behaviour as `fseek', with
      offset 0 meaning the start of the object being written.
 
@@ -1312,7 +1321,7 @@ The `MREADER' contains the following function pointers:
      This function should copy `length' bytes of data from `src', and
      return zero if an error occured, and any nonzero value otherwise.
 
-`BOOL (*Put)(struct MWRITER*, int data);'
+`int (*Put)(struct MWRITER*, int data);'
      This function should have the same behaviour as `fputc'.
 
    For an example of how to build an `MWRITER' object, please refer to
@@ -1752,7 +1761,6 @@ Description
      This function returns whether sound output is enabled or not.
 
 Result
-
 0
      Sound output is disabled.
 
@@ -1788,7 +1796,6 @@ Description
      This function starts the sound mixing.
 
 Result
-
 0
      Sound mixing is ready.
 
@@ -1837,8 +1844,8 @@ Result
      A pointer to a text buffer, or `NULL' if no drivers are registered.
 
 Notes
-     The buffer is created with `MikMod_malloc'; the caller must free
-     it when it is no longer necessary.
+     The buffer is created with `MikMod_malloc'; the caller must free it
+     with `MikMod_free' when it is no longer necessary.
 
 See also
      `MikMod_RegisterDriver', `MikMod_RegisterAllDrivers'.
@@ -1855,8 +1862,8 @@ Result
      A pointer to a text buffer, or `NULL' if no loaders are registered.
 
 Notes
-     The buffer is created with `MikMod_malloc'; the caller must free
-     it when it is no longer necessary.
+     The buffer is created with `MikMod_malloc'; the caller must free it
+     with `MikMod_free' when it is no longer necessary.
 
 See also
      `MikMod_RegisterLoader', `MikMod_RegisterAllLoaders'.
@@ -1871,13 +1878,11 @@ Description
      memory allocations.
 
 Parameters
-
 parameters
      Optional parameters given to the sound driver. These parameters
      are ignored if the value of `md_device' is zero (autodetection).
 
 Result
-
 0
      Initialization was successful.
 
@@ -1900,7 +1905,6 @@ Description
      This function returns whether libmikmod is thread-safe.
 
 Result
-
 0
      The library is not thread-safe.
 
@@ -1964,7 +1968,6 @@ Description
      usable drivers.
 
 Parameters
-
 newdriver
      A pointer to the `MDRIVER' structure identifying the driver.
 
@@ -1988,7 +1991,6 @@ Description
      of error.
 
 Parameters
-
 newhandler
      The new error callback function.
 
@@ -2012,7 +2014,6 @@ Description
      list of usable module loaders.
 
 Parameters
-
 newloader
      A pointer to the `MLOADER' structure identifying the loader.
 
@@ -2037,7 +2038,6 @@ Description
      module playback.
 
 Parameters
-
 newplayer
      The new playback function
 
@@ -2375,7 +2375,7 @@ Result
 
 Notes
      The title buffer is created with `MikMod_malloc'; the caller must
-     free it when it is no longer necessary.
+     free it with `MikMod_free' when it is no longer necessary.
 
 See also
      `Player_Load', `Player_LoadFP', `Player_LoadTitleFP'.
@@ -2397,7 +2397,7 @@ Result
 
 Notes
      The title buffer is created with `MikMod_malloc'; the caller must
-     free it when it is no longer necessary.
+     free it with `MikMod_free' when it is no longer necessary.
 
 See also
      `Player_Load', `Player_LoadFP', `Player_LoadTitle'.
@@ -3146,6 +3146,13 @@ formats as well as for some less-known exotic formats.
      "UltraTracker" was written by MAS of Prophecy, a.k.a. Marc Andre
      Schallehn, and released in 1993.
 
+`load_umx'
+     This loader recognizes the modules in "umx" files from games like
+     "Unreal", "DeusEx", etc. To libmikmod, UMX is just a container and
+     the real music format may be one of "ScreamTracker 3", "Impulse
+     Tracker", "FastTracker 2", or possibly a "Protracker" compatible
+     one.
+
 `load_uni'
      This loader recognizes "UNIMOD" modules. This is the internal
      format used by MikMod and APlayer. Use of this format is
@@ -3406,45 +3413,45 @@ Function Index
 * MikMod_Active:                         Library Core Functions.
                                                               (line   9)
 * MikMod_DisableOutput:                  Library Core Functions.
-                                                              (line  31)
+                                                              (line  30)
 * MikMod_EnableOutput:                   Library Core Functions.
-                                                              (line  45)
+                                                              (line  44)
 * MikMod_Exit:                           Library Core Functions.
-                                                              (line  67)
+                                                              (line  65)
 * MikMod_GetVersion:                     Library Core Functions.
-                                                              (line  78)
+                                                              (line  76)
 * MikMod_InfoDriver:                     Library Core Functions.
-                                                              (line  90)
+                                                              (line  88)
 * MikMod_InfoLoader:                     Library Core Functions.
-                                                              (line 108)
+                                                              (line 106)
 * MikMod_Init:                           Library Core Functions.
-                                                              (line 126)
+                                                              (line 124)
 * MikMod_InitThreads:                    Library Core Functions.
-                                                              (line 157)
+                                                              (line 153)
 * MikMod_Lock:                           Library Core Functions.
-                                                              (line 179)
+                                                              (line 174)
 * MikMod_RegisterAllDrivers:             Library Core Functions.
-                                                              (line 200)
+                                                              (line 195)
 * MikMod_RegisterAllLoaders:             Library Core Functions.
-                                                              (line 210)
+                                                              (line 205)
 * MikMod_RegisterDriver:                 Library Core Functions.
-                                                              (line 220)
+                                                              (line 215)
 * MikMod_RegisterErrorHandler:           Library Core Functions.
-                                                              (line 243)
+                                                              (line 237)
 * MikMod_RegisterLoader:                 Library Core Functions.
-                                                              (line 268)
+                                                              (line 261)
 * MikMod_RegisterPlayer:                 Library Core Functions.
-                                                              (line 293)
+                                                              (line 285)
 * MikMod_Reset:                          Library Core Functions.
-                                                              (line 342)
+                                                              (line 333)
 * MikMod_SetNumVoices:                   Library Core Functions.
-                                                              (line 371)
+                                                              (line 362)
 * MikMod_strerror:                       Library Core Functions.
-                                                              (line 448)
+                                                              (line 439)
 * MikMod_Unlock:                         Library Core Functions.
-                                                              (line 404)
+                                                              (line 395)
 * MikMod_Update:                         Library Core Functions.
-                                                              (line 425)
+                                                              (line 416)
 * Player_Active:                         Module Player Functions.
                                                               (line   9)
 * Player_Free:                           Module Player Functions.
@@ -3529,7 +3536,7 @@ Type and Variable Index
 * MikMod_errno:                          Variable Reference.  (line  12)
 * MODULE:                                Structure Reference. (line  37)
 * MREADER:                               Structure Reference. (line 306)
-* MWRITER:                               Structure Reference. (line 335)
+* MWRITER:                               Structure Reference. (line 343)
 * SAMPLE:                                Structure Reference. (line 234)
 
 
@@ -3552,27 +3559,27 @@ Node: Library Initialization21249
 Ref: Library Initialization-Footnote-124484
 Node: Samples and Voice Control24588
 Node: Modules and Player Control27450
-Node: Loading Data from Memory31728
-Node: Library Reference32646
-Node: Variable Reference33078
-Node: Structure Reference38128
-Node: Error Reference49084
-Ref: Error Reference-Footnote-161100
-Node: Function Reference61261
-Node: Library Core Functions61656
-Node: Module Player Functions74267
-Node: Sample Functions85682
-Node: Voice Functions87860
-Node: Loader Reference94252
-Node: Module Loaders94460
-Node: Sample Loaders101145
-Node: Driver Reference101443
-Node: Network Drivers101696
-Node: Hardware Drivers102790
-Node: Disk Writer Drivers106953
-Node: Other Drivers107794
-Node: Index108834
-Node: Function Index109002
-Node: Type and Variable Index116208
+Node: Loading Data from Memory31750
+Node: Library Reference32668
+Node: Variable Reference33100
+Node: Structure Reference38150
+Node: Error Reference49363
+Ref: Error Reference-Footnote-161379
+Node: Function Reference61540
+Node: Library Core Functions61935
+Node: Module Player Functions74575
+Node: Sample Functions86028
+Node: Voice Functions88206
+Node: Loader Reference94598
+Node: Module Loaders94806
+Node: Sample Loaders101795
+Node: Driver Reference102093
+Node: Network Drivers102346
+Node: Hardware Drivers103440
+Node: Disk Writer Drivers107603
+Node: Other Drivers108444
+Node: Index109484
+Node: Function Index109652
+Node: Type and Variable Index116858
 
 End Tag Table

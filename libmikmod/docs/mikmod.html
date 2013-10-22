@@ -32,7 +32,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
 
 <h2 class="unnumbered">MikMod Sound Library</h2>
 
-<p>This&nbsp;manual&nbsp;documents&nbsp;the&nbsp;MikMod&nbsp;Sound&nbsp;Library,&nbsp;version&nbsp;3.3.2.<!-- /@w -->
+<p>This&nbsp;manual&nbsp;documents&nbsp;the&nbsp;MikMod&nbsp;Sound&nbsp;Library,&nbsp;version&nbsp;3.3.3.<!-- /@w -->
 
 <ul class="menu">
 <li><a accesskey="1" href="#Introduction">Introduction</a>:           What is MikMod ? 
@@ -763,15 +763,15 @@ format is not fully reliable, so other modules might be mistaken as 15
 instrument MOD files.
 
    <p>You can get some printable information regarding the registered loaders with
-<code>MikMod_InfoLoader</code>; don't forget to call <code>free</code> on the returned
+<code>MikMod_InfoLoader</code>; don't forget to call <code>MikMod_free</code> on the returned
 string when you don't need it anymore.
 
    <p>Note that, contrary to the sound drivers, you can register module loaders at
 any time, it doesn't matter.
 
    <p>For playlists, you might be interested in knowing the module title first, and
-<code>Player_LoadTitle</code> will give you this information. Don't forget to
-<code>free</code> the returned text when you don't need it anymore.
+<code>Player_LoadTitle</code> will give you this information. Don't forget to call
+<code>MikMod_free</code> on the returned text when you don't need it anymore.
 
    <p>You can load a module either with <code>Player_Load</code> and the name of the
 module, or with <code>Player_LoadFP</code> and an open <code>FILE*</code> pointer. These
@@ -1191,7 +1191,7 @@ unsigned values.
 The <code>MREADER</code> contains the following function pointers:
 
      <dl>
-<dt><code>BOOL (*Seek)(struct MREADER*, long offset, int whence)</code><dd>This function should have the same behaviour as <code>fseek</code>, with offset 0
+<dt><code>int (*Seek)(struct MREADER*, long offset, int whence)</code><dd>This function should have the same behaviour as <code>fseek</code>, with offset 0
 meaning the start of the object (module, sample) being loaded. 
 <br><dt><code>long (*Tell)(struct MREADER*)</code><dd>This function should have the same behaviour as <code>ftell</code>, with offset 0
 meaning the start of the object being loaded. 
@@ -1200,24 +1200,27 @@ return zero if an error occured, and any nonzero value otherwise. Note that an
 end-of-file condition will not be considered as an error in this case. 
 <br><dt><code>int (*Get)(struct MREADER*)</code><dd>This function should have the same behaviour as <code>fgetc</code>. 
 <br><dt><code>BOOL (*Eof)(struct MREADER*)</code><dd>This function should have the same behaviour as <code>feof</code>. 
+<br><dt><code>long iobase</code><dd>Data start base offset. Managed by libmikmod, do not manipulate. 
+<br><dt><code>long prev_iobase</code><dd>Data start base offset, previous value. Managed by libmikmod, do not manipulate. 
 </dl>
 
    <p>For an example of how to build an <code>MREADER</code> object, please refer to the
-<code>MFILEREADER</code> object in file <code>mmio/mmio.c</code> in the library sources.
+<code>MFILEREADER</code> and <code>MMEMREADER</code> objects in file <code>mmio/mmio.c</code> in
+the library source, as well as the <code>splayMEM</code> example application.
 
 <h4 class="subsection">4.2.6 MWRITER</h4>
 
 <p><a name="index-MWRITER-17"></a>
-The <code>MREADER</code> contains the following function pointers:
+The <code>MWRITER</code> contains the following function pointers:
 
      <dl>
-<dt><code>BOOL (*Seek)(struct MWRITER*, long offset, int whence);</code><dd>This function should have the same behaviour as <code>fseek</code>, with offset 0
+<dt><code>int (*Seek)(struct MWRITER*, long offset, int whence);</code><dd>This function should have the same behaviour as <code>fseek</code>, with offset 0
 meaning the start of the object being written. 
 <br><dt><code>long (*Tell)(struct MWRITER*);</code><dd>This function should have the same behaviour as <code>ftell</code>, with offset 0
 meaning the start of the object being written. 
 <br><dt><code>BOOL (*Write)(struct MWRITER*, const void *src, size_t length);</code><dd>This function should copy <code>length</code> bytes of data from <code>src</code>, and
 return zero if an error occured, and any nonzero value otherwise. 
-<br><dt><code>BOOL (*Put)(struct MWRITER*, int data);</code><dd>This function should have the same behaviour as <code>fputc</code>. 
+<br><dt><code>int (*Put)(struct MWRITER*, int data);</code><dd>This function should have the same behaviour as <code>fputc</code>. 
 </dl>
 
    <p>For an example of how to build an <code>MWRITER</code> object, please refer to the
@@ -1497,7 +1500,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Function-Reference">Function Reference
 <p><a name="index-MikMod_005fActive-18"></a><code>BOOL MikMod_Active(void)</code>
      <dl>
 <dt><i>Description</i><dd>This function returns whether sound output is enabled or not. 
-<br><dt><i>Result</i><br><dt><i>0</i><dd>Sound output is disabled. 
+<br><dt><i>Result</i><dt><i>0</i><dd>Sound output is disabled. 
 <br><dt><i>1</i><dd>Sound output is enabled. 
 <br><dt><i>Notes</i><dd>Calls to <code>MikMod_Update</code> will be ignored when sound output is disabled. 
 <br><dt><i>See also</i><dd><code>MikMod_DisableOutput</code>, <code>MikMod_EnableOutput</code>. 
@@ -1517,8 +1520,8 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Function-Reference">Function Reference
    <p><a name="index-MikMod_005fEnableOutput-20"></a><code>int MikMod_EnableOutput(void)</code>
      <dl>
 <dt><i>Description</i><dd>This function starts the sound mixing. 
-<br><dt><i>Result</i><br><dt><i>0</i><dd>Sound mixing is ready. 
-<br><dt><i>nonzero</i><dd>An error occurred during the operation. 
+<br><dt><i>Result</i><dt><i>0</i><dd>Sound mixing is ready. 
+<dt><i>nonzero</i><dd>An error occurred during the operation. 
 <br><dt><i>Notes</i><dd>Calls to <code>MikMod_Update</code> will be ignored when sound output is disabled. 
 <br><dt><i>See also</i><dd><code>MikMod_Active</code>, <code>MikMod_DisableOutput</code>. 
 </dl>
@@ -1549,8 +1552,8 @@ number, and &lsquo;<samp><span class="samp">rev</span></samp>&rsquo; is the revi
      <dl>
 <dt><i>Description</i><dd>This function returns a formatted list of the registered drivers in a buffer. 
 <br><dt><i>Result</i><dd>A pointer to a text buffer, or <code>NULL</code> if no drivers are registered. 
-<br><dt><i>Notes</i><dd>The buffer is created with <code>MikMod_malloc</code>; the caller must free it when it is
-no longer necessary. 
+<br><dt><i>Notes</i><dd>The buffer is created with <code>MikMod_malloc</code>; the caller must free it
+with <code>MikMod_free</code> when it is no longer necessary. 
 <br><dt><i>See also</i><dd><code>MikMod_RegisterDriver</code>, <code>MikMod_RegisterAllDrivers</code>. 
 </dl>
 
@@ -1561,8 +1564,8 @@ no longer necessary.
 <dt><i>Description</i><dd>This function returns a formatted list of the registered module loaders in a
 buffer. 
 <br><dt><i>Result</i><dd>A pointer to a text buffer, or <code>NULL</code> if no loaders are registered. 
-<br><dt><i>Notes</i><dd>The buffer is created with <code>MikMod_malloc</code>; the caller must free it when it is
-no longer necessary. 
+<br><dt><i>Notes</i><dd>The buffer is created with <code>MikMod_malloc</code>; the caller must free it
+with <code>MikMod_free</code> when it is no longer necessary. 
 <br><dt><i>See also</i><dd><code>MikMod_RegisterLoader</code>, <code>MikMod_RegisterAllLoaders</code>. 
 </dl>
 
@@ -1572,10 +1575,10 @@ no longer necessary.
      <dl>
 <dt><i>Description</i><dd>This function performs the library initialization, including the sound driver
 choice and configuration, and all the necessary memory allocations. 
-<br><dt><i>Parameters</i><br><dt><i>parameters</i><dd>Optional parameters given to the sound driver. These parameters are ignored if
+<br><dt><i>Parameters</i><dt><i>parameters</i><dd>Optional parameters given to the sound driver. These parameters are ignored if
 the value of <code>md_device</code> is zero (autodetection). 
-<br><dt><i>Result</i><br><dt><i>0</i><dd>Initialization was successful. 
-<br><dt><i>nonzero</i><dd>An error occurred during initialization. 
+<br><dt><i>Result</i><dt><i>0</i><dd>Initialization was successful. 
+<dt><i>nonzero</i><dd>An error occurred during initialization. 
 <br><dt><i>Notes</i><dd>When the initialization fails, the library uses the nosound sound driver to
 let other the other MikMod functions work without crashing the application. 
 <br><dt><i>See also</i><dd><code>MikMod_Exit</code>, <code>MikMod_InitThreads</code>, <code>MikMod_Reset</code>. 
@@ -1586,8 +1589,8 @@ let other the other MikMod functions work without crashing the application.
    <p><a name="index-MikMod_005fInitThreads-26"></a><code>BOOL MikMod_InitThreads(void)</code>
      <dl>
 <dt><i>Description</i><dd>This function returns whether libmikmod is thread-safe. 
-<br><dt><i>Result</i><br><dt><i>0</i><dd>The library is not thread-safe. 
-<br><dt><i>1</i><dd>The library is thread-safe. 
+<br><dt><i>Result</i><dt><i>0</i><dd>The library is not thread-safe. 
+<dt><i>1</i><dd>The library is thread-safe. 
 <br><dt><i>Notes</i><dd>This function should be called before any call to <code>MikMod_Lock</code> or
 <code>MikMod_Unlock</code> is made. 
 <br><dt><i>See also</i><dd><code>MikMod_Lock</code>, <code>MikMod_Unlock</code>. 
@@ -1632,7 +1635,7 @@ to <code>MikMod_Lock</code> in made.<br>
      <dl>
 <dt><i>Description</i><dd>This function adds the specified driver to the internal list of usable
 drivers. 
-<br><dt><i>Parameters</i><br><dt><i>newdriver</i><dd>A pointer to the <code>MDRIVER</code> structure identifying the driver. 
+<br><dt><i>Parameters</i><dt><i>newdriver</i><dd>A pointer to the <code>MDRIVER</code> structure identifying the driver. 
 <br><dt><i>Notes</i><dd>It is safe to register the same driver several times, although it will not
 be duplicated in the list.<br>
 You should register all the drivers you need before calling <code>MikMod_Init</code>. 
@@ -1646,7 +1649,7 @@ If you want to register all the available drivers, use
    <p><a name="index-MikMod_005fRegisterErrorHandler-31"></a><code>MikMod_handler_t MikMod_RegisterErrorHandler(MikMod_handler_t newhandler)</code>
      <dl>
 <dt><i>Description</i><dd>This function selects the function which should be called in case of error. 
-<br><dt><i>Parameters</i><br><dt><i>newhandler</i><dd>The new error callback function. 
+<br><dt><i>Parameters</i><dt><i>newhandler</i><dd>The new error callback function. 
 <br><dt><i>Result</i><dd>The previous error callback function, or <code>NULL</code> if there was none. 
 <br><dt><i>Notes</i><dd><code>MikMod_handler_t</code> is defined as <code>void(*function)(void)</code>, this means
 your error function has the following prototype:
@@ -1662,7 +1665,7 @@ your callback).
      <dl>
 <dt><i>Description</i><dd>This function adds the specified module loader to the internal list of usable
 module loaders. 
-<br><dt><i>Parameters</i><br><dt><i>newloader</i><dd>A pointer to the <code>MLOADER</code> structure identifying the loader. 
+<br><dt><i>Parameters</i><dt><i>newloader</i><dd>A pointer to the <code>MLOADER</code> structure identifying the loader. 
 <br><dt><i>Notes</i><dd>It is safe to register the same loader several times, although it will not be
 duplicated in the list.<br>
 You should register all the loaders you need before calling <code>Player_Load</code>
@@ -1679,7 +1682,7 @@ last.
      <dl>
 <dt><i>Description</i><dd>This function selects the function which should be used to process module
 playback. 
-<br><dt><i>Parameters</i><br><dt><i>newplayer</i><dd>The new playback function
+<br><dt><i>Parameters</i><dt><i>newplayer</i><dd>The new playback function
 <br><dt><i>Result</i><dd>The previous playback function. 
 <br><dt><i>Notes</i><dd><code>MikMod_player_t</code> is defined as <code>void(*function)(void)</code>, this means
 your player function has the following prototype:
@@ -1721,7 +1724,7 @@ anymore<small class="enddots">...</small>
 <br><dt><i>Parameters</i><dt><i>parameters</i><dd>Optional parameters given to the sound driver. If you set the value of
 <code>md_device</code> to zero (autodetect), these parameters are ignored. 
 <br><dt><i>Result</i><dt><i>0</i><dd>Reinitialization was successful. 
-<br><dt><i>nonzero</i><dd>An error occurred during reinitialization. 
+<dt><i>nonzero</i><dd>An error occurred during reinitialization. 
 <br><dt><i>Notes</i><dd>Use this function when you have changed the global configuration variables:
 <code>md_device</code> and <code>md_mixfreq</code>, or one of the <code>md_mode</code> flags
 which require sound reinitialization. Sound playback will continue as soon as
@@ -1738,7 +1741,7 @@ and sound effects playback.
 <br><dt><i>Parameters</i><dt><i>musicvoices</i><dd>The number of voices to reserve for music playback. 
 <br><dt><i>samplevoices</i><dd>The number of voices to reserve for sound effects. 
 <br><dt><i>Result</i><dt><i>0</i><dd>Initialization was successful. 
-<br><dt><i>nonzero</i><dd>An error occurred during initialization. 
+<dt><i>nonzero</i><dd>An error occurred during initialization. 
 <br><dt><i>Notes</i><dd>A value of <code>-1</code> for any of the parameters will retain the current number
 of reserved voices.<br>
 The maximum number of voices vary from driver to driver (hardware drivers
@@ -1810,7 +1813,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Function-Reference">Function Reference
      <dl>
 <dt><i>Description</i><dd>This function returns whether the module player is active or not. 
 <br><dt><i>Result</i><dt><i>0</i><dd>No module is playing. 
-<br><dt><i>nonzero</i><dd>A module is currently playing. 
+<dt><i>nonzero</i><dd>A module is currently playing. 
 <br><dt><i>Notes</i><dd>This function will still report that the player is active if the playing module
 is paused. 
 <br><dt><i>See also</i><dd><code>Player_Paused</code>, <code>Player_TogglePause</code>, <code>Player_Start</code>, <code>Player_Stop</code>
@@ -1903,8 +1906,8 @@ after the last &ldquo;official&rdquo; pattern.
 <br><dt><i>Parameters</i><dt><i>filename</i><dd>The name of the module file. 
 <br><dt><i>Result</i><dd>A pointer to the song title, or <code>NULL</code> if either the module has no title
 or an error has occurred. 
-<br><dt><i>Notes</i><dd>The title buffer is created with <code>MikMod_malloc</code>; the caller must free it when it
-is no longer necessary. 
+<br><dt><i>Notes</i><dd>The title buffer is created with <code>MikMod_malloc</code>; the caller must free it
+with <code>MikMod_free</code> when it is no longer necessary. 
 <br><dt><i>See also</i><dd><code>Player_Load</code>, <code>Player_LoadFP</code>, <code>Player_LoadTitleFP</code>. 
 </dl>
 
@@ -1916,8 +1919,8 @@ is no longer necessary.
 <br><dt><i>Parameters</i><dt><i>file</i><dd>An open file, at the position where the module starts. 
 <br><dt><i>Result</i><dd>A pointer to the song title, or <code>NULL</code> if either the module has no title
 or an error has occurred. 
-<br><dt><i>Notes</i><dd>The title buffer is created with <code>MikMod_malloc</code>; the caller must free it when it
-is no longer necessary. 
+<br><dt><i>Notes</i><dd>The title buffer is created with <code>MikMod_malloc</code>; the caller must free it
+with <code>MikMod_free</code> when it is no longer necessary. 
 <br><dt><i>See also</i><dd><code>Player_Load</code>, <code>Player_LoadFP</code>, <code>Player_LoadTitle</code>. 
 </dl>
 
@@ -1950,7 +1953,7 @@ range and are part of the range ; otherwise, if the operation is
 <dt><i>Description</i><dd>This function determines whether a module channel is muted or not. 
 <br><dt><i>Parameters</i><dt><i>channel</i><dd>The module channel to test (starting from zero). 
 <br><dt><i>Result</i><dt><i>0</i><dd>The channel is not muted. 
-<br><dt><i>1</i><dd>The channel is muted. 
+<dt><i>1</i><dd>The channel is muted. 
 <br><dt><i>See also</i><dd><code>Player_Mute</code>, <code>Player_ToggleMute</code>, <code>Player_Unmute</code>. 
 </dl>
 
@@ -2295,7 +2298,7 @@ stopping the playback, use <code>Voice_SetVolume(voice, 0)</code> instead.
 <dt><i>Description</i><dd>This function returns whether the voice is active or not. 
 <br><dt><i>Parameters</i><dt><i>voice</i><dd>The number of the voice to be checked (starting from zero). 
 <br><dt><i>Result</i><dt><i>0</i><dd>The voice is stopped or has no sample assigned. 
-<br><dt><i>nonzero</i><dd>The voice is playing a sample. 
+<dt><i>nonzero</i><dd>The voice is playing a sample. 
 <br><dt><i>Notes</i><dd>This function may not work with some drivers (especially for hardware mixed
 voices). In this case, its return value is undefined. 
 <br><dt><i>See also</i><dd><code>Voice_Stop</code>. 
@@ -2410,6 +2413,10 @@ Tammilehto, and released in 1994.
 Protracker modules, but support two effects per channel.<br>
 &ldquo;UltraTracker&rdquo; was written by MAS of Prophecy, a.k.a. Marc Andre Schallehn,
 and released in 1993. 
+<br><dt><code>load_umx</code><dd>This loader recognizes the modules in &ldquo;umx&rdquo; files from games like &ldquo;Unreal&rdquo;,
+&ldquo;DeusEx&rdquo;, etc. To libmikmod, UMX is just a container and the real music
+format may be one of &ldquo;ScreamTracker 3&rdquo;, &ldquo;Impulse Tracker&rdquo;, &ldquo;FastTracker 2&rdquo;,
+or possibly a &ldquo;Protracker&rdquo; compatible one. 
 <br><dt><code>load_uni</code><dd>This loader recognizes &ldquo;UNIMOD&rdquo; modules. This is the internal format used by
 MikMod and APlayer. Use of this format is discouraged, this loader being
 provided for completeness. 

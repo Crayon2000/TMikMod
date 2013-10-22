@@ -68,7 +68,7 @@ extern "C" {
 
 #define LIBMIKMOD_VERSION_MAJOR 3L
 #define LIBMIKMOD_VERSION_MINOR 3L
-#define LIBMIKMOD_REVISION      2L
+#define LIBMIKMOD_REVISION      3L
 
 #define LIBMIKMOD_VERSION \
     ((LIBMIKMOD_VERSION_MAJOR<<16)| \
@@ -116,7 +116,7 @@ typedef unsigned char   UBYTE;  /* 1 byte, unsigned */
 typedef signed short    SWORD;  /* 2 bytes, signed */
 typedef unsigned short  UWORD;  /* 2 bytes, unsigned */
 typedef signed int      SLONG;  /* 4 bytes, signed */
-typedef unsigned int    ULONG;  /* 4 bytes, unsigned */
+typedef unsigned long   ULONG;  /* 4 bytes, unsigned */
 typedef int             BOOL;   /* 0=false, <>0 true */
 
 #else
@@ -296,7 +296,7 @@ MIKMODAPI extern void   MikMod_free(void*);
  */
 
 typedef struct MREADER {
-    BOOL (*Seek)(struct MREADER*,long,int);
+    int  (*Seek)(struct MREADER*,long,int);
     long (*Tell)(struct MREADER*);
     BOOL (*Read)(struct MREADER*,void*,size_t);
     int  (*Get)(struct MREADER*);
@@ -306,10 +306,10 @@ typedef struct MREADER {
 } MREADER;
 
 typedef struct MWRITER {
-    BOOL (*Seek)(struct MWRITER*, long, int);
+    int  (*Seek)(struct MWRITER*, long, int);
     long (*Tell)(struct MWRITER*);
     BOOL (*Write)(struct MWRITER*, const void*, size_t);
-    BOOL (*Put)(struct MWRITER*, int);
+    int  (*Put)(struct MWRITER*, int);
 } MWRITER;
 
 /*
@@ -608,6 +608,7 @@ MIKMODAPI extern struct MLOADER load_stm; /* ScreamTracker 2 (by Future Crew) */
 MIKMODAPI extern struct MLOADER load_stx; /* STMIK 0.2 (by Future Crew) */
 MIKMODAPI extern struct MLOADER load_s3m; /* ScreamTracker 3 (by Future Crew) */
 MIKMODAPI extern struct MLOADER load_ult; /* UltraTracker (by MAS) */
+MIKMODAPI extern struct MLOADER load_umx; /* Unreal UMX container of Epic Games */
 MIKMODAPI extern struct MLOADER load_uni; /* MikMod and APlayer internal module format */
 MIKMODAPI extern struct MLOADER load_xm;  /* FastTracker 2 (by Triton) */
 

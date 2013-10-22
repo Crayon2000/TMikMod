@@ -230,6 +230,9 @@
         <CppCompile Include="libmikmod\loaders\load_ult.c">
             <BuildOrder>22</BuildOrder>
         </CppCompile>
+        <CppCompile Include="libmikmod\loaders\load_umx.c">
+            <BuildOrder>49</BuildOrder>
+        </CppCompile>
         <CppCompile Include="libmikmod\loaders\load_uni.c">
             <BuildOrder>23</BuildOrder>
         </CppCompile>

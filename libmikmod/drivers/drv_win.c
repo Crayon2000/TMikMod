@@ -45,7 +45,7 @@
 #if defined(_MSC_VER)
 #pragma comment(lib,"winmm.lib")
 #if (_MSC_VER < 1300)
-typedef DWORD DWORD_PTR;
+typedef ULONG_PTR DWORD_PTR;
 #endif
 #endif
 
@@ -191,7 +191,7 @@ static void WIN_PlayStop(void)
 MIKMODAPI MDRIVER drv_win={
 	NULL,
 	"Windows waveform-audio",
-	"Windows waveform-audio driver v0.1",
+	"Windows waveform-audio driver v0.2",
 	0,255,
 	"winmm",
 	NULL,

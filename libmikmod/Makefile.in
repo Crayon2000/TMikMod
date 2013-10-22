@@ -125,14 +125,14 @@ am_libmikmod_la_OBJECTS = dlapi/dl_hpux.lo drivers/drv_AF.lo \
 	loaders/load_it.lo loaders/load_m15.lo loaders/load_med.lo \
 	loaders/load_mod.lo loaders/load_mtm.lo loaders/load_okt.lo \
 	loaders/load_s3m.lo loaders/load_stm.lo loaders/load_stx.lo \
-	loaders/load_ult.lo loaders/load_uni.lo loaders/load_xm.lo \
-	mmio/mmalloc.lo mmio/mmerror.lo mmio/mmio.lo \
-	playercode/mdreg.lo playercode/mdriver.lo playercode/mdulaw.lo \
-	playercode/mloader.lo playercode/mlreg.lo playercode/mlutil.lo \
-	playercode/mplayer.lo playercode/munitrk.lo playercode/mwav.lo \
-	playercode/npertab.lo playercode/sloader.lo \
-	playercode/virtch.lo playercode/virtch2.lo \
-	playercode/virtch_common.lo
+	loaders/load_ult.lo loaders/load_umx.lo loaders/load_uni.lo \
+	loaders/load_xm.lo mmio/mmalloc.lo mmio/mmerror.lo \
+	mmio/mmio.lo playercode/mdreg.lo playercode/mdriver.lo \
+	playercode/mdulaw.lo playercode/mloader.lo playercode/mlreg.lo \
+	playercode/mlutil.lo playercode/mplayer.lo \
+	playercode/munitrk.lo playercode/mwav.lo playercode/npertab.lo \
+	playercode/sloader.lo playercode/virtch.lo \
+	playercode/virtch2.lo playercode/virtch_common.lo
 libmikmod_la_OBJECTS = $(am_libmikmod_la_OBJECTS)
 libmikmod_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -421,6 +421,7 @@ libmikmod_la_SOURCES = \
 		loaders/load_stm.c \
 		loaders/load_stx.c \
 		loaders/load_ult.c \
+		loaders/load_umx.c \
 		loaders/load_uni.c \
 		loaders/load_xm.c \
 		mmio/mmalloc.c \
@@ -649,6 +650,8 @@ loaders/load_stx.lo: loaders/$(am__dirstamp) \
 	loaders/$(DEPDIR)/$(am__dirstamp)
 loaders/load_ult.lo: loaders/$(am__dirstamp) \
 	loaders/$(DEPDIR)/$(am__dirstamp)
+loaders/load_umx.lo: loaders/$(am__dirstamp) \
+	loaders/$(DEPDIR)/$(am__dirstamp)
 loaders/load_uni.lo: loaders/$(am__dirstamp) \
 	loaders/$(DEPDIR)/$(am__dirstamp)
 loaders/load_xm.lo: loaders/$(am__dirstamp) \
@@ -832,6 +835,8 @@ mostlyclean-compile:
 	-rm -f loaders/load_stx.lo
 	-rm -f loaders/load_ult.$(OBJEXT)
 	-rm -f loaders/load_ult.lo
+	-rm -f loaders/load_umx.$(OBJEXT)
+	-rm -f loaders/load_umx.lo
 	-rm -f loaders/load_uni.$(OBJEXT)
 	-rm -f loaders/load_uni.lo
 	-rm -f loaders/load_xm.$(OBJEXT)
@@ -922,6 +927,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@loaders/$(DEPDIR)/load_stm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@loaders/$(DEPDIR)/load_stx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@loaders/$(DEPDIR)/load_ult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@loaders/$(DEPDIR)/load_umx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@loaders/$(DEPDIR)/load_uni.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@loaders/$(DEPDIR)/load_xm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mmio/$(DEPDIR)/mmalloc.Plo@am__quote@
