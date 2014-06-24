@@ -23,7 +23,7 @@ typedef struct _MOD_READER
 static BOOL GST_READER_Eof(MREADER *reader);
 static BOOL GST_READER_Read(MREADER *reader, void *ptr, size_t size);
 static int GST_READER_Get(MREADER *reader);
-static BOOL GST_READER_Seek(MREADER *reader, long offset, int whence);
+static int GST_READER_Seek(MREADER *reader, long offset, int whence);
 static long GST_READER_Tell(MREADER *reader);
 
 /**
@@ -422,7 +422,7 @@ static int GST_READER_Get(MREADER * reader)
 /**
  * This function has the same behaviour as fseek, with offset 0 meaning the start of the object (module, sample) being loaded.
  */
-static BOOL GST_READER_Seek(MREADER * reader, long offset, int whence)
+static int GST_READER_Seek(MREADER * reader, long offset, int whence)
 {
     MOD_READER *pReader = (MOD_READER *) reader;
 
