@@ -1,5 +1,67 @@
-Summary of changes between libmikmod 3.3.2 and libmikmod 3.3.3 ():
-==========================================================================
+Summary of changes between libmikmod 3.3.5 and libmikmod 3.3.6:
+========================================================================
+
+libmikmod v3.3.6 was released on 20-Mar-2014.
+
+- UMX loader: Minor corrections to the container parse code with
+  relation to upkg file format. (for correctness' sake only...)
+- ALSA and ESD drivers: Fixed a dlopen() issue.
+- PulseAudio driver: Simplified its command line parser procedure,
+  so that it always sets server and sink to some value, NULL or
+  otherwise, and fix a very minor memory leak on some occasions.
+- Configury, OSS driver: Removed useless check for /dev/sndstat
+  presence, added <soundcard.h> check to cover all our bases for
+  less common setups.
+- Configury, NAS driver: Use the configury detected X header and
+  library locations when necessary, not just hardcoded /usr/X11R6/.
+- Several configury and makefile clean-ups.
+- Added Dreamcast driver from the old 3.2.0b2 dreamcast.es port.
+
+
+Summary of changes between libmikmod 3.3.4 and libmikmod 3.3.5:
+========================================================================
+
+libmikmod v3.3.5 was released on 10-Jan-2014.
+This is a minor bugfix / maintenance release.
+
+- New PulseAudio driver for audio output, using pa_simple_* api.
+- Improved ALSA driver.
+- mikmod.texi: Fixed document generation using newer texinfo.
+- Updates and fixes to configury (autotools) and to cmake support.
+  Cmake support covers more targets and options now.
+- Made the aiff, wav and raw file writer drivers configurable: the
+  library can be configured and compiled without any audio output
+  drivers if so required, except for drv_nos ('nosound') of course.
+- DOS (djgpp): fixed the sound blaster SB16 driver.
+- Fixed a few potential sources of crash, several code clean-ups.
+- Minor compilation fixes against ancient software versions.
+- Merged an updated gp32 driver (it is still an untested driver...)
+
+
+Summary of changes between libmikmod 3.3.3 and libmikmod 3.3.4:
+========================================================================
+
+libmikmod 3.3.4 was released on 08-Dec-2013.
+
+- libmikmod.m4: fixed so that it works with C++ compilers.
+- cmake: fixed a cpack version number issue.
+- Fix CVE-2006-3879 (Secunia 21196) for Graoumf tracker (gt2) loader.
+  (the loader is non-functional yet but the issue was there.)
+- Fix memory leaks in the Graoumf tracker (gt2) loader.
+- UMX loader: Support umx music files from Unreal 1997/98 beta version.
+- S3M loader: Enforce the 64000 bytes sample length limit, which has
+  been in effect since libmikmod-v3.1.10, only for tracker id 1, i.e.
+  only if setting the S3MIT_SCREAM flag during track conversion. Fixes
+  playback of some rare brokenly prepared files - e.g. Arena2.umx from
+  the unreal game community add-on level decyberduel.
+- ULT loader: Fix version array size (was 1 less then its initializer.)
+- ESD driver: Fix signature for esd_playstream function pointer (const)
+- ALSA driver: Remove unused function pointers.
+- The library is compilable using C++ compilers.
+
+
+Summary of changes between libmikmod 3.3.2 and libmikmod 3.3.3:
+========================================================================
 
 libmikmod 3.3.3 was released on 15-Oct-2013.
 This is a bug fix/maintenance release, with a new umx loader as the
@@ -29,8 +91,8 @@ new feature.
   previous release. (cosmetic change.)
 
 
-Summary of changes between libmikmod 3.2.0 and libmikmod 3.3.2 ():
-==========================================================================
+Summary of changes between libmikmod 3.2.0 and libmikmod 3.3.2:
+========================================================================
 
 libmikmod 3.3.2 was released on 05-Oct-2013.
 
@@ -110,27 +172,26 @@ libmikmod 3.2.0 was released on 01-June-2012.
 
 THANKS
 
-- Axel "awe" Wefers <awe@fruitz-of-dojo.de>,
-  for creating the CoreAudio driver, the new
-  AIFF driver, and fixes for the wav output driver.
-- Frank Loemker, for sending me his collection of patches
-  for libmikmod.
+- Axel "awe" Wefers <awe@fruitz-of-dojo.de>, for creating the CoreAudio
+  driver, the new AIFF driver, and fixes for the wav output driver.
+- Frank Loemker, for sending me his collection of patches for libmikmod.
 - Anders F Björklund <afb@algonet.se>, for updates, fixes and tests on
   Mac Platforms and rpm support.
 - Ivan Shmakov, for the NAS audio driver.
 - Various downstream patch writers (from Mandriva, SuSE, Red Hat/Fedora,
-Debian, etc.)
+  Debian, etc.)
 - P. Martin - the macports maintainer for some patches.
 - Stéphan Kochen for two patches: one to change MDRIVER fields to "const",
-and the other with putting variable declarations at the start of block (which
-is more C89 compliant and fixes compilation on Microsoft Visual C++).
+  and the other with putting variable declarations at the start of block
+  (which is more C89 compliant and fixes compilation on Microsoft Visual
+  C++).
 
 NEW FEATURES
 
 - MacOS X CoreAudio driver
 - Carbon support
-- Loader for ASYLUM Music Format v1.0 (.amf) modules,
-  as used in crusader games.
+- Loader for ASYLUM Music Format v1.0 (.amf) modules, as used in crusader
+  games.
 - New function 'Player_QueryVoices' added, which is used to return
   dynamic channel information about the module player. (Mikmod 3.2.2 uses
   it for its dynamic panels).
@@ -139,21 +200,25 @@ NEW FEATURES
 - AIFF disk writer driver.
 - RPM support. To build a rpm, download the tar.gz, and run this:
    % rpmbuild -tb libmikmod-3.2.0-beta2.tar.gz
-- New NAS driver (Network Audio System). Tested with nasd and NCD X terminals.
-- MREADERs now have an iobase member (previously was a static variable in mmio.c). This
-  permits to have many MREADERs with different iobase base values.
+- New NAS driver (Network Audio System). Tested with nasd and NCD X
+  terminals.
+- MREADERs now have an iobase member (previously was a static variable
+  in mmio.c). This permits to have many MREADERs with different iobase
+  base values.
 - Created an example/ subdirectory, to hold programming examples.
-- Added functions to read from memory (Player_LoadMem, Sample_LoadMem...) and a memory reader in mmio.c
+- Added functions to read from memory (Player_LoadMem, Sample_LoadMem...)
+  and a memory reader in mmio.c
 - renamed internal _mm_malloc function to MikMod_malloc, which is now
   part of the API.
-- Raw samples can now be loaded using the new Sample_LoadRaw* family of functions for sound effects.
+- Raw samples can now be loaded using the new Sample_LoadRaw* family of
+  functions for sound effects.
 - PowerPC 64 support
-- ALSA (Advanced Linux Sound Architecture) driver is now working with "recent"
-(actually a few years back) ALSAs.
+- ALSA (Advanced Linux Sound Architecture) driver is now working with
+  "recent" (actually a few years back) ALSAs.
 - Change MDRIVER "char *" fields to "const char *".
     - Thanks to Stéphan Kochen.
-- Implement a fix to the ALSA driver in MIKMOD_DYNAMIC mode so it will allow
-linking against libmikmod when "-Wl,--no-undefined" is passed.
+- Implement a fix to the ALSA driver in MIKMOD_DYNAMIC mode so it will
+  allow linking against libmikmod when "-Wl,--no-undefined" is passed.
     - Reported by Andrey Bondrov from Mandriva.
     - The problem was that we used some snd_... identifiers indirectly in
     some macro expansions.
@@ -164,7 +229,8 @@ BUGFIXES
   for sending me Jonathan Perkin's fix)
 - The wav output driver had problems on big endian systems. Thanks to
   Axel "awe" Wefers for fixing this.
-- A warning reported by Stéphane LOEUILLET in libmikmod.m4 with autoconf 1.8 was fixed.
+- A warning reported by Stéphane LOEUILLET in libmikmod.m4 with autoconf
+  1.8 was fixed.
 - The 'card' argument, supported by the OSS driver was not documented via
   the MDRIVER->CmdLineHelp string.
 - libmikmod-3.1.11-CVE-2010-2546,2971.diff (from Mandriva/Mageia).
@@ -177,13 +243,15 @@ BUGFIXES
     suffers from the
     http://en.wikipedia.org/wiki/Schlemiel_the_Painter%27s_algorithm
     syndrome.
-- Apply a patch for non-blocking opening of the OSS driver. (from Mandriva/Mageia).
+- Apply a patch for non-blocking opening of the OSS driver.
+  (from Mandriva/Mageia).
 - Fixed the prototypes of vc_callback (thanks to P. Martin).
 - Cast a vc_callback parameter to "unsigned char *" instead of "char *",
-becuase the former is what it accepts (thanks to P. Martin).
+  because the former is what it accepts (thanks to P. Martin).
 - Check for Samples' validatity in virtch_common.c (thanks to P. Martin).
 - Fix compilation on MSVC.
     - Thanks to Stéphan Kochen.
+
 
 Summary of changes between libmikmod 3.1.10 and libmikmod 3.1.11 (Thiers):
 ==========================================================================
@@ -211,26 +279,25 @@ BUGFIXES
   - devfs support for Linux OSS
 
 - Makefile for lcc-win32. To compile libmikmod with lcc-win32 a rather new
-    version is needed. I currently use version 3.7 compiled on Jan 20 2002.
-    A version half a year old did not work.
-    To compile
-      - check that you have the lcc bin directory in the PATH
-        (and no other compiler bin dirs),
-      - change to libmikmod-3.1.11/win32,
-      - check Makefile.lcc for any needed changes, and
-      - use make -f Makefile.lcc.
+  version is needed. I currently use version 3.7 compiled on Jan 20 2002.
+  A version half a year old did not work. To compile
+  - check that you have the lcc bin directory in the PATH
+    (and no other compiler bin dirs),
+  - change to libmikmod-3.1.11/win32,
+  - check Makefile.lcc for any needed changes, and
+  - use make -f Makefile.lcc.
 
-  - Different fixes for the direct sound driver:
-    - Pausing did only work for half of the buffer.
-    - Restarting the player did not work as the output thread was removed
-      in DS_PlayStop().
-    - Removed busy waiting for end of thread.
-    - Sound output is started immediately on the first call to DS_Update()
-      to be consistent with other non threaded drivers.
-    - Different small clean ups.
+- Different fixes for the direct sound driver:
+  - Pausing did only work for half of the buffer.
+  - Restarting the player did not work as the output thread was removed
+    in DS_PlayStop().
+  - Removed busy waiting for end of thread.
+  - Sound output is started immediately on the first call to DS_Update()
+    to be consistent with other non threaded drivers.
+  - Different small clean ups.
 
-  - In MikMod_Reset() the raw output driver driver did not use the
-    filename set via the cmdline.
+- In MikMod_Reset() the raw output driver driver did not use the
+  filename set via the cmdline.
 
 
 Summary of changes between libmikmod 3.1.9 and libmikmod 3.1.10 (Arlanc):

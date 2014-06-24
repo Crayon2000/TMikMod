@@ -1,7 +1,7 @@
 This is mikmod.info, produced by makeinfo version 4.13 from mikmod.texi.
 
-Copyright (C) 1998, 1999, 2000, 2001, 2002 Miodrag Vallat and others --
-see file AUTHORS for complete list.
+Copyright (C) 1998-2014 Miodrag Vallat and others -- see file AUTHORS
+for complete list.
 
    This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU Library General Public License as
@@ -29,7 +29,7 @@ File: mikmod.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
 MikMod Sound Library
 ********************
 
-This manual documents the MikMod Sound Library, version 3.3.3.
+This manual documents the MikMod Sound Library, version 3.3.6.
 
 * Menu:
 
@@ -1516,7 +1516,45 @@ The following errors are currently defined:
      This error occurs when the HP driver can not set the requested
      sample rate.
 
-4.3.4.6 Open Sound System Driver Specific Errors
+4.3.4.6 ALSA Driver Specific Errors
+...................................
+
+`MMERR_ALSA_NOCONFIG'
+     This error occurs when no ALSA playback configuration is available.
+
+`MMERR_ALSA_SETPARAMS'
+     This error occurs when the ALSA driver can not set the requested
+     sample format, sample rate, number of channels, access type, or
+     latency values.
+
+`MMERR_ALSA_SETFORMAT'
+     This error occurs when the ALSA driver can not set the requested
+     sample format.
+
+`MMERR_ALSA_SETRATE'
+     This error occurs when the ALSA driver does not support the
+     requested sample rate.
+
+`MMERR_ALSA_SETCHANNELS'
+     This error occurs when the ALSA driver does not support the
+     requested number of channels.
+
+`MMERR_ALSA_BUFFERSIZE'
+     This error occurs when the ALSA driver can not retrieve the buffer
+     or period size.
+
+`MMERR_ALSA_PCM_START'
+     This error occurs when the ALSA driver can not start the pcm
+     playback.
+
+`MMERR_ALSA_PCM_WRITE'
+     This error occurs when the ALSA driver encounters a write error.
+
+`MMERR_ALSA_PCM_RECOVER'
+     This error occurs when the ALSA driver encounters an error
+     recovery failure.
+
+4.3.4.7 Open Sound System Driver Specific Errors
 ................................................
 
 `MMERR_OSS_SETFRAGMENT'
@@ -1535,7 +1573,7 @@ The following errors are currently defined:
      This error occurs when the OSS driver can not set the requested
      number of channels.
 
-4.3.4.7 SGI Driver Specific Errors
+4.3.4.8 SGI Driver Specific Errors
 ..................................
 
 `MMERR_SGI_MONO'
@@ -1554,14 +1592,14 @@ The following errors are currently defined:
 `MMERR_SGI_8BIT'
      This error occurs when the hardware only supports 8 bit sound.
 
-4.3.4.8 Sun Driver Specific Error
+4.3.4.9 Sun Driver Specific Error
 .................................
 
 `MMERR_SUN_INIT'
      This error occurs when the sound device initialization failed.
 
-4.3.4.9 OS/2 Driver Specific Errors
-...................................
+4.3.4.10 OS/2 Driver Specific Errors
+....................................
 
 `MMERR_OS2_MIXSETUP'
      This error occurs when the DART driver can not set the mixing
@@ -1579,7 +1617,7 @@ The following errors are currently defined:
      This error occurs when the MMPM/2 driver can not create the timer
      needed for playback.
 
-4.3.4.10 DirectX Driver Specific Errors
+4.3.4.11 DirectX Driver Specific Errors
 .......................................
 
 `MMERR_DS_BUFFER'
@@ -1610,7 +1648,7 @@ The following errors are currently defined:
      This error occurs when the DirectX driver can not initialize the
      playback thread.
 
-4.3.4.11 Windows Multimedia API Driver Specific Errors
+4.3.4.12 Windows Multimedia API Driver Specific Errors
 ......................................................
 
 `MMERR_WINMM_ALLOCATED'
@@ -1633,7 +1671,7 @@ The following errors are currently defined:
      This error should not occur ! If you get this error, please
      contact the libmikmod development mailing list.
 
-4.3.4.12 MacOS Driver Specific Errors
+4.3.4.13 MacOS Driver Specific Errors
 .....................................
 
 `MMERR_MAC_SPEED'
@@ -1651,14 +1689,16 @@ The following errors are currently defined:
      audio device! If this happens, please contact the maintainer.
 
 `MMERR_OSX_BAD_PROPERTY'
-     This error occurs...
+     This error occurs when the driver encounters a bad parameter when
+     setting device the properties.
 
 `MMERR_OSX_UNSUPPORTED_FORMAT'
      This error occurs when the detected audio device does not support
      the required format (Linear PCM).
 
 `MMERR_OSX_SET_STEREO'
-     This error occurs...
+     This error occurs when the driver does not support the requested
+     channels setting.
 
 `MMERR_OSX_BUFFER_ALLOC'
      This error occurs if the driver fails to allocate the audio
@@ -3217,6 +3257,14 @@ mixing.
      Start the nas server on the machine you want, and set its hostname
      with the `server' driver command line argument.
 
+`drv_pulseaudio'
+     This driver works with the "PulseAudio" server.
+     Start the pulseaudio server on the machine you want, set the
+     server name with `server' and the device name with `sink' driver
+     command line arguments. Without the optional `server' and `sink'
+     arguments, the driver leaves the server:device decision to the
+     pulseaudio library defaults.
+
 
 File: mikmod.info,  Node: Hardware Drivers,  Next: Disk Writer Drivers,  Prev: Network Drivers,  Up: Driver Reference
 
@@ -3243,6 +3291,12 @@ this list:
      This driver is only available under OS/2 version 3 and higher
      (Warp), and uses the "Direct Audio Real-Time" interface.
      This driver only supports software mixing.
+
+`drv_dc'
+     This driver is only for the Dreamcast platform, and outputs a
+     stream to the AICA SPU of a Dreamcast.
+     This driver only supports software mixing. This driver is not
+     tested yet.
 
 `drv_ds'
      This driver is only available under WIN32, and uses the
@@ -3542,44 +3596,44 @@ Type and Variable Index
 
 
 Tag Table:
-Node: Top1017
-Node: Introduction1468
-Node: Tutorial2347
-Node: MikMod Concepts3077
-Node: A Skeleton Program4042
-Node: Playing Modules5600
-Node: Playing Sound Effects9402
-Node: More Sound Effects13372
-Ref: More Sound Effects-Footnote-115800
-Node: Using the Library15986
-Node: Library Version16387
-Node: Type Definitions18562
-Node: Error Handling19613
-Node: Library Initialization21249
-Ref: Library Initialization-Footnote-124484
-Node: Samples and Voice Control24588
-Node: Modules and Player Control27450
-Node: Loading Data from Memory31750
-Node: Library Reference32668
-Node: Variable Reference33100
-Node: Structure Reference38150
-Node: Error Reference49363
-Ref: Error Reference-Footnote-161379
-Node: Function Reference61540
-Node: Library Core Functions61935
-Node: Module Player Functions74575
-Node: Sample Functions86028
-Node: Voice Functions88206
-Node: Loader Reference94598
-Node: Module Loaders94806
-Node: Sample Loaders101795
-Node: Driver Reference102093
-Node: Network Drivers102346
-Node: Hardware Drivers103440
-Node: Disk Writer Drivers107603
-Node: Other Drivers108444
-Node: Index109484
-Node: Function Index109652
-Node: Type and Variable Index116858
+Node: Top998
+Node: Introduction1449
+Node: Tutorial2328
+Node: MikMod Concepts3058
+Node: A Skeleton Program4023
+Node: Playing Modules5581
+Node: Playing Sound Effects9383
+Node: More Sound Effects13353
+Ref: More Sound Effects-Footnote-115781
+Node: Using the Library15967
+Node: Library Version16368
+Node: Type Definitions18543
+Node: Error Handling19594
+Node: Library Initialization21230
+Ref: Library Initialization-Footnote-124465
+Node: Samples and Voice Control24569
+Node: Modules and Player Control27431
+Node: Loading Data from Memory31731
+Node: Library Reference32649
+Node: Variable Reference33081
+Node: Structure Reference38131
+Node: Error Reference49344
+Ref: Error Reference-Footnote-162648
+Node: Function Reference62809
+Node: Library Core Functions63204
+Node: Module Player Functions75844
+Node: Sample Functions87297
+Node: Voice Functions89475
+Node: Loader Reference95867
+Node: Module Loaders96075
+Node: Sample Loaders103064
+Node: Driver Reference103362
+Node: Network Drivers103615
+Node: Hardware Drivers105088
+Node: Disk Writer Drivers109456
+Node: Other Drivers110297
+Node: Index111337
+Node: Function Index111505
+Node: Type and Variable Index118711
 
 End Tag Table

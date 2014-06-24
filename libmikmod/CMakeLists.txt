@@ -24,32 +24,30 @@
 # (This copyright notice applies only to this file)
 
 PROJECT(libmikmod C)
-SET(VERSION "3.3.3")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 LIST(APPEND CMAKE_MODULE_PATH "${libmikmod_SOURCE_DIR}/cmake")
 
-# This is the equivalent to perform a "make dist"/"make distdir" etc.
+SET(LIBMIKMOD_MAJOR_VERSION 3)
+SET(LIBMIKMOD_MINOR_VERSION 3)
+SET(LIBMIKMOD_MICRO_VERSION 6)
+
+SET(VERSION "${LIBMIKMOD_MAJOR_VERSION}.${LIBMIKMOD_MINOR_VERSION}.${LIBMIKMOD_MICRO_VERSION}")
+SET(LIBMIKMOD_VERSION "${LIBMIKMOD_MAJOR_VERSION}.${LIBMIKMOD_MINOR_VERSION}.${LIBMIKMOD_MICRO_VERSION}")
+SET(CPACK_PACKAGE_VERSION_MAJOR ${LIBMIKMOD_MAJOR_VERSION})
+SET(CPACK_PACKAGE_VERSION_MINOR ${LIBMIKMOD_MINOR_VERSION})
+SET(CPACK_PACKAGE_VERSION_PATCH ${LIBMIKMOD_MICRO_VERSION})
+
+# package generation (make package[_source])
 SET(CPACK_PACKAGE_NAME "libmikmod")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "libmikmod - a module file playing and sound library")
 SET(CPACK_PACKAGE_VENDOR "Shlomi Fish")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING.LESSER")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING.LESSER")
 
-STRING (REGEX MATCHALL "([0-9]+)" VERSION_DIGITS "${VERSION}")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_DESCRIPTION_SUMMARY} ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 
-LIST(GET VERSION_DIGITS 0 CPACK_PACKAGE_MAJOR_VERSION)
-LIST(GET VERSION_DIGITS 1 CPACK_PACKAGE_MINOR_VERSION)
-LIST(GET VERSION_DIGITS 2 CPACK_PACKAGE_MICRO_VERSION)
-
-SET(LIBMIKMOD_VERSION "${VERSION}")
-SET(LIBMIKMOD_MAJOR_VERSION "${CPACK_PACKAGE_MAJOR_VERSION}")
-SET(LIBMIKMOD_MINOR_VERSION "${CPACK_PACKAGE_MINOR_VERSION}")
-SET(LIBMIKMOD_MICRO_VERSION "${CPACK_PACKAGE_MICRO_VERSION}")
-
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_DESCRIPTION_SUMMARY} ${CPACK_PACKAGE_MAJOR_VERSION}.${CPACK_PACKAGE_MINOR_VERSION}.${CPACK_PACKAGE_MICRO_VERSION}")
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_MAJOR_VERSION}.${CPACK_PACKAGE_MINOR_VERSION}.${CPACK_PACKAGE_MICRO_VERSION}")
-
-SET (base_with_ver "libmikmod-[0-9]+\\\\.[0-9]+\\\\.[0-9]+")
+SET(base_with_ver "libmikmod-[0-9]+\\\\.[0-9]+\\\\.[0-9]+")
 SET(CPACK_SOURCE_IGNORE_FILES
     "/_CPack_Packages/"
     "/CMakeFiles/"
@@ -71,8 +69,6 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "/CPackSourceConfig\\\\.cmake$"
     "/tags$"
     "/libmikmod-config$"
-    "/libfreecell-solver\\\\.pc$"
-    "/([0-9]+)\\\\.board$"
     "^config\\\\.h$"
     "/install_manifest\\\\.txt$"
     "/t/card-test-(parse|render)\\\\.c$"
@@ -83,44 +79,92 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "/autom4te.cache/"
 )
 
-IF(WIN32 AND NOT UNIX)
-    # There is a bug in NSI that does not handle full unix paths properly. Make
-    # sure there is at least one set of four (4) backlasshes.
-    SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\dondorf-king.bmp")
-    SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\fc-solve.exe")
-    SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\mikmod.shlomifish.org")
-    SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\mikmod.shlomifish.org")
-    SET(CPACK_NSIS_DISPLAY_NAME "libmikmod")
-    SET(CPACK_NSIS_CONTACT "shlomif@cpan.org")
-    SET(CPACK_NSIS_MODIFY_PATH ON)
-    # Setting for NSIS :
-    SET(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\fc-solve.ico")
-    SET(CPACK_NSIS_MUI_UNIICON ${CPACK_NSIS_MUI_ICON})
-    SET(CPACK_PACKAGE_ICON ${CPACK_NSIS_MUI_ICON})
-    SET(CPACK_NSIS_MODIFY_PATH "ON")
-ELSE(WIN32 AND NOT UNIX)
-    # SET(CPACK_STRIP_FILES "fc-solve")
-    # SET(CPACK_SOURCE_STRIP_FILES "")
-ENDIF(WIN32 AND NOT UNIX)
-
+IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 SET (ENABLE_ALSA 1 CACHE BOOL "Include the ALSA driver")
-SET (ENABLE_ESD 0 CACHE BOOL "Include the EsounD (Enlightened Sound Daemon) driver")
-SET (ENABLE_OPENAL 0 CACHE BOOL "Include the OpenAL driver")
+ELSE()
+SET (ENABLE_ALSA 0)
+ENDIF()
+
+IF(UNIX AND NOT APPLE)
 SET (ENABLE_OSS 1 CACHE BOOL "Include the OSS driver")
+SET (ENABLE_ESD 0 CACHE BOOL "Include the EsounD (Enlightened Sound Daemon) driver")
+SET (ENABLE_PULSE 1 CACHE BOOL "Include the PulseAudio driver")
+SET (ENABLE_NAS 0 CACHE BOOL "Include the Network Audio System driver")
+SET (ENABLE_AF 0 CACHE BOOL "Include the DEC AudioFile server (AF) driver")
+ELSE()
+SET (ENABLE_AF 0)
+SET (ENABLE_OSS 0)
+SET (ENABLE_PULSE 0)
+SET (ENABLE_ESD 0)
+SET (ENABLE_NAS 0)
+ENDIF()
+
+IF(CMAKE_SYSTEM_NAME MATCHES "kNetBSD.*|NetBSD.*|kOpenBSD.*|OpenBSD.*|Solaris.*")
+SET (ENABLE_SUNAUDIO 1 CACHE BOOL "Include the SunAudio (or compatibles) driver")
+ELSE()
+SET (ENABLE_SUNAUDIO 0)
+ENDIF()
+
+IF(CMAKE_SYSTEM_NAME MATCHES "AIX.*")
+SET (ENABLE_AIX 1 CACHE BOOL "Include the AIX audio driver")
+ELSE()
+SET (ENABLE_AIX 0)
+ENDIF()
+
+IF(CMAKE_SYSTEM_NAME MATCHES "HP-UX.*")
+SET (ENABLE_AIX 1 CACHE BOOL "Include the HP-UX audio driver")
+ELSE()
+SET (ENABLE_HPUX 0)
+ENDIF()
+
+IF(WIN32)
+SET (ENABLE_DSOUND 1 CACHE BOOL "Include the DirectSound driver")
+SET (ENABLE_MMSOUND 1 CACHE BOOL "Include the Windows MCI driver")
+SET (ENABLE_XAUDIO2 0 CACHE BOOL "Include the XAudio2 driver")
+SET (ENABLE_XAUDIO28 0 CACHE BOOL "Use XAudio2.8 for Windows8 instead of XAudio2.7")
+ELSE()
+SET (ENABLE_DSOUND 0)
+SET (ENABLE_MMSOUND 0)
+SET (ENABLE_XAUDIO2 0)
+SET (ENABLE_XAUDIO28 0)
+ENDIF()
+
+IF(APPLE)
+SET (ENABLE_COREAUDIO 1 CACHE BOOL "Include the CoreAudio driver")
+ELSE()
+SET (ENABLE_COREAUDIO 0)
+ENDIF()
+
+SET (ENABLE_OPENAL 0 CACHE BOOL "Include the OpenAL driver")
 SET (ENABLE_SDL 0 CACHE BOOL "Include the SDL driver")
+
+IF(UNIX)
 SET (ENABLE_STDOUT 1 CACHE BOOL "Support for output to stdout")
 SET (ENABLE_PIPE 1 CACHE BOOL "Support for output via a pipe to another command")
-SET (ENABLE_DL 0 CACHE BOOL "Load ALSA and Ultra Drivers at Runtime")
+ELSE()
+SET (ENABLE_STDOUT 0)
+SET (ENABLE_PIPE 0)
+ENDIF()
+
+SET (ENABLE_AIFF 1 CACHE BOOL "Support for output to an .aiff file")
+SET (ENABLE_WAV 1 CACHE BOOL "Support for output to a .wav file")
+SET (ENABLE_RAW 1 CACHE BOOL "Support for output raw pcm data to a file")
+
+IF(NOT WIN32)
+SET (ENABLE_DL 0 CACHE BOOL "Load ALSA and EsounD drivers at runtime")
+SET (ENABLE_THREADS 1 CACHE BOOL "build a thread-safe version of libmikmod") # only for pthreads.
+ELSE()
+SET (ENABLE_DL 0)
+SET (ENABLE_THREADS 0) # windows builds have it using win32api already.
+ENDIF()
+
 SET (ENABLE_SIMD 0 CACHE BOOL "Use SIMD (AltiVec or SSE2) optimizations (Unstable!)")
-SET (ENABLE_THREADS 1 CACHE BOOL "build a thread-safe version of libmikmod")
-SET (ENABLE_RPATH "1" CACHE BOOL "Whether to use an rpath when linking" )
-SET (ENABLE_STATIC "1" CACHE BOOL "Whether to build the static library (which takes more time)" )
+SET (ENABLE_RPATH 1 CACHE BOOL "Whether to use an rpath when linking" )
+SET (ENABLE_STATIC 1 CACHE BOOL "Whether to build the static library (which takes more time)" )
 
 ### This is to set the RPATH correctly, so when installed
 ### under a prefix the executables will find the libraries.
 ### See:  http://www.cmake.org/Wiki/CMake_RPATH_handling
-### (Taken from that wiki page)
-
 IF (ENABLE_RPATH)
     # use, i.e. don't skip the full RPATH for the build tree
     SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -135,18 +179,18 @@ IF (ENABLE_RPATH)
     # add the automatically determined parts of the RPATH
     # which point to directories outside the build tree to the install RPATH
     SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-#ELSE(ENABLE_RPATH)
+ELSE(ENABLE_RPATH)
 #   SET (CMAKE_SKIP_RPATH YES)
 ENDIF(ENABLE_RPATH)
 
-include(${libmikmod_SOURCE_DIR}/cmake/macros.cmake)
 INCLUDE(CPack)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 INCLUDE(CheckCCompilerFlag)
-INCLUDE(FindThreads)
+INCLUDE(CheckCSourceCompiles)
 include(FindPkgConfig)
 include(TestBigEndian)
+include(mik_macros)
 
 ADD_SUBDIRECTORY ("dlapi")
 ADD_SUBDIRECTORY ("docs")
@@ -160,17 +204,19 @@ ADD_SUBDIRECTORY ("mmio")
 ADD_SUBDIRECTORY ("os2")
 ADD_SUBDIRECTORY ("playercode")
 ADD_SUBDIRECTORY ("posix")
-ADD_SUBDIRECTORY ("t")
 ADD_SUBDIRECTORY ("win32")
 
 SET(COMPILER_FLAGS_TO_CHECK
     "-Wall" "-Werror=implicit-function-declaration"
-    # -fvisibility=hidden check is down below
 )
+
+IF (APPLE)
+    LIST(APPEND COMPILER_FLAGS_TO_CHECK "-fno-common")
+ENDIF()
 
 IF (CPU_ARCH)
     LIST(APPEND COMPILER_FLAGS_TO_CHECK "-march=${CPU_ARCH}")
-ENDIF(CPU_ARCH)
+ENDIF()
 
 IF (ENABLE_SIMD)
     IF(CMAKE_SYSTEM_PROCESSOR MATCHES "^i.86$")
@@ -189,13 +235,7 @@ IF (ENABLE_SIMD)
     ENDIF(CMAKE_SYSTEM_PROCESSOR MATCHES "^i.86$")
 ENDIF(ENABLE_SIMD)
 
-SET (IS_DEBUG "")
 IF ((CMAKE_BUILD_TYPE STREQUAL debug) OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo))
-    SET (IS_DEBUG 1)
-
-    # Removed these flags because they emitted spurious warnings, which were of
-    # no use to us:
-    # "-Winline"
     IF (${CMAKE_COMPILER_IS_GNUCC})
         ADD_DEFINITIONS(
             "-Wold-style-declaration"
@@ -216,12 +256,12 @@ IF ((CMAKE_BUILD_TYPE STREQUAL debug) OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebIn
             "-Wold-style-definition"
             "-Wdeclaration-after-statement"
         )
-    ENDIF (${CMAKE_COMPILER_IS_GNUCC})
-ENDIF ((CMAKE_BUILD_TYPE STREQUAL debug) OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo))
+    ENDIF()
+ENDIF()
 
 IF (CMAKE_BUILD_TYPE STREQUAL release)
     LIST(APPEND COMPILER_FLAGS_TO_CHECK "-flto")
-ENDIF (CMAKE_BUILD_TYPE STREQUAL release)
+ENDIF()
 
 SET (IDX 1)
 FOREACH (CFLAG_TO_CHECK ${COMPILER_FLAGS_TO_CHECK})
@@ -230,7 +270,6 @@ FOREACH (CFLAG_TO_CHECK ${COMPILER_FLAGS_TO_CHECK})
     CHECK_C_COMPILER_FLAG("${CFLAG_TO_CHECK}" ${FLAG_EXISTS_VAR})
     IF (${FLAG_EXISTS_VAR})
         ADD_DEFINITIONS(${CFLAG_TO_CHECK})
-        LIST(APPEND MY_LINK_FLAGS "${CFLAG_TO_CHECK}")
     ENDIF (${FLAG_EXISTS_VAR})
 ENDFOREACH(CFLAG_TO_CHECK)
 
@@ -252,24 +291,33 @@ ENDIF()
 
 TEST_BIG_ENDIAN(WORDS_BIGENDIAN)
 
-# So it can find the includes when building libavl.avl.h.
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
-INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+# to find mikmod_internals.h:
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_SOURCE_DIR})
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_SOURCE_DIR}/include")
 
-# So it can find config.h and mikmod.h
-INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-FILE (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include")
-INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/include")
+# to find config.h and mikmod[_build].h:
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_BINARY_DIR})
+FILE (MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_BINARY_DIR}/include")
 
 CHECK_MULTI_INCLUDE_FILES(
-    "dlfcn.h" "fcntl.h" "limits.h" "malloc.h" "memory.h" "strings.h" "sys/ioctl.h" "unistd.h"
+    "dlfcn.h" "fcntl.h" "limits.h" "malloc.h" "memory.h" "strings.h" "sys/ioctl.h" "unistd.h" "windows.h"
 )
+
+IF(WIN32 AND NOT HAVE_WINDOWS_H)
+    MESSAGE(FATAL_ERROR "windows.h not found.")
+ENDIF()
+
+IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    CHECK_MULTI_INCLUDE_FILES("alsa/asoundlib.h" "sys/sam9407.h")
+ENDIF()
 
 CHECK_MULTI_FUNCTIONS_EXISTS(
     "posix_memalign" "setenv" "snprintf" "srandom"
 )
 
 CHECK_SYMBOL_EXISTS(RTLD_GLOBAL dlfcn.h HAVE_RTLD_GLOBAL)
+CHECK_SYMBOL_EXISTS(srandom math.h SRANDOM_IN_MATH_H)
 
 ADD_DEFINITIONS("-DHAVE_CONFIG_H")
 # always define MIKMOD_BUILD when building libmikmod
@@ -292,6 +340,7 @@ SET (MIKMOD_LIB_MODULES
     drivers/drv_oss.c
     drivers/drv_osx.c
     drivers/drv_pipe.c
+    drivers/drv_pulseaudio.c
     drivers/drv_raw.c
     drivers/drv_sam9407.c
     drivers/drv_sdl.c
@@ -372,7 +421,7 @@ IF (ENABLE_STATIC)
 ENDIF (ENABLE_STATIC)
 
 SET_TARGET_PROPERTIES(mikmod
-    PROPERTIES VERSION 3.2.0 SOVERSION 3
+    PROPERTIES VERSION 3.3.0 SOVERSION 3
     )
 IF(WIN32)
     SET_TARGET_PROPERTIES(mikmod
@@ -380,129 +429,412 @@ IF(WIN32)
     )
 ENDIF(WIN32)
 
-IF (UNIX AND ENABLE_PIPE)
-    SET(DRV_PIPE 1)
-ENDIF(UNIX AND ENABLE_PIPE)
-IF (UNIX AND ENABLE_STDOUT)
-    SET(DRV_STDOUT 1)
-ENDIF(UNIX AND ENABLE_STDOUT)
+IF(ENABLE_PIPE)
+  SET(DRV_PIPE 1)
+ELSE()
+  SET(DRV_PIPE)
+ENDIF()
 
+IF(ENABLE_STDOUT)
+  SET(DRV_STDOUT 1)
+ELSE()
+  SET(DRV_STDOUT)
+ENDIF()
+
+IF(ENABLE_AIFF)
 SET(DRV_AIFF 1)
+ELSE()
+SET(DRV_AIFF)
+ENDIF()
 
-IF (ENABLE_SIMD)
-    SET(MIKMOD_SIMD 1)
-ENDIF (ENABLE_SIMD)
+IF(ENABLE_WAV)
+SET(DRV_WAV 1)
+ELSE()
+SET(DRV_WAV)
+ENDIF()
+
+IF(ENABLE_RAW)
+SET(DRV_RAW 1)
+ELSE()
+SET(DRV_RAW)
+ENDIF()
+
+IF(ENABLE_SIMD)
+  SET(MIKMOD_SIMD 1)
+ELSE()
+  SET(MIKMOD_SIMD)
+ENDIF()
 
 IF (ENABLE_DL)
-    SET(MIKMOD_DYNAMIC 1)
-ENDIF (ENABLE_DL)
+  SET(MIKMOD_DYNAMIC 1)
+ELSE()
+  SET(MIKMOD_DYNAMIC)
+ENDIF()
 
 SET(EXTRA_LIBS )
 
-INCLUDE (FindThreads)
-
-IF (CMAKE_THREAD_LIBS_INIT)
+SET(HAVE_PTHREAD)
+IF (NOT WIN32)
+ INCLUDE(FindThreads)
+ IF (CMAKE_THREAD_LIBS_INIT)
   IF (ENABLE_THREADS)
     LIST (APPEND EXTRA_LIBS ${CMAKE_THREAD_LIBS_INIT})
     IF (CMAKE_USE_PTHREADS_INIT)
         SET (HAVE_PTHREAD 1)
-    ENDIF (CMAKE_USE_PTHREADS_INIT)
-  ENDIF (ENABLE_THREADS)
-ENDIF (CMAKE_THREAD_LIBS_INIT)
+    ENDIF()
+  ENDIF()
+ ENDIF()
+ENDIF()
 
-INCLUDE(CheckLibraryExists)
+IF (ENABLE_PULSE)
+    PKG_CHECK_MODULES(PKG_PULSESIMPLE "libpulse-simple")
+    IF(PKG_PULSESIMPLE_FOUND)
+        SET(DRV_PULSEAUDIO 1)
+        SET(PULSESIMPLE_LIBRARIES ${PKG_PULSESIMPLE_LDFLAGS})
+        ADD_DEFINITIONS (${PKG_PULSESIMPLE_CFLAGS})
+    ELSE()
+        find_path(PULSESIMPLE_INCLUDE_DIR "pulse/simple.h")
+        find_library(PULSESIMPLE_LIBRARIES "pulse-simple")
+        IF (PULSESIMPLE_LIBRARIES STREQUAL "PULSESIMPLE_LIBRARIES-NOTFOUND")
+            MESSAGE(STATUS "Could NOT find PulseAudio.")
+            SET(ENABLE_PULSE 0)
+            SET(DRV_PULSEAUDIO)
+            MESSAGE(WARNING "PulseAudio support is disabled.")
+        ELSE()
+            MESSAGE(STATUS "Found PulseAudio: ${PULSESIMPLE_LIBRARIES}")
+            SET(DRV_PULSEAUDIO 1)
+            INCLUDE_DIRECTORIES(${PULSESIMPLE_INCLUDE_DIR})
+        ENDIF()
+    ENDIF()
+    IF(ENABLE_PULSE)
+      LIST (APPEND EXTRA_LIBS ${PULSESIMPLE_LIBRARIES})
+    ENDIF()
+ELSE()
+    SET(DRV_PULSEAUDIO)
+ENDIF(ENABLE_PULSE)
 
 IF (ENABLE_ESD)
     PKG_CHECK_MODULES(PKG_ESD esound)
     IF(PKG_ESD_FOUND)
         SET(DRV_ESD 1)
-        LIST (APPEND EXTRA_LIBS ${PKG_ESD_LDFLAGS})
+        SET(ESD_LIBRARIES ${PKG_ESD_LDFLAGS})
         ADD_DEFINITIONS (${PKG_ESD_CFLAGS})
     ELSE(PKG_ESD_FOUND)
-        SET (ENABLE_ESD 0)
+        find_path(ESD_INCLUDE_DIR esd.h)
+        find_library(ESD_LIBRARIES esd)
+        IF (ESD_LIBRARIES STREQUAL "ESD_LIBRARIES-NOTFOUND")
+            MESSAGE(STATUS "Could NOT find EsounD.")
+            SET(ENABLE_ESD 0)
+            SET(DRV_ESD)
+            MESSAGE(WARNING "EsounD support is disabled.")
+        ELSE()
+            MESSAGE(STATUS "Found EsounD: ${ESD_LIBRARIES}")
+            SET(DRV_ESD 1)
+            INCLUDE_DIRECTORIES(${ESD_INCLUDE_DIR})
+        ENDIF()
     ENDIF(PKG_ESD_FOUND)
+    IF(ENABLE_ESD AND NOT ENABLE_DL)
+      LIST (APPEND EXTRA_LIBS ${ESD_LIBRARIES})
+    ENDIF()
+ELSE()
+    SET(DRV_ESD)
 ENDIF(ENABLE_ESD)
 
+IF (ENABLE_NAS)
+  CHECK_INCLUDE_FILE("audio/audiolib.h" HAVE_AUDIO_AUDIOLIB_H)
+  find_library(NAS_LIBRARIES audio)
+  IF(NOT (NAS_LIBRARIES STREQUAL "NAS_LIBRARIES-NOTFOUND"))
+    SET(OLD_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES}")
+    SET(CMAKE_REQUIRED_LIBRARIES "audio")
+    CHECK_FUNCTION_EXISTS(AuCreateFlow NAS_LIBS_OK)
+    SET(CMAKE_REQUIRED_LIBRARIES "${OLD_REQUIRED_LIBRARIES}")
+  ENDIF()
+  IF((NOT NAS_LIBS_OK) OR (NOT HAVE_AUDIO_AUDIOLIB_H))
+    MESSAGE(STATUS "Could not find NAS.")
+    SET(ENABLE_NAS 0)
+    SET(DRV_NAS)
+    MESSAGE(WARNING "NAS (Network Audio System) support is disabled.")
+  ELSE()
+    MESSAGE(STATUS "Found NAS: ${NAS_LIBRARIES}")
+    SET(DRV_NAS 1)
+    LIST (APPEND EXTRA_LIBS ${NAS_LIBRARIES})
+  ENDIF()
+ELSE()
+  SET(DRV_NAS)
+ENDIF(ENABLE_NAS)
+
+IF (ENABLE_AF)
+  CHECK_INCLUDE_FILE("AF/AFlib.h" HAVE_AF_AFLIB_H)
+  find_library(AF_LIBRARIES AF)
+  IF(NOT (AF_LIBRARIES STREQUAL "AF_LIBRARIES-NOTFOUND"))
+    SET(OLD_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES}")
+    SET(CMAKE_REQUIRED_LIBRARIES "AF")
+    CHECK_FUNCTION_EXISTS(AFOpenAudioConn AF_LIBS_OK)
+    SET(CMAKE_REQUIRED_LIBRARIES "${OLD_REQUIRED_LIBRARIES}")
+  ENDIF()
+  IF((NOT AF_LIBS_OK) OR (NOT HAVE_AF_AFLIB_H))
+    MESSAGE(STATUS "Could not find DEC AudioFile server.")
+    SET(ENABLE_AF 0)
+    SET(DRV_AF)
+    MESSAGE(WARNING "DEC AudioFile server support is disabled.")
+  ELSE()
+    MESSAGE(STATUS "Found DEC AudioFile server: ${AF_LIBRARIES}")
+    SET(DRV_AF 1)
+    LIST (APPEND EXTRA_LIBS ${AF_LIBRARIES})
+  ENDIF()
+ELSE()
+  SET(DRV_AF)
+ENDIF(ENABLE_AF)
+
 IF (ENABLE_OSS)
-CHECK_MULTI_INCLUDE_FILES("machine/soundcard.h" "sys/soundcard.h")
-IF ("${HAVE_MACHINE_SOUNDCARD_H}" OR "${HAVE_SYS_SOUNDCARD_H}")
+  CHECK_MULTI_INCLUDE_FILES("sys/soundcard.h" "machine/soundcard.h" "soundcard.h")
+
+  # NetBSD and OpenBSD uses ossaudio emulation layer,
+  # otherwise no link library is needed.
+  IF(CMAKE_SYSTEM_NAME MATCHES "kNetBSD.*|NetBSD.*|kOpenBSD.*|OpenBSD.*") # AND HAVE_SOUNDCARD_H ??
+    FIND_LIBRARY(OSSAUDIO_LIBRARIES "ossaudio")
+    IF(OSSAUDIO_LIBRARIES STREQUAL "OSSAUDIO_LIBRARIES-NOTFOUND")
+      SET(OSSAUDIO_LIBRARIES)
+    ELSE()
+      MESSAGE(STATUS "Found libossaudio: ${OSSAUDIO_LIBRARIES}")
+    ENDIF()
+  ELSE()
+    SET(OSSAUDIO_LIBRARIES)
+  ENDIF()
+  SET(OLD_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES}")
+  IF(OSSAUDIO_LIBRARIES)
+       SET(CMAKE_REQUIRED_LIBRARIES ${OSSAUDIO_LIBRARIES})
+  ENDIF()
+
+  IF(HAVE_SYS_SOUNDCARD_H)
+    CHECK_C_SOURCE_COMPILES("#include <sys/ioctl.h>
+                             #include <sys/soundcard.h>
+                             int main() {return SNDCTL_DSP_RESET;}" HAVE_OSS)
+  ELSEIF(HAVE_MACHINE_SOUNDCARD_H)
+    CHECK_C_SOURCE_COMPILES("#include <sys/ioctl.h>
+                             #include <machine/soundcard.h>
+                             int main() {return SNDCTL_DSP_RESET;}" HAVE_OSS)
+  ELSEIF(HAVE_SOUNDCARD_H)
+    CHECK_C_SOURCE_COMPILES("#include <sys/ioctl.h>
+                             #include <soundcard.h>
+                             int main() {return SNDCTL_DSP_RESET;}" HAVE_OSS)
+  ELSE()
+    SET (HAVE_OSS)
+  ENDIF()
+  SET(CMAKE_REQUIRED_LIBRARIES "${OLD_REQUIRED_LIBRARIES}")
+
+  IF(HAVE_OSS)
     SET (DRV_OSS 1)
-ENDIF ("${HAVE_MACHINE_SOUNDCARD_H}" OR "${HAVE_SYS_SOUNDCARD_H}")
+    IF(OSSAUDIO_LIBRARIES)
+      LIST(APPEND EXTRA_LIBS ${OSSAUDIO_LIBRARIES})
+    ENDIF()
+  ELSE()
+    SET (ENABLE_OSS 0)
+    SET (DRV_OSS)
+    MESSAGE(WARNING "OSS support is disabled.")
+  ENDIF()
+ELSE()
+  SET (DRV_OSS)
 ENDIF (ENABLE_OSS)
 
 IF (ENABLE_ALSA)
-include(FindALSA)
-IF (ALSA_FOUND)
-    SET (HAVE_ALSA_ASOUNDLIB_H "1")
-    ADD_DEFINITIONS("-DHAVE_ALSA_ASOUNDLIB_H=1")
+  include(FindALSA)
+  IF (ALSA_FOUND)
     SET (DRV_ALSA 1)
-ENDIF (ALSA_FOUND)
+    IF(NOT ENABLE_DL)
+      LIST (APPEND EXTRA_LIBS ${ALSA_LIBRARIES})
+    ENDIF()
+  ELSE()
+    SET (ENABLE_ALSA 0)
+    SET (DRV_ALSA)
+    MESSAGE(WARNING "ALSA support is disabled.")
+  ENDIF()
+ELSE()
+  SET (DRV_ALSA)
 ENDIF(ENABLE_ALSA)
 
+IF (ENABLE_SUNAUDIO)
+  CHECK_MULTI_INCLUDE_FILES("sys/audioio.h" "sun/audioio.h")
+  IF ("${HAVE_SYS_AUDIOIO_H}" OR "${HAVE_SUN_AUDIOIO_H}")
+    SET (DRV_SUN 1)
+  ELSE()
+    SET (ENABLE_SUNAUDIO 0)
+    SET (DRV_SUN)
+    MESSAGE(WARNING "SunAudio driver support is disabled.")
+  ENDIF()
+ELSE()
+  SET (DRV_SUN)
+ENDIF (ENABLE_SUNAUDIO)
+
+IF (ENABLE_AIX)
+  CHECK_MULTI_INCLUDE_FILES("sys/audio.h" "sys/acpa.h")
+  IF ("${HAVE_SYS_AUDIO_H}" AND "${HAVE_SYS_ACPA_H}")
+    SET (DRV_AIX 1)
+  ELSE()
+    SET (ENABLE_AIX 0)
+    SET (DRV_AIX)
+    MESSAGE(WARNING "AIX audio driver support is disabled.")
+  ENDIF()
+ELSE()
+  SET (DRV_AIX)
+ENDIF (ENABLE_AIX)
+
+IF (ENABLE_HPUX)
+  CHECK_INCLUDE_FILE("sys/audio.h" HAVE_SYS_AUDIO_H)
+  IF ("${HAVE_SYS_AUDIO_H}")
+    SET (DRV_HPUX 1)
+  ELSE()
+    SET (ENABLE_HPUX 0)
+    SET (DRV_HPUX)
+    MESSAGE(WARNING "HP-UX audio driver support is disabled.")
+  ENDIF()
+ELSE()
+  SET (DRV_HPUX)
+ENDIF (ENABLE_HPUX)
+
+IF (ENABLE_COREAUDIO)
+    find_library(COREAUDIO_LIBS CoreAudio)
+    IF (COREAUDIO_LIBS STREQUAL "COREAUDIO_LIBS-NOTFOUND")
+        MESSAGE(STATUS "Could NOT find CoreAudio.")
+        SET (ENABLE_COREAUDIO 0)
+        SET (DRV_OSX)
+        MESSAGE(WARNING "CoreAudio driver support is disabled.")
+    ELSE()
+        MESSAGE(STATUS "Found CoreAudio libs: ${COREAUDIO_LIBS}")
+        SET (DRV_OSX 1)
+        LIST (APPEND EXTRA_LIBS ${COREAUDIO_LIBS})
+    ENDIF()
+ELSE()
+    SET (DRV_OSX)
+ENDIF(ENABLE_COREAUDIO)
+
+IF (ENABLE_MMSOUND)
+    SET (DRV_WIN 1)
+    LIST (APPEND EXTRA_LIBS "winmm")
+ELSE()
+    SET (DRV_WIN)
+ENDIF(ENABLE_MMSOUND)
+
+IF (ENABLE_DSOUND)
+    CHECK_INCLUDE_FILE("dsound.h" HAVE_DSOUND_H)
+    IF (HAVE_DSOUND_H)
+      SET (DRV_DS 1)
+      LIST (APPEND EXTRA_LIBS "dsound")
+    ELSE()
+      SET (ENABLE_DSOUND 0)
+      SET (DRV_DS)
+      MESSAGE(WARNING "DirectSound support is disabled.")
+    ENDIF()
+ELSE()
+    SET (DRV_DS)
+ENDIF(ENABLE_DSOUND)
+
+IF (ENABLE_XAUDIO2)
+    SET(OLD_REQUIRED_DEFINITIONS "${CMAKE_REQUIRED_DEFINITIONS}")
+    IF (ENABLE_XAUDIO28)
+      SET(CMAKE_REQUIRED_DEFINITIONS "-D_WIN32_WINNT=0x0602")
+    ENDIF()
+    CHECK_INCLUDE_FILE("xaudio2.h" HAVE_XAUDIO2_H)
+    SET(CMAKE_REQUIRED_DEFINITIONS "${OLD_REQUIRED_DEFINITIONS}")
+    IF(HAVE_XAUDIO2_H)
+      CHECK_SYMBOL_EXISTS(XAUDIO2_DEBUG_ENGINE xaudio2.h XAUDIO2_7_HEADER)
+      IF (XAUDIO2_7_HEADER AND ENABLE_XAUDIO28)
+        MESSAGE(WARNING "xaudio2.h <= 2.7 and xaudio2.8 enabled - build will likely fail.")
+      ELSEIF((NOT XAUDIO2_7_HEADER) AND (NOT ENABLE_XAUDIO28))
+        MESSAGE(WARNING "xaudio2.h >= 2.8 and xaudio2.8 disabled - build will likely fail.")
+      ENDIF()
+      SET (DRV_XAUDIO2 1)
+      LIST (APPEND EXTRA_LIBS "ole32")
+      IF (ENABLE_XAUDIO28)
+          ADD_DEFINITIONS("-D_WIN32_WINNT=0x0602")
+          SET (DRV_XAUDIO28 1)
+          LIST (APPEND EXTRA_LIBS "xaudio2_8")
+      ELSE()
+          SET (DRV_XAUDIO28)
+      ENDIF()
+    ELSE()
+      SET (ENABLE_XAUDIO2 0)
+      SET (ENABLE_XAUDIO28 0)
+      SET (DRV_XAUDIO2)
+      SET (DRV_XAUDIO28)
+      MESSAGE(WARNING "XAudio2 support is disabled.")
+    ENDIF()
+ELSE()
+    SET (ENABLE_XAUDIO28 0)
+    SET (DRV_XAUDIO2)
+    SET (DRV_XAUDIO28)
+ENDIF(ENABLE_XAUDIO2)
+
 IF (ENABLE_SDL)
-SET (SDL_BUILDING_LIBRARY TRUE)
-include(FindSDL)
-IF (SDL_FOUND)
+  SET (SDL_BUILDING_LIBRARY TRUE)
+  include(FindSDL)
+  IF (SDL_FOUND)
     SET (DRV_SDL 1)
-ENDIF (SDL_FOUND)
+    LIST (APPEND EXTRA_LIBS ${SDL_LIBRARY})
+  ELSE()
+    SET (ENABLE_SDL 0)
+    SET (DRV_SDL)
+    MESSAGE(WARNING "SDL support is disabled.")
+  ENDIF()
+ELSE()
+  SET (DRV_SDL)
 ENDIF(ENABLE_SDL)
 
 IF (ENABLE_OPENAL)
-include(FindOpenAL)
-IF (OPENAL_FOUND)
+  include(FindOpenAL)
+  IF (OPENAL_FOUND)
     SET (DRV_OPENAL 1)
     CHECK_MULTI_INCLUDE_FILES("AL/al.h" "AL/alc.h")
     IF (HAVE_AL_AL_H)
-        # alext.h depends on al.h and alc.h: cmake does
-        # not handle it and CHECK_INCLUDE_FILE fails.
+        # alext.h depends on al.h and alc.h, therefore
+        # a plain CHECK_INCLUDE_FILE() doesn't work.
         CHECK_C_SOURCE_COMPILES("#include <AL/al.h>
                                  #include <AL/alc.h>
                                  #include <AL/alext.h>
                                  int main() {return 0;}" HAVE_AL_ALEXT_H)
-    ENDIF (HAVE_AL_AL_H)
-ENDIF (OPENAL_FOUND)
-ENDIF(ENABLE_OPENAL)
-
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake" "${CMAKE_CURRENT_BINARY_DIR}/config.h")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/mikmod.h")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/mikmod_build.h")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_CURRENT_BINARY_DIR}/macintosh/mikmod.h")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_CURRENT_BINARY_DIR}/macintosh/mikmod_build.h")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_CURRENT_BINARY_DIR}/macosx/mikmod.h")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_CURRENT_BINARY_DIR}/macosx/mikmod_build.h")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_CURRENT_BINARY_DIR}/win32/mikmod.h")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_CURRENT_BINARY_DIR}/win32/mikmod_build.h")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/libmikmod-config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/libmikmod-config")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/libmikmod.pc.cmake" "${CMAKE_CURRENT_BINARY_DIR}/libmikmod.pc" @ONLY)
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/macosx/Info.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/macosx/Info.plist")
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/macosx/InfoPlist.strings.in" "${CMAKE_CURRENT_BINARY_DIR}/macosx/InfoPlist.strings")
-
-IF (ENABLE_OPENAL)
+    ENDIF()
     LIST (APPEND EXTRA_LIBS ${OPENAL_LIBRARY})
-ENDIF (ENABLE_OPENAL)
-
-IF (ENABLE_SDL)
-    LIST (APPEND EXTRA_LIBS ${SDL_LIBRARY})
-ENDIF (ENABLE_SDL)
-
-IF (ENABLE_ALSA AND NOT ENABLE_DL)
-    LIST (APPEND EXTRA_LIBS ${ALSA_LIBRARIES})
-ENDIF (ENABLE_ALSA AND NOT ENABLE_DL)
+  ELSE()
+    SET (ENABLE_OPENAL 0)
+    SET (DRV_OPENAL)
+    MESSAGE(WARNING "OpenAL support is disabled.")
+  ENDIF()
+ELSE()
+  SET (DRV_OPENAL)
+ENDIF(ENABLE_OPENAL)
 
 IF (ENABLE_DL)
 # add -ldl but only if a driver using dlopen() is active
-  IF (ENABLE_ALSA)
+  IF(DRV_ALSA OR DRV_ESD)
     LIST (APPEND EXTRA_LIBS ${CMAKE_DL_LIBS})
-  ENDIF (ENABLE_ALSA)
-ENDIF (ENABLE_DL)
+  ENDIF()
+ENDIF(ENABLE_DL)
 
 IF (UNIX)
     SET(MATH_LIB "m")
 ELSE(UNIX)
     SET(MATH_LIB )
 ENDIF(UNIX)
-
 LIST (APPEND EXTRA_LIBS ${MATH_LIB})
+
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/config.h.cmake" "${CMAKE_BINARY_DIR}/config.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/include/mikmod.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/include/mikmod_build.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/macintosh/mikmod.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/macintosh/mikmod_build.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/macosx/mikmod.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/macosx/mikmod_build.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/win32/mikmod.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/win32/mikmod_build.h")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/macosx/Info.plist.in" "${CMAKE_BINARY_DIR}/macosx/Info.plist")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/macosx/InfoPlist.strings.in" "${CMAKE_BINARY_DIR}/macosx/InfoPlist.strings")
+
+SET(prefix ${CMAKE_INSTALL_PREFIX})
+SET(exec_prefix "\${prefix}")
+SET(libdir "\${exec_prefix}/lib${LIB_SUFFIX}")
+SET(includedir "\${prefix}/include")
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/libmikmod-config.in" "${CMAKE_BINARY_DIR}/libmikmod-config" @ONLY)
+CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/libmikmod.pc.in" "${CMAKE_BINARY_DIR}/libmikmod.pc" @ONLY)
 
 FOREACH (TGT ${LIBMIKMOD_LIBS})
     TARGET_LINK_LIBRARIES ("${TGT}"
@@ -517,31 +849,21 @@ INSTALL(
 )
 
 INSTALL(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/libmikmod-config"
+    FILES "${CMAKE_BINARY_DIR}/libmikmod-config"
     PERMISSIONS GROUP_EXECUTE GROUP_READ OWNER_EXECUTE OWNER_READ OWNER_WRITE WORLD_EXECUTE WORLD_READ
     DESTINATION "bin"
 )
 
 INSTALL(
     FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/include/mikmod.h"
+        "${CMAKE_BINARY_DIR}/include/mikmod.h"
     DESTINATION
         "include"
 )
 
 INSTALL(
     FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/libmikmod.pc"
+        "${CMAKE_BINARY_DIR}/libmikmod.pc"
     DESTINATION
         "lib${LIB_SUFFIX}/pkgconfig"
-)
-
-ADD_CUSTOM_TARGET(
-    "test"
-    "perl" "${CMAKE_CURRENT_SOURCE_DIR}/run-tests.pl"
-)
-
-ADD_DEPENDENCIES(
-    "test"
-    "all"
 )

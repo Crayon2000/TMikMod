@@ -19,11 +19,19 @@
 
 #include "dosdma.h"
 
+#include <go32.h> /* includes sys/version.h (djgpp >= 2.02) */
 #include <dos.h>
 #include <dpmi.h>
 #include <sys/nearptr.h>
 #include <malloc.h>
 #include "mikmod_build.h" /* for MikMod_malloc() & co */
+
+/* BUG WARNING:  there is an error in DJGPP libraries <= 2.01:
+ * src/libc/dpmi/api/d0102.s loads the selector and allocsize
+ * arguments in the wrong order.  DJGPP >= 2.02 have it fixed. */
+#if (!defined(__DJGPP_MINOR__) || (__DJGPP_MINOR__+0) < 2)
+#warning __dpmi_resize_dos_memory() from DJGPP <= 2.01 is broken!
+#endif
 
 __dma_regs dma[8] = {
 /* *INDENT-OFF* */
@@ -107,10 +115,7 @@ dma_buffer *dma_allocate(unsigned int channel, unsigned int size)
 				resize = 0;
 			else {
 				allocsize = maxsize;
-				/* BUG WARNING: there is an error in dpmi.h DJGPP 2.01 library:
-				   the order of "selector" and "alloc size" should be
-				   reversed */
-				if (__dpmi_resize_dos_memory(allocsize, selector, &maxsize) !=
+				if (__dpmi_resize_dos_memory(selector, allocsize, &maxsize) !=
 					0) resize = 0;
 			}
 		}
@@ -138,8 +143,8 @@ dma_buffer *dma_allocate(unsigned int channel, unsigned int size)
 		goto exit;
 	}
 
-	buffer = MikMod_malloc(sizeof(dma_buffer));
-	buffer->linear = (void *)(__djgpp_conventional_base + bound * 16);
+	buffer = (dma_buffer *) MikMod_malloc(sizeof(dma_buffer));
+	buffer->linear = (unsigned char *)(__djgpp_conventional_base + bound * 16);
 	buffer->physical = bound * 16;
 	buffer->size = parsize * 16;
 	buffer->selector = selector;

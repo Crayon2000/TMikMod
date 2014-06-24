@@ -58,9 +58,10 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(srcdir)/libmikmod-config.in $(srcdir)/libmikmod.pc.in \
 	$(srcdir)/libmikmod.spec.in $(top_srcdir)/configure AUTHORS \
-	COPYING.LESSER COPYING.LIB INSTALL NEWS TODO compile \
-	config.guess config.sub depcomp install-sh ltmain.sh missing \
-	mkinstalldirs
+	COPYING.LESSER COPYING.LIB INSTALL NEWS TODO autotools/compile \
+	autotools/config.guess autotools/config.sub autotools/depcomp \
+	autotools/install-sh autotools/ltmain.sh autotools/missing \
+	autotools/mkinstalldirs autotools/texinfo.tex
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/esd.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
@@ -72,7 +73,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = libmikmod-config libmikmod.pc libmikmod.spec
 CONFIG_CLEAN_VPATH_FILES =
@@ -111,10 +112,11 @@ libmikmod_la_DEPENDENCIES = @LTLIBOBJS@
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libmikmod_la_OBJECTS = dlapi/dl_hpux.lo drivers/drv_AF.lo \
 	drivers/drv_aiff.lo drivers/drv_aix.lo drivers/drv_alsa.lo \
-	drivers/drv_dart.lo drivers/drv_ds.lo drivers/drv_esd.lo \
-	drivers/drv_gp32.lo drivers/drv_hp.lo drivers/drv_mac.lo \
-	drivers/drv_nas.lo drivers/drv_nos.lo drivers/drv_openal.lo \
-	drivers/drv_os2.lo drivers/drv_oss.lo drivers/drv_osx.lo \
+	drivers/drv_dart.lo drivers/drv_dc.lo drivers/drv_ds.lo \
+	drivers/drv_esd.lo drivers/drv_gp32.lo drivers/drv_hp.lo \
+	drivers/drv_mac.lo drivers/drv_nas.lo drivers/drv_nos.lo \
+	drivers/drv_openal.lo drivers/drv_os2.lo drivers/drv_oss.lo \
+	drivers/drv_osx.lo drivers/drv_pulseaudio.lo \
 	drivers/drv_pipe.lo drivers/drv_raw.lo drivers/drv_sam9407.lo \
 	drivers/drv_sb.lo drivers/drv_sdl.lo drivers/drv_sgi.lo \
 	drivers/drv_stdout.lo drivers/drv_sun.lo drivers/drv_ultra.lo \
@@ -139,7 +141,7 @@ libmikmod_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(libmikmod_la_LDFLAGS) $(LDFLAGS) -o $@
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -265,6 +267,7 @@ LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
+MANIFEST_TOOL = @MANIFEST_TOOL@
 MIKMOD_LT_AGE = @MIKMOD_LT_AGE@
 MIKMOD_LT_CURRENT = @MIKMOD_LT_CURRENT@
 MIKMOD_LT_REVISION = @MIKMOD_LT_REVISION@
@@ -302,6 +305,7 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
@@ -334,7 +338,6 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
-lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -357,9 +360,7 @@ SUBDIRS = drivers include loaders mmio playercode posix \
 bin_SCRIPTS = libmikmod-config
 EXTRA_DIST = libmikmod-config.in libmikmod.m4 libmikmod.pc.in \
 	     libmikmod.spec.in libmikmod.spec COPYING.LESSER \
-	     libmikmod.pc.cmake libmikmod-config.cmake \
-	     config.h.cmake CMakeLists.txt cmake \
-	     t run-tests.pl
+	     config.h.cmake CMakeLists.txt cmake
 
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libmikmod.m4
@@ -379,6 +380,7 @@ libmikmod_la_SOURCES = \
 		drivers/drv_aix.c \
 		drivers/drv_alsa.c \
 		drivers/drv_dart.c \
+		drivers/drv_dc.c \
 		drivers/drv_ds.c \
 		drivers/drv_esd.c \
 		drivers/drv_gp32.c \
@@ -390,6 +392,7 @@ libmikmod_la_SOURCES = \
 		drivers/drv_os2.c \
 		drivers/drv_oss.c \
 		drivers/drv_osx.c \
+		drivers/drv_pulseaudio.c \
 		drivers/drv_pipe.c \
 		drivers/drv_raw.c \
 		drivers/drv_sam9407.c \
@@ -560,6 +563,8 @@ drivers/drv_alsa.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_dart.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
+drivers/drv_dc.lo: drivers/$(am__dirstamp) \
+	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_ds.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_esd.lo: drivers/$(am__dirstamp) \
@@ -581,6 +586,8 @@ drivers/drv_os2.lo: drivers/$(am__dirstamp) \
 drivers/drv_oss.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_osx.lo: drivers/$(am__dirstamp) \
+	drivers/$(DEPDIR)/$(am__dirstamp)
+drivers/drv_pulseaudio.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_pipe.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
@@ -751,6 +758,8 @@ mostlyclean-compile:
 	-rm -f drivers/drv_alsa.lo
 	-rm -f drivers/drv_dart.$(OBJEXT)
 	-rm -f drivers/drv_dart.lo
+	-rm -f drivers/drv_dc.$(OBJEXT)
+	-rm -f drivers/drv_dc.lo
 	-rm -f drivers/drv_ds.$(OBJEXT)
 	-rm -f drivers/drv_ds.lo
 	-rm -f drivers/drv_esd.$(OBJEXT)
@@ -775,6 +784,8 @@ mostlyclean-compile:
 	-rm -f drivers/drv_osx.lo
 	-rm -f drivers/drv_pipe.$(OBJEXT)
 	-rm -f drivers/drv_pipe.lo
+	-rm -f drivers/drv_pulseaudio.$(OBJEXT)
+	-rm -f drivers/drv_pulseaudio.lo
 	-rm -f drivers/drv_raw.$(OBJEXT)
 	-rm -f drivers/drv_raw.lo
 	-rm -f drivers/drv_sam9407.$(OBJEXT)
@@ -885,6 +896,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_aix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_alsa.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_dart.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_dc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_ds.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_esd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_gp32.Plo@am__quote@
@@ -897,6 +909,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_oss.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_osx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_pipe.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_pulseaudio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_raw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_sam9407.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_sb.Plo@am__quote@

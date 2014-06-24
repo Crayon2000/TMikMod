@@ -61,6 +61,7 @@ typedef struct GT2_CHUNK {
 	UBYTE	date_month;
 	UWORD	date_year;
 	CHAR	tracker_name[25]; /* 24 in file */
+	/* the rest are for file versions <= 5. */
 	UWORD	initial_speed;
 	UWORD	initial_tempo;
 	UWORD	initial_master_volume; /* 000 - fff */
@@ -80,7 +81,7 @@ typedef struct TVOL_CHUNK {
 typedef struct XCOM_CHUNK {
 	UBYTE	id[4]; /* must be XCOM */
 	ULONG	chunk_size;
-	ULONG	comment_len;
+	UWORD	comment_len;
 	CHAR	*comment; /* comment_len + 1 allocated */
 } XCOM_CHUNK;
 
@@ -122,7 +123,7 @@ typedef struct ORCH_CHUNK {
 } ORCH_CHUNK;
 
 typedef struct INST_NOTE {
-	UBYTE 	samp_number;/* sample number for midi note */
+	UBYTE	samp_number;/* sample number for midi note */
 	CHAR	tranp;		/* transposition for note */
 } INST_NOTE;
 
@@ -194,7 +195,7 @@ typedef union GT_CHUNK
 
 static GT_CHUNK *loadChunk(void)
 {
-	GT_CHUNK *new_chunk = MikMod_malloc(sizeof(GT_CHUNK));
+	GT_CHUNK *new_chunk = (GT_CHUNK *) MikMod_malloc(sizeof(GT_CHUNK));
 
 	if (!new_chunk) return NULL;
 
@@ -206,8 +207,9 @@ static GT_CHUNK *loadChunk(void)
 	else {
 		new_chunk->id[3] = ' ';
 	}
-
-	printf(">> %c%c%c%c\n", new_chunk->id[0], new_chunk->id[1], new_chunk->id[2], new_chunk->id[3]);
+#ifdef MIKMOD_DEBUG
+	fprintf(stderr, ">> %c%c%c%c\n", new_chunk->id[0], new_chunk->id[1], new_chunk->id[2], new_chunk->id[3]);
+#endif
 
 	if (!memcmp(new_chunk, "GT2", 3)) {
 		_mm_read_UBYTES(&new_chunk->gt2.version, 1, modreader);
@@ -221,11 +223,13 @@ static GT_CHUNK *loadChunk(void)
 		_mm_read_M_UWORDS(&new_chunk->gt2.date_year, 1, modreader);
 		new_chunk->gt2.tracker_name[24] = 0;
 		_mm_read_UBYTES(&new_chunk->gt2.tracker_name, 24, modreader);
+		if (new_chunk->gt2.version > 5) return new_chunk;
 		_mm_read_M_UWORDS(&new_chunk->gt2.initial_speed, 1, modreader);
 		_mm_read_M_UWORDS(&new_chunk->gt2.initial_tempo, 1, modreader);
 		_mm_read_M_UWORDS(&new_chunk->gt2.initial_master_volume, 1, modreader);
 		_mm_read_M_UWORDS(&new_chunk->gt2.num_voices, 1, modreader);
-		new_chunk->gt2.voice_pannings = MikMod_malloc(2*new_chunk->gt2.num_voices);
+		new_chunk->gt2.voice_pannings = (UWORD *) MikMod_malloc(2*new_chunk->gt2.num_voices);
+		if (new_chunk->gt2.voice_pannings == NULL) goto fail;
 		_mm_read_M_UWORDS(new_chunk->gt2.voice_pannings, new_chunk->gt2.num_voices, modreader);
 		return new_chunk;
 	}
@@ -233,15 +237,21 @@ static GT_CHUNK *loadChunk(void)
 	if (!memcmp(new_chunk, "TVOL", 4)) {
 		new_chunk->tvol.chunk_size = _mm_read_M_ULONG(modreader);
 		new_chunk->tvol.num_tracks = _mm_read_M_UWORD(modreader);
-		new_chunk->tvol.track_volumes = MikMod_malloc(new_chunk->tvol.num_tracks * 2);
+		new_chunk->tvol.track_volumes = (UWORD *) MikMod_malloc(new_chunk->tvol.num_tracks * 2);
+		if (new_chunk->tvol.track_volumes == NULL) goto fail;
 		_mm_read_M_UWORDS(new_chunk->tvol.track_volumes, new_chunk->tvol.num_tracks, modreader);
 		return new_chunk;
 	}
 
 	if (!memcmp(new_chunk, "XCOM", 4)) {
 		new_chunk->xcom.chunk_size = _mm_read_M_ULONG(modreader);
-		new_chunk->xcom.comment_len = _mm_read_M_ULONG(modreader);
-		new_chunk->xcom.comment = MikMod_malloc(new_chunk->xcom.comment_len + 1);
+		new_chunk->xcom.comment_len = _mm_read_M_UWORD(modreader);
+		if (!new_chunk->xcom.comment_len) {
+			new_chunk->xcom.comment = NULL;
+			return new_chunk;
+		}
+		new_chunk->xcom.comment = (CHAR *) MikMod_malloc((ULONG)new_chunk->xcom.comment_len + 1);
+		if (new_chunk->xcom.comment == NULL) goto fail;
 		_mm_read_UBYTES(new_chunk->xcom.comment, new_chunk->xcom.comment_len, modreader);
 		return new_chunk;
 	}
@@ -250,7 +260,8 @@ static GT_CHUNK *loadChunk(void)
 		new_chunk->song.chunk_size = _mm_read_M_ULONG(modreader);
 		new_chunk->song.song_length = _mm_read_M_UWORD(modreader);
 		new_chunk->song.song_repeat_point = _mm_read_M_UWORD(modreader);
-		new_chunk->song.patterns = MikMod_malloc(2*new_chunk->song.song_length);
+		new_chunk->song.patterns = (UWORD *) MikMod_malloc(2*new_chunk->song.song_length);
+		if (new_chunk->song.patterns == NULL) goto fail;
 		_mm_read_M_UWORDS(new_chunk->song.patterns, new_chunk->song.song_length, modreader);
 		return new_chunk;
 	}
@@ -270,9 +281,10 @@ static GT_CHUNK *loadChunk(void)
 		new_chunk->patd.codage_version = _mm_read_M_UWORD(modreader);
 		new_chunk->patd.num_lines = _mm_read_M_UWORD(modreader);
 		new_chunk->patd.num_tracks = _mm_read_M_UWORD(modreader);
-		new_chunk->patd.notes = MikMod_malloc(5 *
+		new_chunk->patd.notes = (GT_NOTE *) MikMod_malloc(5 *
 								new_chunk->patd.num_lines *
 								new_chunk->patd.num_tracks);
+		if (new_chunk->patd.notes == NULL) goto fail;
 		_mm_read_UBYTES(new_chunk->patd.notes,
 				new_chunk->patd.num_lines * new_chunk->patd.num_tracks * 5,
 				modreader);
@@ -303,10 +315,37 @@ static GT_CHUNK *loadChunk(void)
 		return new_chunk;
 	}
 
-	printf("?? %c%c%c%c\n", new_chunk->id[0], new_chunk->id[1], new_chunk->id[2], new_chunk->id[3]);
-
+#ifdef MIKMOD_DEBUG
+	fprintf(stderr, "?? %c%c%c%c\n", new_chunk->id[0], new_chunk->id[1], new_chunk->id[2], new_chunk->id[3]);
+#endif
+fail:
 	MikMod_free(new_chunk);
 	return NULL; /* unknown chunk */
+}
+
+static void freeChunk(GT_CHUNK *c)
+{
+	if (!memcmp(c, "GT2", 3)) {
+		if (c->gt2.voice_pannings)
+			MikMod_free(c->gt2.voice_pannings);
+	}
+	else if (!memcmp(c, "TVOL", 4)) {
+		if (c->tvol.track_volumes)
+			MikMod_free(c->tvol.track_volumes);
+	}
+	else if (!memcmp(c, "XCOM", 4)) {
+		if (c->xcom.comment)
+			MikMod_free(c->xcom.comment);
+	}
+	else if (!memcmp(c, "SONG", 4)) {
+		if (c->song.patterns)
+			MikMod_free(c->song.patterns);
+	}
+	else if (!memcmp(c, "PATD", 4)) {
+		if (c->patd.notes)
+			MikMod_free(c->patd.notes);
+	}
+	MikMod_free(c);
 }
 
 static BOOL GT2_Test(void)
@@ -336,11 +375,13 @@ static BOOL GT2_Load(BOOL curious)
 
 	_mm_fseek(modreader, 0, SEEK_SET);
 	while ((tmp = loadChunk()) != NULL) {
+#ifdef MIKMOD_DEBUG
 		/* FIXME: to be completed */
-		printf("%c%c%c%c\n", tmp->id[0], tmp->id[1], tmp->id[2], tmp->id[3]);
-		MikMod_free(tmp);
+		fprintf(stderr, "%c%c%c%c\n", tmp->id[0], tmp->id[1], tmp->id[2], tmp->id[3]);
+#endif
+		freeChunk(tmp);
 	}
-
+	_mm_errno = MMERR_LOADING_HEADER;
 	return 0;
 }
 

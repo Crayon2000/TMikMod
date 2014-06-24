@@ -112,6 +112,8 @@ static void AMF_Cleanup(void)
 {
 	MikMod_free(mh);
 	MikMod_free(track);
+	mh=NULL;
+	track=NULL;
 }
 
 static BOOL AMF_UnpackTrack(MREADER* r)
@@ -491,7 +493,7 @@ static BOOL AMF_Load(BOOL curious)
 	}
 
 	/* read track table */
-	if(!(track_remap=MikMod_calloc(mh->numtracks+1,sizeof(UWORD))))
+	if(!(track_remap=(UWORD*)MikMod_calloc(mh->numtracks+1,sizeof(UWORD))))
 		return 0;
 	_mm_read_I_UWORDS(track_remap+1,mh->numtracks,modreader);
 	if(_mm_eof(modreader)) {

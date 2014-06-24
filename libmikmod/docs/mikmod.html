@@ -32,7 +32,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
 
 <h2 class="unnumbered">MikMod Sound Library</h2>
 
-<p>This&nbsp;manual&nbsp;documents&nbsp;the&nbsp;MikMod&nbsp;Sound&nbsp;Library,&nbsp;version&nbsp;3.3.3.<!-- /@w -->
+<p>This&nbsp;manual&nbsp;documents&nbsp;the&nbsp;MikMod&nbsp;Sound&nbsp;Library,&nbsp;version&nbsp;3.3.6.<!-- /@w -->
 
 <ul class="menu">
 <li><a accesskey="1" href="#Introduction">Introduction</a>:           What is MikMod ? 
@@ -972,7 +972,7 @@ only for stereo sound, this flag has no effect if the sound playback is in
 mono. 
 </dl>
 
-     <p><br>The following flags aren't taken in account until the sound driver is changed
+     <p>The following flags aren't taken in account until the sound driver is changed
 or reset:
           <dl>
 <dt>&lsquo;<samp><span class="samp">DMODE_16BIT</span></samp>&rsquo;<dd>This flag, if set, selects 16 bit sound mode. This mode yields better sound
@@ -985,7 +985,7 @@ effect if no <code>DMODE_SOFT_xx</code> flag is set.
 <br><dt>&lsquo;<samp><span class="samp">DMODE_STEREO</span></samp>&rsquo;<dd>This flag, if set, selects stereo sound. 
 </dl>
 
-     <p><br>The default value of this variable is &lsquo;<samp><span class="samp">DMODE_STEREO | DMODE_SURROUND |
+     <p>The default value of this variable is &lsquo;<samp><span class="samp">DMODE_STEREO | DMODE_SURROUND |
 DMODE_16BITS | DMODE_SOFT_MUSIC | DMODE_SOFT_SNDFX</span></samp>&rsquo;. 
 </dl>
 
@@ -1172,7 +1172,7 @@ unsigned values.
 <br><dt>&lsquo;<samp><span class="samp">SF_STEREO</span></samp>&rsquo;<dd>If set, sample data is stereo (two channels); otherwise, it is mono. 
 </dl>
 
-     <p><br>Playback flags:
+     <p>Playback flags:
           <dl>
 <dt>&lsquo;<samp><span class="samp">SF_BIDI</span></samp>&rsquo;<dd>If set, sample loops &ldquo;ping pong&rdquo; (back and forth). 
 <br><dt>&lsquo;<samp><span class="samp">SF_LOOP</span></samp>&rsquo;<dd>If set, sample loops forward. 
@@ -1348,7 +1348,23 @@ channels.
 <br><dt>&lsquo;<samp><span class="samp">MMERR_HP_SETSPEED</span></samp>&rsquo;<dd>This error occurs when the HP driver can not set the requested sample rate. 
 </dl>
 
-<h5 class="subsubsection">4.3.4.6 Open Sound System Driver Specific Errors</h5>
+<h5 class="subsubsection">4.3.4.6 ALSA Driver Specific Errors</h5>
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">MMERR_ALSA_NOCONFIG</span></samp>&rsquo;<dd>This error occurs when no ALSA playback configuration is available. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_ALSA_SETPARAMS</span></samp>&rsquo;<dd>This error occurs when the ALSA driver can not set the requested sample
+format, sample rate, number of channels, access type, or latency values. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_ALSA_SETFORMAT</span></samp>&rsquo;<dd>This error occurs when the ALSA driver can not set the requested sample format. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_ALSA_SETRATE</span></samp>&rsquo;<dd>This error occurs when the ALSA driver does not support the requested sample rate. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_ALSA_SETCHANNELS</span></samp>&rsquo;<dd>This error occurs when the ALSA driver does not support the requested number of
+channels. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_ALSA_BUFFERSIZE</span></samp>&rsquo;<dd>This error occurs when the ALSA driver can not retrieve the buffer or period size. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_ALSA_PCM_START</span></samp>&rsquo;<dd>This error occurs when the ALSA driver can not start the pcm playback. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_ALSA_PCM_WRITE</span></samp>&rsquo;<dd>This error occurs when the ALSA driver encounters a write error. 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_ALSA_PCM_RECOVER</span></samp>&rsquo;<dd>This error occurs when the ALSA driver encounters an error recovery failure. 
+</dl>
+
+<h5 class="subsubsection">4.3.4.7 Open Sound System Driver Specific Errors</h5>
 
      <dl>
 <dt>&lsquo;<samp><span class="samp">MMERR_OSS_SETFRAGMENT</span></samp>&rsquo;<dd>This error occurs when the OSS driver can not set audio fragment size. 
@@ -1358,7 +1374,7 @@ channels.
 channels. 
 </dl>
 
-<h5 class="subsubsection">4.3.4.7 SGI Driver Specific Errors</h5>
+<h5 class="subsubsection">4.3.4.8 SGI Driver Specific Errors</h5>
 
      <dl>
 <dt>&lsquo;<samp><span class="samp">MMERR_SGI_MONO</span></samp>&rsquo;<dd>This error occurs when the hardware only supports stereo sound. 
@@ -1368,13 +1384,13 @@ channels.
 <br><dt>&lsquo;<samp><span class="samp">MMERR_SGI_8BIT</span></samp>&rsquo;<dd>This error occurs when the hardware only supports 8 bit sound. 
 </dl>
 
-<h5 class="subsubsection">4.3.4.8 Sun Driver Specific Error</h5>
+<h5 class="subsubsection">4.3.4.9 Sun Driver Specific Error</h5>
 
      <dl>
 <dt>&lsquo;<samp><span class="samp">MMERR_SUN_INIT</span></samp>&rsquo;<dd>This error occurs when the sound device initialization failed. 
 </dl>
 
-<h5 class="subsubsection">4.3.4.9 OS/2 Driver Specific Errors</h5>
+<h5 class="subsubsection">4.3.4.10 OS/2 Driver Specific Errors</h5>
 
      <dl>
 <dt>&lsquo;<samp><span class="samp">MMERR_OS2_MIXSETUP</span></samp>&rsquo;<dd>This error occurs when the DART driver can not set the mixing parameters. 
@@ -1386,7 +1402,7 @@ playback.
 playback. 
 </dl>
 
-<h5 class="subsubsection">4.3.4.10 DirectX Driver Specific Errors</h5>
+<h5 class="subsubsection">4.3.4.11 DirectX Driver Specific Errors</h5>
 
      <dl>
 <dt>&lsquo;<samp><span class="samp">MMERR_DS_BUFFER</span></samp>&rsquo;<dd>This error occurs when the DirectX driver can not allocate the playback buffers. 
@@ -1400,7 +1416,7 @@ callback.
 thread. 
 </dl>
 
-<h5 class="subsubsection">4.3.4.11 Windows Multimedia API Driver Specific Errors</h5>
+<h5 class="subsubsection">4.3.4.12 Windows Multimedia API Driver Specific Errors</h5>
 
      <dl>
 <dt>&lsquo;<samp><span class="samp">MMERR_WINMM_ALLOCATED</span></samp>&rsquo;<dd>This error occurs when the playback resource is already allocated by another
@@ -1414,7 +1430,7 @@ device.
 libmikmod development mailing list. 
 </dl>
 
-<h5 class="subsubsection">4.3.4.12 MacOS Driver Specific Errors</h5>
+<h5 class="subsubsection">4.3.4.13 MacOS Driver Specific Errors</h5>
 
      <dl>
 <dt>&lsquo;<samp><span class="samp">MMERR_MAC_SPEED</span></samp>&rsquo;<dd>This error occurs when the playback speed is not supported by the audio device. 
@@ -1426,10 +1442,11 @@ libmikmod development mailing list.
      <dl>
 <dt>&lsquo;<samp><span class="samp">MMERR_OSX_UNKNOWN_DEVICE</span></samp>&rsquo;<dd>This error occurs if the default audio output device is not an audio device! If
 this happens, please contact the maintainer. 
-<br><dt>&lsquo;<samp><span class="samp">MMERR_OSX_BAD_PROPERTY</span></samp>&rsquo;<dd>This error occurs... 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OSX_BAD_PROPERTY</span></samp>&rsquo;<dd>This error occurs when the driver encounters a bad parameter when setting device
+the properties. 
 <br><dt>&lsquo;<samp><span class="samp">MMERR_OSX_UNSUPPORTED_FORMAT</span></samp>&rsquo;<dd>This error occurs when the detected audio device does not support
 the required format (Linear PCM). 
-<br><dt>&lsquo;<samp><span class="samp">MMERR_OSX_SET_STEREO</span></samp>&rsquo;<dd>This error occurs... 
+<br><dt>&lsquo;<samp><span class="samp">MMERR_OSX_SET_STEREO</span></samp>&rsquo;<dd>This error occurs when the driver does not support the requested channels setting. 
 <br><dt>&lsquo;<samp><span class="samp">MMERR_OSX_BUFFER_ALLOC</span></samp>&rsquo;<dd>This error occurs if the driver fails to allocate the audio buffers. 
 <br><dt>&lsquo;<samp><span class="samp">MMERR_OSX_ADD_IO_PROC</span></samp>&rsquo;<dd>This error occurs if the driver fails to add its Audio IO Proc. 
 <br><dt>&lsquo;<samp><span class="samp">MMERR_OSX_DEVICE_START</span></samp>&rsquo;<dd>This error occurs if the driver fails to start the audio IO Proc. 
@@ -1521,7 +1538,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Function-Reference">Function Reference
      <dl>
 <dt><i>Description</i><dd>This function starts the sound mixing. 
 <br><dt><i>Result</i><dt><i>0</i><dd>Sound mixing is ready. 
-<dt><i>nonzero</i><dd>An error occurred during the operation. 
+<br><dt><i>nonzero</i><dd>An error occurred during the operation. 
 <br><dt><i>Notes</i><dd>Calls to <code>MikMod_Update</code> will be ignored when sound output is disabled. 
 <br><dt><i>See also</i><dd><code>MikMod_Active</code>, <code>MikMod_DisableOutput</code>. 
 </dl>
@@ -1578,7 +1595,7 @@ choice and configuration, and all the necessary memory allocations.
 <br><dt><i>Parameters</i><dt><i>parameters</i><dd>Optional parameters given to the sound driver. These parameters are ignored if
 the value of <code>md_device</code> is zero (autodetection). 
 <br><dt><i>Result</i><dt><i>0</i><dd>Initialization was successful. 
-<dt><i>nonzero</i><dd>An error occurred during initialization. 
+<br><dt><i>nonzero</i><dd>An error occurred during initialization. 
 <br><dt><i>Notes</i><dd>When the initialization fails, the library uses the nosound sound driver to
 let other the other MikMod functions work without crashing the application. 
 <br><dt><i>See also</i><dd><code>MikMod_Exit</code>, <code>MikMod_InitThreads</code>, <code>MikMod_Reset</code>. 
@@ -1590,7 +1607,7 @@ let other the other MikMod functions work without crashing the application.
      <dl>
 <dt><i>Description</i><dd>This function returns whether libmikmod is thread-safe. 
 <br><dt><i>Result</i><dt><i>0</i><dd>The library is not thread-safe. 
-<dt><i>1</i><dd>The library is thread-safe. 
+<br><dt><i>1</i><dd>The library is thread-safe. 
 <br><dt><i>Notes</i><dd>This function should be called before any call to <code>MikMod_Lock</code> or
 <code>MikMod_Unlock</code> is made. 
 <br><dt><i>See also</i><dd><code>MikMod_Lock</code>, <code>MikMod_Unlock</code>. 
@@ -1724,7 +1741,7 @@ anymore<small class="enddots">...</small>
 <br><dt><i>Parameters</i><dt><i>parameters</i><dd>Optional parameters given to the sound driver. If you set the value of
 <code>md_device</code> to zero (autodetect), these parameters are ignored. 
 <br><dt><i>Result</i><dt><i>0</i><dd>Reinitialization was successful. 
-<dt><i>nonzero</i><dd>An error occurred during reinitialization. 
+<br><dt><i>nonzero</i><dd>An error occurred during reinitialization. 
 <br><dt><i>Notes</i><dd>Use this function when you have changed the global configuration variables:
 <code>md_device</code> and <code>md_mixfreq</code>, or one of the <code>md_mode</code> flags
 which require sound reinitialization. Sound playback will continue as soon as
@@ -1741,7 +1758,7 @@ and sound effects playback.
 <br><dt><i>Parameters</i><dt><i>musicvoices</i><dd>The number of voices to reserve for music playback. 
 <br><dt><i>samplevoices</i><dd>The number of voices to reserve for sound effects. 
 <br><dt><i>Result</i><dt><i>0</i><dd>Initialization was successful. 
-<dt><i>nonzero</i><dd>An error occurred during initialization. 
+<br><dt><i>nonzero</i><dd>An error occurred during initialization. 
 <br><dt><i>Notes</i><dd>A value of <code>-1</code> for any of the parameters will retain the current number
 of reserved voices.<br>
 The maximum number of voices vary from driver to driver (hardware drivers
@@ -1813,7 +1830,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Function-Reference">Function Reference
      <dl>
 <dt><i>Description</i><dd>This function returns whether the module player is active or not. 
 <br><dt><i>Result</i><dt><i>0</i><dd>No module is playing. 
-<dt><i>nonzero</i><dd>A module is currently playing. 
+<br><dt><i>nonzero</i><dd>A module is currently playing. 
 <br><dt><i>Notes</i><dd>This function will still report that the player is active if the playing module
 is paused. 
 <br><dt><i>See also</i><dd><code>Player_Paused</code>, <code>Player_TogglePause</code>, <code>Player_Start</code>, <code>Player_Stop</code>
@@ -1953,7 +1970,7 @@ range and are part of the range ; otherwise, if the operation is
 <dt><i>Description</i><dd>This function determines whether a module channel is muted or not. 
 <br><dt><i>Parameters</i><dt><i>channel</i><dd>The module channel to test (starting from zero). 
 <br><dt><i>Result</i><dt><i>0</i><dd>The channel is not muted. 
-<dt><i>1</i><dd>The channel is muted. 
+<br><dt><i>1</i><dd>The channel is muted. 
 <br><dt><i>See also</i><dd><code>Player_Mute</code>, <code>Player_ToggleMute</code>, <code>Player_Unmute</code>. 
 </dl>
 
@@ -2298,7 +2315,7 @@ stopping the playback, use <code>Voice_SetVolume(voice, 0)</code> instead.
 <dt><i>Description</i><dd>This function returns whether the voice is active or not. 
 <br><dt><i>Parameters</i><dt><i>voice</i><dd>The number of the voice to be checked (starting from zero). 
 <br><dt><i>Result</i><dt><i>0</i><dd>The voice is stopped or has no sample assigned. 
-<dt><i>nonzero</i><dd>The voice is playing a sample. 
+<br><dt><i>nonzero</i><dd>The voice is playing a sample. 
 <br><dt><i>Notes</i><dd>This function may not work with some drivers (especially for hardware mixed
 voices). In this case, its return value is undefined. 
 <br><dt><i>See also</i><dd><code>Voice_Stop</code>. 
@@ -2348,7 +2365,9 @@ format has the same limitations as the S3M format. The most famous DSMI
 application was DMP, the Dual Module Player.<br>
 DMP and the DSMI library were written by Otto Chrons. DSMI was first released
 in 1993. 
-<br><dt><code>load_asy</code><dd>This loader recognize the &ldquo;ASYLUM Music Format&rdquo;, which was used in Crusader series of games by Origin. This format uses the .amf extension, but is very similar to a 8 Channel Mod file. 
+<br><dt><code>load_asy</code><dd>This loader recognize the &ldquo;ASYLUM Music Format&rdquo;, which was used in Crusader
+series of games by Origin. This format uses the .amf extension, but is very
+similar to a 8 Channel Mod file. 
 <br><dt><code>load_dsm</code><dd>This loader recognizes the internal DSIK format, which is the internal module
 format of the &ldquo;Digital Sound Interface Kit&rdquo; (DSIK) library, the ancester of
 the SEAL library. This format has the same limitations as the S3M format.<br>
@@ -2486,6 +2505,11 @@ Start the esd daemon on the machine you want, set its hostname in the
 <br><dt><code>drv_nas</code><dd>This driver works with the &ldquo;Network Audio System&rdquo;.<br>
 Start the nas server on the machine you want, and set its hostname with
 the &lsquo;<samp><span class="samp">server</span></samp>&rsquo; driver command line argument. 
+<br><dt><code>drv_pulseaudio</code><dd>This driver works with the &ldquo;PulseAudio&rdquo; server.<br>
+Start the pulseaudio server on the machine you want, set the server name
+with &lsquo;<samp><span class="samp">server</span></samp>&rsquo; and the device name with &lsquo;<samp><span class="samp">sink</span></samp>&rsquo; driver command line
+arguments. Without the optional &lsquo;<samp><span class="samp">server</span></samp>&rsquo; and &lsquo;<samp><span class="samp">sink</span></samp>&rsquo; arguments, the
+driver leaves the server:device decision to the pulseaudio library defaults. 
 </dl>
 
 <div class="node">
@@ -2513,6 +2537,9 @@ might be able to use the hardware capabilities of some sound cards.
 <br><dt><code>drv_dart</code><dd>This driver is only available under OS/2 version 3 and higher (Warp), and uses
 the &ldquo;Direct Audio Real-Time&rdquo; interface.<br>
 This driver only supports software mixing. 
+<br><dt><code>drv_dc</code><dd>This driver is only for the Dreamcast platform, and outputs a stream to the
+AICA SPU of a Dreamcast.<br>
+This driver only supports software mixing. This driver is not tested yet. 
 <br><dt><code>drv_ds</code><dd>This driver is only available under WIN32, and uses the &ldquo;DirectSound&rdquo; api.<br>
 This driver only supports software mixing. 
 <br><dt><code>drv_gp32</code><dd>This driver is only for the GP32 platform, and uses the &ldquo;GP32&rdquo; api.<br>
@@ -2521,7 +2548,8 @@ This driver only supports software mixing. This driver is not tested yet.
 This driver only supports software mixing. 
 <br><dt><code>drv_mac</code><dd>This driver is only available under MacOS, and uses the &ldquo;Sound Manager&rdquo;.<br>
 This driver supports the Classic and Carbon environments, and does only software mixing. 
-<br><dt><code>drv_openal</code><dd>This driver is available for all platforms where &ldquo;OpenAL&rdquo; is supported, and uses the &ldquo;OpenAL&rdquo; api.<br>
+<br><dt><code>drv_openal</code><dd>This driver is available for all platforms where &ldquo;OpenAL&rdquo; is supported,
+and uses the &ldquo;OpenAL&rdquo; api.<br>
 This driver only supports software mixing. 
 <br><dt><code>drv_os2</code><dd>This driver is only available under OS/2 version 3 and higher (Warp), and OS/2
 2.x with MMPM/2.<br>
@@ -2537,7 +2565,8 @@ driver to be compiled for your current kernel.<br>
 This driver only supports hardware mixing. 
 <br><dt><code>drv_sb</code><dd>This driver is only available under DOS, and supports the SoundBlaster/Pro/16/AWE32.<br>
 This driver only supports hardware mixing. This driver needs to be tested. 
-<br><dt><code>drv_sdl</code><dd>This driver is available for all platforms where &ldquo;SDL&rdquo; is supported, and uses the &ldquo;Simple DirectMedia Layer&rdquo; apis.<br>
+<br><dt><code>drv_sdl</code><dd>This driver is available for all platforms where &ldquo;SDL&rdquo; is supported, and
+uses the &ldquo;Simple DirectMedia Layer&rdquo; apis.<br>
 This driver only supports software mixing. 
 <br><dt><code>drv_sgi</code><dd>This driver is only available under IRIX, and uses the SGI audio library.<br>
 This driver only supports software mixing. 
@@ -2545,13 +2574,17 @@ This driver only supports software mixing.
 device interfaces, that is, SunOS, Solaris, NetBSD and OpenBSD.<br>
 This driver only supports software mixing. 
 <br><dt><code>drv_ultra</code><dd>This driver is available under Linux, and requires the Linux Ultrasound
-driver (the ancestor of ALSA) to be compiled for your current kernel. This driver is also available under DOS/DJGPP and OS/2.<br>
-This driver only supports hardware mixing. The DOS/DJGPP and OS/2 parts needs to be tested. 
+driver (the ancestor of ALSA) to be compiled for your current kernel. This
+driver is also available under DOS/DJGPP and OS/2.<br>
+This driver only supports hardware mixing. The DOS/DJGPP and OS/2 parts
+needs to be tested. 
 <br><dt><code>drv_win</code><dd>This driver is only available under WIN32, and uses the &ldquo;multimedia API&rdquo;.<br>
 This driver only supports software mixing. 
-<br><dt><code>drv_wss</code><dd>This driver is only available under DOS, and supports Windows Sound System compatible sound cards.<br>
+<br><dt><code>drv_wss</code><dd>This driver is only available under DOS, and supports Windows Sound System
+compatible sound cards.<br>
 This driver only supports software mixing. This driver needs to be tested. 
-<br><dt><code>drv_xaudio2</code><dd>This driver is only available under Windows XP and newer Windows versions and uses the &ldquo;XAudio2&rdquo; 2.7 or 2.8 apis.<br>
+<br><dt><code>drv_xaudio2</code><dd>This driver is only available under Windows XP and newer Windows versions
+and uses the &ldquo;XAudio2&rdquo; 2.7 or 2.8 apis.<br>
 This driver only supports software mixing. 
 </dl>
 
@@ -2571,7 +2604,9 @@ hardware, but written in a file. Disk writer drivers only support software
 mixing.
 
      <dl>
-<dt><code>drv_aiff</code><dd>This driver outputs the sound data in a AIFF (Audio Interchange File Format) file by default named <samp><span class="file">music.aiff</span></samp> or <samp><span class="file">music.aif</span></samp> on win32/dos in the current directory. 
+<dt><code>drv_aiff</code><dd>This driver outputs the sound data in a AIFF (Audio Interchange File Format)
+file by default named <samp><span class="file">music.aiff</span></samp> or <samp><span class="file">music.aif</span></samp> on win32/dos in
+the current directory. 
 <br><dt><code>drv_raw</code><dd>This driver outputs the sound data in a file by default named <samp><span class="file">music.raw</span></samp>
 in the current directory. The file has no header and only contains the sound
 output. 
@@ -2781,13 +2816,14 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#Index">Index</a>
 <li><a href="#Error-Reference">4.3.4.3 AIX Driver Specific Errors</a>
 <li><a href="#Error-Reference">4.3.4.4 Ultra Driver Specific Errors</a>
 <li><a href="#Error-Reference">4.3.4.5 HP-UX Driver Specific Errors</a>
-<li><a href="#Error-Reference">4.3.4.6 Open Sound System Driver Specific Errors</a>
-<li><a href="#Error-Reference">4.3.4.7 SGI Driver Specific Errors</a>
-<li><a href="#Error-Reference">4.3.4.8 Sun Driver Specific Error</a>
-<li><a href="#Error-Reference">4.3.4.9 OS/2 Driver Specific Errors</a>
-<li><a href="#Error-Reference">4.3.4.10 DirectX Driver Specific Errors</a>
-<li><a href="#Error-Reference">4.3.4.11 Windows Multimedia API Driver Specific Errors</a>
-<li><a href="#Error-Reference">4.3.4.12 MacOS Driver Specific Errors</a>
+<li><a href="#Error-Reference">4.3.4.6 ALSA Driver Specific Errors</a>
+<li><a href="#Error-Reference">4.3.4.7 Open Sound System Driver Specific Errors</a>
+<li><a href="#Error-Reference">4.3.4.8 SGI Driver Specific Errors</a>
+<li><a href="#Error-Reference">4.3.4.9 Sun Driver Specific Error</a>
+<li><a href="#Error-Reference">4.3.4.10 OS/2 Driver Specific Errors</a>
+<li><a href="#Error-Reference">4.3.4.11 DirectX Driver Specific Errors</a>
+<li><a href="#Error-Reference">4.3.4.12 Windows Multimedia API Driver Specific Errors</a>
+<li><a href="#Error-Reference">4.3.4.13 MacOS Driver Specific Errors</a>
 </li></ul>
 <li><a href="#Error-Reference">4.3.5 MaxOS X Driver Specific Errors</a>
 <li><a href="#Error-Reference">4.3.6 Dos &ldquo;Windows Sound System&rdquo; Driver Specific Errors</a>

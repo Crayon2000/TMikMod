@@ -6,9 +6,7 @@ bin_SCRIPTS = libmikmod-config
 
 EXTRA_DIST = libmikmod-config.in libmikmod.m4 libmikmod.pc.in \
 	     libmikmod.spec.in libmikmod.spec COPYING.LESSER \
-	     libmikmod.pc.cmake libmikmod-config.cmake \
-	     config.h.cmake CMakeLists.txt cmake \
-	     t run-tests.pl
+	     config.h.cmake CMakeLists.txt cmake
 
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libmikmod.m4
@@ -33,6 +31,7 @@ libmikmod_la_SOURCES = \
 		drivers/drv_aix.c \
 		drivers/drv_alsa.c \
 		drivers/drv_dart.c \
+		drivers/drv_dc.c \
 		drivers/drv_ds.c \
 		drivers/drv_esd.c \
 		drivers/drv_gp32.c \
@@ -44,6 +43,7 @@ libmikmod_la_SOURCES = \
 		drivers/drv_os2.c \
 		drivers/drv_oss.c \
 		drivers/drv_osx.c \
+		drivers/drv_pulseaudio.c \
 		drivers/drv_pipe.c \
 		drivers/drv_raw.c \
 		drivers/drv_sam9407.c \

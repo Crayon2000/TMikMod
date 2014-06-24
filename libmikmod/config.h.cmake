@@ -4,16 +4,20 @@
 #cmakedefine DRV_PIPE 1
 /* Define if you want support for output to stdout */
 #cmakedefine DRV_STDOUT 1
-
-/* Define if you want a .aiff file writer driver */
+/* Define if you want an .aiff file writer driver */
 #cmakedefine DRV_AIFF 1
-
-/* Define if the AudioFile audio server driver is compiled */
+/* Define if you want a .wav file writer driver */
+#cmakedefine DRV_WAV 1
+/* Define if you want a raw pcm data file writer driver */
+#cmakedefine DRV_RAW 1
+/* Define if the DEC AudioFile server driver is compiled */
 #cmakedefine DRV_AF 1
 /* Define if the AIX audio driver is compiled */
 #cmakedefine DRV_AIX 1
 /* Define if the Linux ALSA driver is compiled */
 #cmakedefine DRV_ALSA 1
+/* Define if the PulseAudio driver is compiled */
+#cmakedefine DRV_PULSEAUDIO 1
 /* Define if the Enlightened Sound Daemon driver is compiled */
 #cmakedefine DRV_ESD 1
 /* Define if the HP-UX audio driver is compiled */
@@ -39,6 +43,14 @@
 #cmakedefine DRV_OSX 1
 /* Define this if you want the Carbon Mac Audio driver */
 #cmakedefine DRV_MAC 1
+/* Define if the Windows DirectSound driver is compiled */
+#cmakedefine DRV_DS 1
+/* Define if the Windows MCI driver is compiled */
+#cmakedefine DRV_WIN 1
+/* Define if the Windows XAudio2 driver is compiled */
+#cmakedefine DRV_XAUDIO2 1
+/* Define if using XAudio 2.8 for Windows8 with XAudio2 driver */
+#cmakedefine DRV_XAUDIO28 1
 
 /* Define if you want a debug version of the library */
 #cmakedefine MIKMOD_DEBUG 1
@@ -48,8 +60,6 @@
 #cmakedefine MIKMOD_SIMD 1
 /* Define to 0 or 1 to override MIKMOD_UNIX in mikmod_internals.h. */
 #cmakedefine MIKMOD_UNIX 1
-/* Define if your system provides POSIX.4 threads */
-#cmakedefine HAVE_PTHREAD 1
 
 /* ========== Build environment information */
 
@@ -57,12 +67,19 @@
 #cmakedefine SUNOS 1
 /* Define if your system is AIX 3.* - might be needed for 4.* too */
 #cmakedefine AIX 1
+
 /* Define if your system defines random(3) and srandom(3) in math.h instead
    of stdlib.h */
 #cmakedefine SRANDOM_IN_MATH_H 1
+
 /* Define if your system has RTLD_GLOBAL defined in <dlfcn.h> */
 #cmakedefine HAVE_RTLD_GLOBAL 1
-/* Define if your system needs leading underscore to function names in dlsym() calls */
+
+/* Define if your system provides POSIX.4 threads */
+#cmakedefine HAVE_PTHREAD 1
+
+/* Define if your system needs leading underscore to function names in dlsym()
+   calls */
 #cmakedefine DLSYM_NEEDS_UNDERSCORE 1
 
 /* define this if you are running a bigendian system (motorola, sparc, etc) */
@@ -95,6 +112,9 @@
 /* Define to 1 if you have the <dmedia/audio.h> header file. */
 #cmakedefine HAVE_DMEDIA_AUDIO_H 1
 
+/* Define to 1 if you have the <dsound.h> header file. */
+#cmakedefine HAVE_DSOUND_H 1
+
 /* Define to 1 if you have the <fcntl.h> header file. */
 #cmakedefine HAVE_FCNTL_H 1
 
@@ -119,6 +139,9 @@
 /* Define to 1 if you have the `posix_memalign' function. */
 #cmakedefine HAVE_POSIX_MEMALIGN 1
 
+/* Define to 1 if you have the <pulse/simple.h> header file. */
+#cmakedefine HAVE_PULSE_SIMPLE_H 1
+
 /* Define to 1 if you have the `setenv' function. */
 #cmakedefine HAVE_SETENV 1
 
@@ -136,6 +159,9 @@
 
 /* Define to 1 if you have the `memcmp' function. */
 #cmakedefine HAVE_MEMCMP 1
+
+/* Define to 1 if you have the <soundcard.h> header file. */
+#cmakedefine HAVE_SOUNDCARD_H 1
 
 /* Define to 1 if you have the `strcasecmp' function. */
 #cmakedefine HAVE_STRCASECMP 1
@@ -185,32 +211,17 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #cmakedefine HAVE_UNISTD_H 1
 
-/* Name of package */
-#undef PACKAGE
+/* Define to 1 if you have the <windows.h> header file. */
+#cmakedefine HAVE_WINDOWS_H 1
 
-/* Define to the address where bug reports for this package should be sent. */
-#undef PACKAGE_BUGREPORT
-
-/* Define to the full name of this package. */
-#undef PACKAGE_NAME
-
-/* Define to the full name and version of this package. */
-#undef PACKAGE_STRING
-
-/* Define to the one symbol short name of this package. */
-#undef PACKAGE_TARNAME
-
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
-
-/* Define to the version of this package. */
-#undef PACKAGE_VERSION
+/* Define to 1 if you have the <xaudio2.h> header file. */
+#cmakedefine HAVE_XAUDIO2_H 1
 
 /* Define to 1 if you have the ANSI C header files. */
-#undef STDC_HEADERS
+#cmakedefine STDC_HEADERS
 
 /* Version number of package */
-#undef VERSION
+#cmakedefine VERSION "${VERSION}"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #cmakedefine const

@@ -52,7 +52,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = docs
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/libmikmod-config.1.in texinfo.tex
+	$(srcdir)/libmikmod-config.1.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/esd.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
@@ -62,14 +62,15 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/esd.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES = libmikmod-config.1
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
 INFO_DEPS = $(srcdir)/mikmod.info
-am__TEXINFO_TEX_DIR = $(srcdir)
+TEXINFO_TEX = $(top_srcdir)/autotools/texinfo.tex
+am__TEXINFO_TEX_DIR = $(top_srcdir)/autotools
 DVIS = mikmod.dvi
 PDFS = mikmod.pdf
 PSS = mikmod.ps
@@ -168,6 +169,7 @@ LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
+MANIFEST_TOOL = @MANIFEST_TOOL@
 MIKMOD_LT_AGE = @MIKMOD_LT_AGE@
 MIKMOD_LT_CURRENT = @MIKMOD_LT_CURRENT@
 MIKMOD_LT_REVISION = @MIKMOD_LT_REVISION@
@@ -205,6 +207,7 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
@@ -237,7 +240,6 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
-lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@

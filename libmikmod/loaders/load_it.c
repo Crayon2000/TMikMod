@@ -212,6 +212,13 @@ static void IT_Cleanup(void)
 	MikMod_free(last);
 	MikMod_free(paraptr);
 	MikMod_free(origpositions);
+	mh=NULL;
+	poslookup=NULL;
+	itpat=NULL;
+	mask=NULL;
+	last=NULL;
+	paraptr=NULL;
+	origpositions=NULL;
 }
 
 /* Because so many IT files have 64 channels as the set number used, but really
@@ -219,7 +226,7 @@ static void IT_Cleanup(void)
    which determines the number of channels that are actually USED by a pattern.
 
    NOTE: You must first seek to the file location of the pattern before calling
-         this procedure.
+   this procedure.
 
    Returns 0 on error
 */
@@ -550,7 +557,7 @@ static BOOL IT_Load(BOOL curious)
 
 	/* read the order data */
 	if(!AllocPositions(mh->ordnum)) return 0;
-	if(!(origpositions=MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
+	if(!(origpositions=(UWORD*)MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
 
 	for(t=0;t<mh->ordnum;t++) {
 		origpositions[t]=_mm_read_UBYTE(modreader);

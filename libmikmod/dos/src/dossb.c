@@ -20,17 +20,16 @@
 
 /*==============================================================================
 
-  $Id$
-
   Sound Blaster I/O routines, common for SB8, SBPro and SB16
+  Written by Andrew Zabolotny <bit@eltech.ru>
 
 ==============================================================================*/
 
-/*
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-	Written by Andrew Zabolotny <bit@eltech.ru>
-
-*/
+#ifdef DRV_SB
 
 #include <stdlib.h>
 #include <dpmi.h>
@@ -279,6 +278,7 @@ static boolean __sb_detect()
 		}
 
 		irq_unhook(sb.irq_handle);
+		sb.irq_handle = NULL;
 		if (!sb.dma8 || ((sb.dspver >= SBVER_16) && !sb.dma16))
 			return FALSE;
 	}
@@ -502,23 +502,23 @@ boolean sb_start_dma(unsigned char mode, unsigned int freq)
 	dma_start(sb.dma_buff, dmabuffsize, DMA_MODE_WRITE | DMA_MODE_AUTOINIT);
 
 	/* Tell SoundBlaster to start transfer */
-	dmabuffsize = (dmabuffsize >> 1) - 1;
 	if (sb.dspver >= SBVER_16) {	/* SB16 */
-		/* SoundBlaster 16 */
 		__sb_dspreg_outwhl(SBDSP_SET_RATE, freq);
 
 		/* Start DMA->DAC transfer */
-		__sb_dspreg_out(SBM_GENDAC_AUTOINIT |
+		__sb_dspreg_out(SBM_GENDAC_AUTOINIT | SBM_GENDAC_FIFO |
 						((mode & SBMODE_16BITS) ? SBDSP_DMA_GENERIC16 :
 						 SBDSP_DMA_GENERIC8),
 						((mode & SBMODE_SIGNED) ? SBM_GENDAC_SIGNED : 0) |
 						((mode & SBMODE_STEREO) ? SBM_GENDAC_STEREO : 0));
 
 		/* Write the length of transfer */
+		dmabuffsize = (dmabuffsize >> 2) - 1;
 		__sb_dsp_out(dmabuffsize);
 		__sb_dsp_out(dmabuffsize >> 8);
 	} else {
 		__sb_dspreg_out(SBDSP_SET_TIMING, 256 - tc);
+		dmabuffsize = (dmabuffsize >> 1) - 1;
 		if (sb.dspver >= SBVER_20) {	/* SB 2.0/Pro */
 			/* Set stereo mode */
 			__sb_stereo((mode & SBMODE_STEREO) ? TRUE : FALSE);
@@ -528,7 +528,6 @@ boolean sb_start_dma(unsigned char mode, unsigned int freq)
 			else
 				__sb_dsp_out(SBDSP_DMA_PCM8_AUTO);
 		} else {				/* Original SB */
-
 			/* Start DMA->DAC transfer */
 			__sb_dspreg_outwlh(SBDSP_DMA_PCM8, dmabuffsize);
 		}
@@ -570,5 +569,7 @@ void sb_query_dma(unsigned int *dma_size, unsigned int *dma_pos)
 	}
 	*dma_pos = *dma_size - dma_left;
 }
+
+#endif /* DRV_SB */
 
 /* ex:set ts=4: */

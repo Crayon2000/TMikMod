@@ -56,7 +56,7 @@ typedef struct ITPACK {
 BOOL SL_Init(SAMPLOAD* s)
 {
 	if(!sl_buffer)
-		if(!(sl_buffer=MikMod_malloc(SLBUFSIZE*sizeof(SWORD)))) return 0;
+		if(!(sl_buffer=(SWORD*)MikMod_malloc(SLBUFSIZE*sizeof(SWORD)))) return 0;
 
 	sl_rlength = s->length;
 	if(s->infmt & SF_16BITS) sl_rlength>>=1;
@@ -68,10 +68,9 @@ BOOL SL_Init(SAMPLOAD* s)
 void SL_Exit(SAMPLOAD *s)
 {
 	if(sl_rlength>0) _mm_fseek(s->reader,sl_rlength,SEEK_CUR);
-	if(sl_buffer) {
-		MikMod_free(sl_buffer);
-		sl_buffer=NULL;
-	}
+
+	MikMod_free(sl_buffer);
+	sl_buffer=NULL;
 }
 
 /* unpack a 8bit IT packed sample */

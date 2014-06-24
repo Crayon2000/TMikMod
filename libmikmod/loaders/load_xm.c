@@ -155,6 +155,7 @@ static BOOL XM_Init(void)
 static void XM_Cleanup(void)
 {
 	MikMod_free(mh);
+	mh=NULL;
 }
 
 static int XM_ReadNote(XMNOTE* n)
@@ -513,8 +514,8 @@ static BOOL LoadInstruments(void)
 				if(pth.panpts>XMENVCNT/2) pth.panpts=XMENVCNT/2;
 
 				if((_mm_eof(modreader))||(pth.volpts>XMENVCNT/2)||(pth.panpts>XMENVCNT/2)) {
-					if(nextwav) { MikMod_free(nextwav);nextwav=NULL; }
-					if(wh) { MikMod_free(wh);wh=NULL; }
+					MikMod_free(nextwav);nextwav=NULL;
+					MikMod_free(wh);wh=NULL;
 					_mm_errno = MMERR_LOADING_SAMPLEINFO;
 					return 0;
 				}
@@ -584,12 +585,12 @@ static BOOL LoadInstruments(void)
 					/* Allocate more room for sample information if necessary */
 					if(of.numsmp+u==wavcnt) {
 						wavcnt+=XM_SMPINCR;
-						if(!(nextwav=MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))){
-							if(wh) { MikMod_free(wh);wh=NULL; }
+						if(!(nextwav=(ULONG*)MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))){
+							MikMod_free(wh);wh=NULL;
 							_mm_errno = MMERR_OUT_OF_MEMORY;
 							return 0;
 						}
-						if(!(wh=MikMod_realloc(wh,wavcnt*sizeof(XMWAVHEADER)))) {
+						if(!(wh=(XMWAVHEADER*)MikMod_realloc(wh,wavcnt*sizeof(XMWAVHEADER)))) {
 							MikMod_free(nextwav);nextwav=NULL;
 							_mm_errno = MMERR_OUT_OF_MEMORY;
 							return 0;
@@ -656,8 +657,8 @@ static BOOL LoadInstruments(void)
 
 	/* sanity check */
 	if(!of.numsmp) {
-		if(nextwav) { MikMod_free(nextwav);nextwav=NULL; }
-		if(wh) { MikMod_free(wh);wh=NULL; }
+		MikMod_free(nextwav);nextwav=NULL;
+		MikMod_free(wh);wh=NULL;
 		_mm_errno = MMERR_LOADING_SAMPLEINFO;
 		return 0;
 	}

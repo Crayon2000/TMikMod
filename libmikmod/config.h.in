@@ -10,10 +10,10 @@
    calls */
 #undef DLSYM_NEEDS_UNDERSCORE
 
-/* Define if the AudioFile audio server driver is compiled */
+/* Define if the DEC AudioFile server driver is compiled */
 #undef DRV_AF
 
-/* Define if you want a .aiff file writer driver */
+/* Define if you want an .aiff file writer driver */
 #undef DRV_AIFF
 
 /* Define if the AIX audio driver is compiled */
@@ -55,6 +55,12 @@
 /* Define if your system supports binary pipes (i.e. Unix) */
 #undef DRV_PIPE
 
+/* Define if the PulseAudio driver is compiled */
+#undef DRV_PULSEAUDIO
+
+/* Define if you want a raw pcm data file writer driver */
+#undef DRV_RAW
+
 /* Define if the Linux SAM9407 driver is compiled */
 #undef DRV_SAM9407
 
@@ -73,6 +79,9 @@
 
 /* Define if the Linux Ultra driver is compiled */
 #undef DRV_ULTRA
+
+/* Define if you want a .wav file writer driver */
+#undef DRV_WAV
 
 /* Define if the Windows MCI driver is compiled */
 #undef DRV_WIN
@@ -152,6 +161,9 @@
 /* Define if your system provides POSIX.4 threads */
 #undef HAVE_PTHREAD
 
+/* Define to 1 if you have the <pulse/simple.h> header file. */
+#undef HAVE_PULSE_SIMPLE_H
+
 /* Define if your system has RTLD_GLOBAL defined in <dlfcn.h> */
 #undef HAVE_RTLD_GLOBAL
 
@@ -160,6 +172,9 @@
 
 /* Define to 1 if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
+
+/* Define to 1 if you have the <soundcard.h> header file. */
+#undef HAVE_SOUNDCARD_H
 
 /* Define to 1 if you have the `srandom' function. */
 #undef HAVE_SRANDOM
@@ -224,8 +239,7 @@
 /* Define to 1 if you have the <xaudio2.h> header file. */
 #undef HAVE_XAUDIO2_H
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
 /* Define if you want a debug version of the library */

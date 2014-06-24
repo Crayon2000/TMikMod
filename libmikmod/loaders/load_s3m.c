@@ -144,6 +144,11 @@ static void S3M_Cleanup(void)
 	MikMod_free(poslookup);
 	MikMod_free(mh);
 	MikMod_free(origpositions);
+	s3mbuf=NULL;
+	paraptr=NULL;
+	poslookup=NULL;
+	mh=NULL;
+	origpositions=NULL;
 }
 
 /* Because so many s3m files have 16 channels as the set number used, but really
@@ -154,9 +159,9 @@ static void S3M_Cleanup(void)
    global variable 'remap'
 
    NOTE: You must first seek to the file location of the pattern before calling
-         this procedure.
+   this procedure.
 
-   Returns 0 on fail.                                                         */
+   Returns 0 on fail. */
 static BOOL S3M_GetNumChannels(void)
 {
 	int row=0,flag,ch;
@@ -315,7 +320,7 @@ static BOOL S3M_Load(BOOL curious)
 
 	/* read the order data */
 	if(!AllocPositions(mh->ordnum)) return 0;
-	if(!(origpositions=MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
+	if(!(origpositions=(UWORD*)MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
 
 	for(t=0;t<mh->ordnum;t++) {
 		origpositions[t]=_mm_read_UBYTE(modreader);
@@ -374,7 +379,8 @@ static BOOL S3M_Load(BOOL curious)
 		_mm_read_string(s.scrs,4,modreader);
 
 		/* ScreamTracker imposes a 64000 bytes (not 64k !) limit */
-		if (s.length > 64000)
+		/* enforce it, if we'll use S3MIT_SCREAM in S3M_ConvertTrack() */
+		if (s.length > 64000 && tracker == 1)
 			s.length = 64000;
 
 		if(_mm_eof(modreader)) {

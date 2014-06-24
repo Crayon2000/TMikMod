@@ -62,7 +62,7 @@
 /* note that since we only need the network part of EsounD, we don't need to
    load libasound.so or libaudiofile.so as well */
 static int(*esd_closestream)(int);
-static int(*esd_playstream)(esd_format_t,int,char*,char*);
+static int(*esd_playstream)(esd_format_t,int,const char*,const char*);
 static void* libesd=NULL;
 #ifndef HAVE_RTLD_GLOBAL
 #define RTLD_GLOBAL (0)
@@ -94,21 +94,21 @@ static int ESD_Link(void)
 	if (libesd) return 0;
 
 	/* load libesd.so */
-	libesd=dlopen("libesd.so",RTLD_LAZY|RTLD_GLOBAL);
+	libesd=dlopen("libesd.so.0",RTLD_LAZY|RTLD_GLOBAL);
+	if (!libesd) libesd=dlopen("libesd.so",RTLD_LAZY|RTLD_GLOBAL);
 	if (!libesd) return 1;
 
 	/* resolve function references */
-	if (!(esd_closestream=dlsym(libesd,"esd_close"))) return 1;
-	if (!(esd_playstream=dlsym(libesd,"esd_play_stream"))) return 1;
+	if (!(esd_closestream = (int (*)(int)) dlsym(libesd,"esd_close"))) return 1;
+	if (!(esd_playstream = (int (*)(esd_format_t,int,const char*,const char*))
+					 dlsym(libesd,"esd_play_stream"))) return 1;
 
 	return 0;
 }
 
 static void ESD_Unlink(void)
 {
-#ifdef HAVE_ESD_CLOSE
 	esd_closestream=NULL;
-#endif
 	esd_playstream=NULL;
 
 	if (libesd) {
@@ -207,7 +207,7 @@ static void ESD_CommandLine(const CHAR *cmdline)
 	CHAR *ptr=MD_GetAtom("machine",cmdline,0);
 
 	if (ptr) {
-		if (espeaker) MikMod_free(espeaker);
+		MikMod_free(espeaker);
 		espeaker=ptr;
 	}
 }

@@ -38,6 +38,9 @@ static void _mm_registeralldrivers(void)
 #ifdef DRV_AF
 	_mm_registerdriver(&drv_AF);
 #endif
+#ifdef DRV_PULSEAUDIO
+	_mm_registerdriver(&drv_pulseaudio);
+#endif
 #ifdef DRV_ESD
 	_mm_registerdriver(&drv_esd);
 #endif
@@ -98,6 +101,9 @@ static void _mm_registeralldrivers(void)
 #ifdef DRV_OSX
 	_mm_registerdriver(&drv_osx);
 #endif
+#ifdef DRV_DC
+	_mm_registerdriver(&drv_dc);
+#endif
 #ifdef DRV_GP32
 	_mm_registerdriver(&drv_gp32);
 #endif
@@ -112,11 +118,15 @@ static void _mm_registeralldrivers(void)
 #endif
 
 	/* Register disk writers */
+#ifdef DRV_WAV
 	_mm_registerdriver(&drv_wav);
+#endif
 #ifdef DRV_AIFF
 	_mm_registerdriver(&drv_aiff);
 #endif
+#ifdef DRV_RAW
 	_mm_registerdriver(&drv_raw);
+#endif
 
 	/* Register other drivers */
 #ifdef DRV_PIPE

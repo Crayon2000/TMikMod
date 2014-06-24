@@ -77,17 +77,15 @@ int *AllocLinear(void)
 {
 	if(of.numsmp>noteindexcount) {
 		noteindexcount=of.numsmp;
-		noteindex=MikMod_realloc(noteindex,noteindexcount*sizeof(int));
+		noteindex=(int*)MikMod_realloc(noteindex,noteindexcount*sizeof(int));
 	}
 	return noteindex;
 }
 
 void FreeLinear(void)
 {
-	if(noteindex) {
-		MikMod_free(noteindex);
-		noteindex=NULL;
-	}
+	MikMod_free(noteindex);
+	noteindex=NULL;
 	noteindexcount=0;
 }
 
