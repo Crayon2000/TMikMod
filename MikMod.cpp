@@ -14,8 +14,6 @@
 #pragma comment(lib, "dsound") // Needed for the DirectSound driver
 #endif                      // DRV_DS
 
-#define RT_RAWDATA 10 // Same has RT_RCDATA but works in OS X
-
 typedef struct _MOD_READER
 {
     MREADER Core;
@@ -186,9 +184,16 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
  */
 void __fastcall TMikMod::LoadFromFile(const System::UnicodeString AFileName, int Maxchan, bool Curious)
 {
-    TFileStream *FileStream = new TFileStream(AFileName, fmOpenRead);
-    LoadFromStream(FileStream, Maxchan, Curious);
-    delete FileStream;
+    TFileStream *FileStream = NULL;
+    try
+    {
+        FileStream = new TFileStream(AFileName, fmOpenRead);
+        LoadFromStream(FileStream, Maxchan, Curious);
+    }
+    __finally
+    {
+        delete FileStream;
+    }
 }
 
 /**
@@ -220,9 +225,16 @@ void __fastcall TMikMod::LoadFromStream(System::Classes::TStream *ASream, int Ma
  */
 void __fastcall TMikMod::LoadFromResourceName(unsigned Instance, const System::UnicodeString ResName, int Maxchan, bool Curious)
 {
-    TResourceStream *ResStream = new TResourceStream(Instance, ResName, (System::WideChar *)RT_RAWDATA);
-    LoadFromStream(ResStream, Maxchan, Curious);
-    delete ResStream;
+    TResourceStream *ResStream = NULL;
+    try
+    {
+        ResStream = new TResourceStream(Instance, ResName, (System::WideChar *)RT_RCDATA);
+        LoadFromStream(ResStream, Maxchan, Curious);
+    }
+    __finally
+    {
+        delete ResStream;
+    }
 }
 
 /**
