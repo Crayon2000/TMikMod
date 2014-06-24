@@ -28,7 +28,7 @@ void AutoRegMediaCodecClass()
 
 /**
  * Creates a TMikModMedia from a given file.
- * @param AFileName The parameter specifies the name of the file from which to create the TMikModMedia. 
+ * @param AFileName The parameter specifies the name of the file from which to create the TMikModMedia.
  */
 TMedia* __fastcall TMikModMediaCodec::CreateFromFile(const System::UnicodeString AFileName)
 {
@@ -37,6 +37,7 @@ TMedia* __fastcall TMikModMediaCodec::CreateFromFile(const System::UnicodeString
 
 /**
  * Constructor.
+ * @param AFileName The media file.
  */
 __fastcall TMikModMedia::TMikModMedia(const System::UnicodeString AFileName) :
     Media::TMedia(AFileName)
@@ -55,14 +56,16 @@ __fastcall TMikModMedia::~TMikModMedia(void)
 
 /**
  * Getter function for the Duration property.
+ * @return The total play time of the current media file.
  */
 __int64 __fastcall TMikModMedia::GetDuration(void)
 {
     return FMikMod->NumberPos;
 }
- 
+
 /**
  * Getter function for the CurrentTime property.
+ * @return The current playback position.
  */
 __int64 __fastcall TMikModMedia::GetCurrent(void)
 {
@@ -71,7 +74,7 @@ __int64 __fastcall TMikModMedia::GetCurrent(void)
 
 /**
  * Setter function for the CurrentTime property.
- * @param Value Specifies the new value for CurrentTime.  
+ * @param Value Specifies the new value for CurrentTime.
  */
 void __fastcall TMikModMedia::SetCurrent(const __int64 Value)
 {
@@ -80,6 +83,7 @@ void __fastcall TMikModMedia::SetCurrent(const __int64 Value)
 
 /**
  * Getter function for the VideoSize property.
+ * @param The media file is audio only and does not have a window, so the VideoSize is (0,0).
  */
 System::Types::TPointF __fastcall TMikModMedia::GetVideoSize(void)
 {
@@ -88,14 +92,16 @@ System::Types::TPointF __fastcall TMikModMedia::GetVideoSize(void)
 
 /**
  * Getter function for the State property.
+ * @return If the current media file is playing, then State is set to Playing, otherwise it is set to Stopped.
  */
 TMediaState __fastcall TMikModMedia::GetMediaState(void)
 {
-    return TMediaState::Unavailable;
+    return FMikMod->Active ? TMediaState::Playing : TMediaState::Stopped;
 }
 
 /**
- * Getter function for the Volume property. 
+ * Getter function for the Volume property.
+ * @param The audio volume of the current media file.
  */
 float __fastcall TMikModMedia::GetVolume(void)
 {

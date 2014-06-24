@@ -364,6 +364,15 @@ TVoice* __fastcall TMikMod::GetVoice(int Index)
 }
 
 /**
+ * This function returns whether sound output is enabled or not.
+ * @return Returns true if sound output is enabled, false otherwise.
+ */
+bool __fastcall TMikMod::GetActive()
+{
+    return MikMod_Active();
+}
+
+/**
  * This function has the same behaviour as feof.
  */
 static BOOL GST_READER_Eof(MREADER * reader)

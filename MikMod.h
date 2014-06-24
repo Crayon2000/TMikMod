@@ -78,6 +78,7 @@ protected:
     unsigned short __fastcall GetPosition();
     void __fastcall SetPosition(unsigned short APosition);
     TVoice* __fastcall GetVoice(int Index);
+    bool __fastcall GetActive();
 public:
     __fastcall TMikMod(TModuleDriver ADriver = TModuleDriver::mdNoSound);
     virtual __fastcall ~TMikMod();
@@ -98,6 +99,7 @@ public:
     __property unsigned short SongPosition = {read=GetPosition, write=SetPosition}; /**< Song position. */
     __property int VoiceCount = {read=FVoiceCount}; /**< Number of voice. */
     __property TVoice* Voices[int Index] = {read=GetVoice}; /**< Use Voices to obtain a pointer to a specific TVoice object in the array. */
+    __property bool Active = {read=GetActive}; /**< Returns whether sound output is enabled or not. */
 __published:
     __property int Volume = {read=FVolume, write=SetVolume, default = 128}; /**< Volume. */
 };
