@@ -114,7 +114,7 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     // Only one device is used, this is needed to use command line
     md_device = 1;
 
-    AnsiString CommandLine;
+    std::string CommandLine; // Do not use AnsiString, there is a problem with OS X
     if(ADriver == TModuleDriver::mdDirectSound)
     {
         CommandLine = "globalfocus"; // Play if window does not have the focus
