@@ -2,15 +2,15 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
 
-AC_INIT([libmikmod],[3.3.6])
+AC_INIT([libmikmod],[3.3.7])
 LIBMIKMOD_MAJOR_VERSION=3
 LIBMIKMOD_MINOR_VERSION=3
-LIBMIKMOD_MICRO_VERSION=6
+LIBMIKMOD_MICRO_VERSION=7
 LIBMIKMOD_VERSION=$LIBMIKMOD_MAJOR_VERSION.$LIBMIKMOD_MINOR_VERSION.$LIBMIKMOD_MICRO_VERSION
 
 AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE([1.10 foreign subdir-objects])
-AC_CONFIG_SRCDIR([include/mikmod.h.in])
+AC_CONFIG_SRCDIR([include/mikmod_internals.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_LIBOBJ_DIR([posix])
 AM_MAINTAINER_MODE
@@ -43,6 +43,7 @@ libmikmod_netbsd=no
 libmikmod_openbsd=no
 libmikmod_os2=no
 libmikmod_djgpp=no
+libmikmod_amiga=no
 
 case $host_os in
 	mingw*) libmikmod_mingw=yes ;;
@@ -53,6 +54,8 @@ case $host_os in
 	openbsd*) libmikmod_openbsd=yes ;;
 	emx*) libmikmod_os2=yes;;
 	*djgpp) libmikmod_djgpp=yes ;;
+	amigaos*|aros*|morphos*)
+		libmikmod_amiga=yes ;;
 esac
 
 # ==============================================================
@@ -60,6 +63,7 @@ esac
 # ==============================================================
 
 libmikmod_driver_af=no
+libmikmod_driver_ahi=yes
 libmikmod_driver_aix=no
 libmikmod_driver_alsa=yes
 libmikmod_driver_pulseaudio=yes
@@ -85,6 +89,8 @@ libmikmod_driver_wav=yes
 libmikmod_driver_raw=yes
 libmikmod_driver_stdout=yes
 libmikmod_driver_pipe=yes
+# ANDROID and DRV_OSLES are not configury-integrated
+libmikmod_driver_osles=no
 
 libmikmod_dynload=yes
 libmikmod_dynload_underscores=no
@@ -95,6 +101,8 @@ libmikmod_altivec=no
 libmikmod_sse2=no
 
 libmikmod_unix=default
+
+libmikmod_docs=yes
 
 # =========================
 # Configure script options.
@@ -114,6 +122,14 @@ then
   libmikmod_driver_alsa=yes
 else
   libmikmod_driver_alsa=no
+fi])
+
+AC_ARG_ENABLE([ahi], [AS_HELP_STRING([--enable-ahi],[Amiga only: include AHI driver [guessed]])],
+[if test "$enableval" = "yes"
+then
+  libmikmod_driver_ahi=yes
+else
+  libmikmod_driver_ahi=no
 fi])
 
 AC_ARG_ENABLE([pulseaudio], [AS_HELP_STRING([--enable-pulseaudio],[include PulseAudio driver [guessed]])],
@@ -141,7 +157,7 @@ else
 fi])
 
 case $host_os in
-  mingw*|emx*|*djgpp)
+  mingw*|emx*|*djgpp|amigaos*|aros*|morphos*)
      # windows, dos, os2 don't need sdl, stdout, or pipe.
      # so default to disabled, but still user-selectable.
      libmikmod_driver_pipe=no
@@ -285,7 +301,7 @@ else
   libmikmod_driver_os2=no
 fi])
 
-AC_ARG_ENABLE([dart], [AS_HELP_STRING([--enable-dart],[OS/2 (Warp 4) only: include OS/2 direct audio (DART) [default=no]])],
+AC_ARG_ENABLE([dart], [AS_HELP_STRING([--enable-dart],[OS/2 (Warp 4) only: include OS/2 direct audio (DART) [guessed]])],
 [if test "$enableval" = "yes"
 then
   libmikmod_driver_dart=yes
@@ -348,6 +364,13 @@ elif test "$enableval" = "no" ;then
   libmikmod_unix=0
 fi])
 
+AC_ARG_ENABLE([doc], [AS_HELP_STRING([--enable-doc],[Build and install the documentation [default=yes]])],
+[if test "$enableval" = "yes" ;then
+  libmikmod_docs=yes
+elif test "$enableval" = "no" ;then
+  libmikmod_docs=no
+fi])
+
 # ===================
 # Check for programs.
 # ===================
@@ -360,20 +383,6 @@ AC_PROG_MAKE_SET
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
-# Check if makeinfo support html output. If it doesn't, pretend it's missing
-# rather than failing rebuilding the documentation.
-AC_CACHE_CHECK([if makeinfo supports html output],[libmikmod_cv_makeinfo_html],
-		if (makeinfo --help 2>&1 | grep html > /dev/null) 2>/dev/null ; then
-			libmikmod_cv_makeinfo_html=yes
-		else
-			libmikmod_cv_makeinfo_html=no
-		fi)
-if test $libmikmod_cv_makeinfo_html = no ; then
-	MAKEINFO="$missing_dir/missing makeinfo"
-else
-	MAKEINFO="$MAKEINFO --no-split"
-fi
-
 # =============================================================
 # Check for typedefs, structures, and compiler characteristics.
 # =============================================================
@@ -385,10 +394,8 @@ AC_CACHE_CHECK([if compiler understands the signed keyword],[libmikmod_cv_gcc_si
 	AC_LANG_C
 	AC_TRY_COMPILE(,[signed int t = 0;],[libmikmod_cv_gcc_signed=yes],[libmikmod_cv_gcc_signed=no])
 	AC_LANG_RESTORE)
-if test $libmikmod_cv_gcc_signed = yes; then
-	DOES_NOT_HAVE_SIGNED=""
-else
-	DOES_NOT_HAVE_SIGNED="#define signed"
+if test $libmikmod_cv_gcc_signed = no; then
+	AC_DEFINE(signed,,[Define to empty if compiler does not understand the `signed' keyword.])
 fi
 
 AC_TYPE_PID_T
@@ -480,7 +487,7 @@ fi
 
 # POSIX.4 threads
 # ---------------
-if test $libmikmod_mingw = yes ; then
+if test $libmikmod_mingw = yes || test $libmikmod_amiga = yes ; then
 	dnl libmikmod_threads variable is for pthreads only
 	libmikmod_threads=no
 fi
@@ -524,6 +531,13 @@ else
 	libmikmod_driver_alsa=no
 fi
 
+# Amiga audio
+# ---------------------
+case $host_os in
+ amigaos*|aros*|morphos*) ;;
+ *) libmikmod_driver_ahi=no ;;
+esac
+
 # pulseaudio
 # ----------
 if test $libmikmod_driver_pulseaudio = yes
@@ -555,15 +569,17 @@ then
 	    if test -n "$ac_x_includes" || test -n "$ac_x_libraries"; then
 		ac_save_CFLAGS=$CFLAGS
 		ac_save_LDFLAGS=$LDFLAGS
+		ac_save_LIBS=$LIBS
 		test -n "$ac_x_includes" && CFLAGS="$CFLAGS -I$ac_x_includes"
 		test -n "$ac_x_libraries" && LDFLAGS="$LDFLAGS -L$ac_x_libraries"
-		LDFLAGS="$LDFLAGS -laudio"
+		LIBS="$LIBS -laudio"
 		AC_MSG_CHECKING([X11 locations for NAS])
 		AC_TRY_LINK([#include <audio/audiolib.h>],
 				[AuFlowID f=AuCreateFlow(0,0);],
 				[libmikmod_driver_nas=yes])
 		CFLAGS=$ac_save_CFLAGS
 		LDFLAGS=$ac_save_LDFLAGS
+		LIBS=$ac_save_LIBS
 		AC_MSG_RESULT([$libmikmod_driver_nas])
 		if test $libmikmod_driver_nas = yes; then
 			test -n "$ac_x_includes" && CFLAGS="$CFLAGS -I$ac_x_includes"
@@ -860,6 +876,12 @@ then
 	AC_DEFINE([DRV_AIX], 1, [Define if the AIX audio driver is compiled])
 fi
 
+if test $libmikmod_driver_ahi = yes
+then
+	libmikmod_driverlist="ahi $libmikmod_driverlist"
+	AC_DEFINE([DRV_AHI], 1, [Define if the Amiga AHI driver is compiled])
+fi
+
 if test $libmikmod_driver_alsa = yes
 then
 	libmikmod_driverlist="alsa $libmikmod_driverlist"
@@ -969,6 +991,13 @@ then
 		AC_DEFINE([DRV_OSX], 1, [Define this if you want the MacOS X CoreAudio driver])
 		LIBRARY_LIB="-framework CoreAudio $LIBRARY_LIB"
 	fi
+fi
+
+#OpenSL ES driver (e.g. Android)
+if test $libmikmod_driver_osles = yes
+then
+	AC_DEFINE([DRV_OSLES], 1, [Define if the OpenSL ES driver is compiled])
+	LIBRARY_LIB="-lOpenSLES $LIBRARY_LIB"
 fi
 
 if test $libmikmod_darwin = yes
@@ -1158,12 +1187,12 @@ __attribute__((visibility("default"))) void foo(void) {}],
 		[libmikmod_cv_gcc_visibility=no])
 	AC_LANG_RESTORE)
 # we want symbol -fvisibility for elf targets, however it works
-# with darwin/macho too.  other than that, windows, dos and os2
+# with darwin/macho too.  other than that, windows, dos, os/2, amiga
 # do not need it:  for any such targets, the -Werror switch is
 # supposed to fail the above check. (I'm adding the manual test
 # below nonetheless, just in case.)
 case $host_os in
-   mingw*|cygwin*|emx*|*djgpp)
+   mingw*|cygwin*|emx*|*djgpp|amigaos*|aros*|morphos*)
 	libmikmod_cv_gcc_visibility=no
 	;;
 esac
@@ -1176,8 +1205,9 @@ fi
 # Create Makefiles.
 # =================
 
+AM_CONDITIONAL([BUILD_DOCS], [test "$libmikmod_docs" = yes])
+
 AC_SUBST(REENTRANT)
-AC_SUBST(DOES_NOT_HAVE_SIGNED)
 
 AC_SUBST(LIBRARY_LIB)
 
@@ -1197,43 +1227,22 @@ docs/Makefile
 docs/libmikmod-config.1
 dlapi/Makefile
 drivers/Makefile
+drivers/dos/Makefile
 include/Makefile
-include/mikmod.h
-include/mikmod_build.h:include/mikmod.h.in
 loaders/Makefile
 mmio/Makefile
 playercode/Makefile
-posix/Makefile
-macintosh/Makefile
-macintosh/mikmod.h:include/mikmod.h.in
-macintosh/mikmod_build.h:include/mikmod.h.in
-macintosh/_libmikmodversion.r
-macosx/Makefile
-macosx/mikmod.h:include/mikmod.h.in
-macosx/mikmod_build.h:include/mikmod.h.in
-macosx/Info.plist
-macosx/InfoPlist.strings
-os2/Makefile
-dos/Makefile
-dos/include/Makefile
-dos/src/Makefile
-win32/Makefile
-win32/mikmod.h:include/mikmod.h.in
-win32/mikmod_build.h:include/mikmod.h.in
-examples/Makefile])
+posix/Makefile])
 AC_CONFIG_HEADERS([config.h])
 AC_OUTPUT
 
 chmod +x libmikmod-config
-cat macintosh/_libmikmodversion.r | tr '\n' '\r' > macintosh/libmikmodversion.r
 
 # ====================
 # Print configuration.
 # ====================
 
-libmikmod_driverlist=`echo $libmikmod_driverlist|sed -e 's,  , ,g'`
-if test $libmikmod_dynload != no
-then
+if test $libmikmod_dynload != no; then
 	libmikmod_dynload="yes, ${libmikmod_dynload} style"
 fi
 

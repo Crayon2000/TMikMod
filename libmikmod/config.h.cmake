@@ -26,6 +26,8 @@
 #cmakedefine DRV_NAS 1
 /* Define if the OpenAL driver is compiled */
 #cmakedefine DRV_OPENAL 1
+/* Define if the OpenSL ES driver is compiled */
+#cmakedefine DRV_OSLES 1
 /* Define if the Open Sound System driver is compiled */
 #cmakedefine DRV_OSS 1
 /* Define if the Linux SAM9407 driver is compiled */
@@ -54,12 +56,16 @@
 
 /* Define if you want a debug version of the library */
 #cmakedefine MIKMOD_DEBUG 1
+
 /* Define if you want runtime dynamic linking of ALSA and EsounD drivers */
 #cmakedefine MIKMOD_DYNAMIC 1
+
 /* Define if you want to use SIMD (AltiVec or SSE2) optimizations (Unstable!)  */
 #cmakedefine MIKMOD_SIMD 1
+
 /* Define to 0 or 1 to override MIKMOD_UNIX in mikmod_internals.h. */
 #cmakedefine MIKMOD_UNIX 1
+
 
 /* ========== Build environment information */
 
@@ -225,6 +231,9 @@
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #cmakedefine const
+
+/* Define to empty if compiler does not understand the `signed' keyword. */
+#cmakedefine signed
 
 /* Define to `int' if <sys/types.h> does not define. */
 #cmakedefine pid_t

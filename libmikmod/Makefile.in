@@ -111,13 +111,14 @@ LIBOBJDIR = posix/
 libmikmod_la_DEPENDENCIES = @LTLIBOBJS@
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libmikmod_la_OBJECTS = dlapi/dl_hpux.lo drivers/drv_AF.lo \
-	drivers/drv_aiff.lo drivers/drv_aix.lo drivers/drv_alsa.lo \
-	drivers/drv_dart.lo drivers/drv_dc.lo drivers/drv_ds.lo \
-	drivers/drv_esd.lo drivers/drv_gp32.lo drivers/drv_hp.lo \
-	drivers/drv_mac.lo drivers/drv_nas.lo drivers/drv_nos.lo \
-	drivers/drv_openal.lo drivers/drv_os2.lo drivers/drv_oss.lo \
-	drivers/drv_osx.lo drivers/drv_pulseaudio.lo \
-	drivers/drv_pipe.lo drivers/drv_raw.lo drivers/drv_sam9407.lo \
+	drivers/drv_aiff.lo drivers/drv_ahi.lo drivers/drv_aix.lo \
+	drivers/drv_alsa.lo drivers/drv_dart.lo drivers/drv_dc.lo \
+	drivers/drv_ds.lo drivers/drv_esd.lo drivers/drv_gp32.lo \
+	drivers/drv_hp.lo drivers/drv_mac.lo drivers/drv_nas.lo \
+	drivers/drv_nos.lo drivers/drv_openal.lo drivers/drv_os2.lo \
+	drivers/drv_osles.lo drivers/drv_oss.lo drivers/drv_osx.lo \
+	drivers/drv_pulseaudio.lo drivers/drv_pipe.lo \
+	drivers/drv_psp.lo drivers/drv_raw.lo drivers/drv_sam9407.lo \
 	drivers/drv_sb.lo drivers/drv_sdl.lo drivers/drv_sgi.lo \
 	drivers/drv_stdout.lo drivers/drv_sun.lo drivers/drv_ultra.lo \
 	drivers/drv_wav.lo drivers/drv_win.lo drivers/drv_wss.lo \
@@ -175,7 +176,8 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	distdir dist dist-all distcheck
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = drivers include loaders mmio playercode posix dlapi \
+	docs
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -233,7 +235,6 @@ CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
-DOES_NOT_HAVE_SIGNED = @DOES_NOT_HAVE_SIGNED@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -354,12 +355,16 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
+@BUILD_DOCS_TRUE@MAYBE_DOCS = docs
 SUBDIRS = drivers include loaders mmio playercode posix \
-          dlapi dos macintosh macosx os2 win32 docs examples
+	  dlapi $(MAYBE_DOCS)
 
 bin_SCRIPTS = libmikmod-config
 EXTRA_DIST = libmikmod-config.in libmikmod.m4 libmikmod.pc.in \
 	     libmikmod.spec.in libmikmod.spec COPYING.LESSER \
+	     android macosx win32 \
+	     dos dc gp32 macintosh os2 psp \
+	     examples \
 	     config.h.cmake CMakeLists.txt cmake
 
 m4datadir = $(datadir)/aclocal
@@ -371,12 +376,13 @@ ACLOCAL_AMFLAGS = -I m4
 # always define MIKMOD_BUILD when building libmikmod
 # regardless of static build or shared library build..
 AM_CFLAGS = -DMIKMOD_BUILD=1
-AM_CPPFLAGS = -I@top_builddir@/include -I@top_srcdir@/include
+AM_CPPFLAGS = -I@top_srcdir@/include
 lib_LTLIBRARIES = libmikmod.la
 libmikmod_la_SOURCES = \
 		dlapi/dl_hpux.c   \
 		drivers/drv_AF.c \
 		drivers/drv_aiff.c \
+		drivers/drv_ahi.c \
 		drivers/drv_aix.c \
 		drivers/drv_alsa.c \
 		drivers/drv_dart.c \
@@ -390,10 +396,12 @@ libmikmod_la_SOURCES = \
 		drivers/drv_nos.c \
 		drivers/drv_openal.c \
 		drivers/drv_os2.c \
+		drivers/drv_osles.c \
 		drivers/drv_oss.c \
 		drivers/drv_osx.c \
 		drivers/drv_pulseaudio.c \
 		drivers/drv_pipe.c \
+		drivers/drv_psp.c \
 		drivers/drv_raw.c \
 		drivers/drv_sam9407.c \
 		drivers/drv_sb.c \
@@ -557,6 +565,8 @@ drivers/drv_AF.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_aiff.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
+drivers/drv_ahi.lo: drivers/$(am__dirstamp) \
+	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_aix.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_alsa.lo: drivers/$(am__dirstamp) \
@@ -583,6 +593,8 @@ drivers/drv_openal.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_os2.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
+drivers/drv_osles.lo: drivers/$(am__dirstamp) \
+	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_oss.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_osx.lo: drivers/$(am__dirstamp) \
@@ -590,6 +602,8 @@ drivers/drv_osx.lo: drivers/$(am__dirstamp) \
 drivers/drv_pulseaudio.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_pipe.lo: drivers/$(am__dirstamp) \
+	drivers/$(DEPDIR)/$(am__dirstamp)
+drivers/drv_psp.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_raw.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
@@ -750,6 +764,8 @@ mostlyclean-compile:
 	-rm -f dlapi/dl_hpux.lo
 	-rm -f drivers/drv_AF.$(OBJEXT)
 	-rm -f drivers/drv_AF.lo
+	-rm -f drivers/drv_ahi.$(OBJEXT)
+	-rm -f drivers/drv_ahi.lo
 	-rm -f drivers/drv_aiff.$(OBJEXT)
 	-rm -f drivers/drv_aiff.lo
 	-rm -f drivers/drv_aix.$(OBJEXT)
@@ -778,12 +794,16 @@ mostlyclean-compile:
 	-rm -f drivers/drv_openal.lo
 	-rm -f drivers/drv_os2.$(OBJEXT)
 	-rm -f drivers/drv_os2.lo
+	-rm -f drivers/drv_osles.$(OBJEXT)
+	-rm -f drivers/drv_osles.lo
 	-rm -f drivers/drv_oss.$(OBJEXT)
 	-rm -f drivers/drv_oss.lo
 	-rm -f drivers/drv_osx.$(OBJEXT)
 	-rm -f drivers/drv_osx.lo
 	-rm -f drivers/drv_pipe.$(OBJEXT)
 	-rm -f drivers/drv_pipe.lo
+	-rm -f drivers/drv_psp.$(OBJEXT)
+	-rm -f drivers/drv_psp.lo
 	-rm -f drivers/drv_pulseaudio.$(OBJEXT)
 	-rm -f drivers/drv_pulseaudio.lo
 	-rm -f drivers/drv_raw.$(OBJEXT)
@@ -892,6 +912,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@dlapi/$(DEPDIR)/dl_hpux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_AF.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_ahi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_aiff.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_aix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_alsa.Plo@am__quote@
@@ -906,9 +927,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_nos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_openal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_os2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_osles.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_oss.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_osx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_pipe.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_psp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_pulseaudio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_raw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_sam9407.Plo@am__quote@

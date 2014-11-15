@@ -1,11 +1,18 @@
 AUTOMAKE_OPTIONS = foreign
+
+if BUILD_DOCS
+   MAYBE_DOCS = docs
+endif
 SUBDIRS = drivers include loaders mmio playercode posix \
-          dlapi dos macintosh macosx os2 win32 docs examples
+	  dlapi $(MAYBE_DOCS)
 
 bin_SCRIPTS = libmikmod-config
 
 EXTRA_DIST = libmikmod-config.in libmikmod.m4 libmikmod.pc.in \
 	     libmikmod.spec.in libmikmod.spec COPYING.LESSER \
+	     android macosx win32 \
+	     dos dc gp32 macintosh os2 psp \
+	     examples \
 	     config.h.cmake CMakeLists.txt cmake
 
 m4datadir = $(datadir)/aclocal
@@ -20,7 +27,7 @@ ACLOCAL_AMFLAGS = -I m4
 # regardless of static build or shared library build..
 AM_CFLAGS = -DMIKMOD_BUILD=1
 
-AM_CPPFLAGS = -I@top_builddir@/include -I@top_srcdir@/include
+AM_CPPFLAGS = -I@top_srcdir@/include
 
 lib_LTLIBRARIES = libmikmod.la
 
@@ -28,6 +35,7 @@ libmikmod_la_SOURCES = \
 		dlapi/dl_hpux.c   \
 		drivers/drv_AF.c \
 		drivers/drv_aiff.c \
+		drivers/drv_ahi.c \
 		drivers/drv_aix.c \
 		drivers/drv_alsa.c \
 		drivers/drv_dart.c \
@@ -41,10 +49,12 @@ libmikmod_la_SOURCES = \
 		drivers/drv_nos.c \
 		drivers/drv_openal.c \
 		drivers/drv_os2.c \
+		drivers/drv_osles.c \
 		drivers/drv_oss.c \
 		drivers/drv_osx.c \
 		drivers/drv_pulseaudio.c \
 		drivers/drv_pipe.c \
+		drivers/drv_psp.c \
 		drivers/drv_raw.c \
 		drivers/drv_sam9407.c \
 		drivers/drv_sb.c \
@@ -98,4 +108,3 @@ libmikmod_la_SOURCES = \
 
 libmikmod_la_LDFLAGS = -no-undefined -version-info @MIKMOD_LT_CURRENT@:@MIKMOD_LT_REVISION@:@MIKMOD_LT_AGE@
 libmikmod_la_LIBADD = @LTLIBOBJS@ @LIBRARY_LIB@
-

@@ -5,8 +5,8 @@
 #include "MikMod.h"
 #include "MikModThread.h"
 #include "MikModContnrs.h"
-#include "mikmod_build.h"
-#include "mikmod_internals.h"
+#include "include/mikmod.h"
+#include "include/mikmod_internals.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 

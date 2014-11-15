@@ -1,7 +1,7 @@
   Hello folks !
 
 
-This is libmikmod, version 3.3.6, a portable sound library for Unix.
+This is libmikmod, version 3.3.7, a portable sound library for Unix.
 Check out the file 'NEWS' for more history information.
 
 
@@ -18,42 +18,26 @@ I hope you've installed REXX support during the system installation. If
 you didn't, you lose. Run 'selective install' from the system setup
 folder, install REXX support, check it works, and come back here.
 
-Currently, libmikmod can be build under OS/2 only with the emx compiler
-or the Watcom compiler. Borland C lacks a 64-bit integer type and can't
-be used.  You'll need the MMPM/2 toolkit (included in all the Warp
-toolkits) to compile the MMPM/2 driver. The Warp 4 toolkit is required
-if you want to build the DART driver, too.
+Currently, libmikmod can be build under OS/2 only with the Watcom compiler
+(tested with OpenWatcom 1.9) or with the EMX compiler (not tested). You'll
+need the MMPM/2 toolkit (included in all the Warp toolkits) to compile the
+MMPM/2 driver. The Warp4 toolkit is required if you want to build the DART
+driver, too.
 
-Oh, I almost forgot: you need long filenames to compile libmikmod, so
-you'll have to compile it on an HPFS drive, or an ext2fs drive, or a
-network drive where you can use decent-size filenames.
+You need long filenames to compile libmikmod, so you'll have to compile it
+on an HPFS drive, or an ext2fs drive, or a network drive where you can
+use decent-size filenames.
 
-In this directory, run
+For EMX, run:
+    make -f Makefile.emx dll
 
-  configure
+For Watcom, run:
+    wmake -f Makefile.wat
 
-You will then be asked some questions.
-First, you'll have to choose your compiler. 
+and you'll get your mikmod.dll and its import lib in this directory.
+Edit the makefiles in case you need to customize the build options, or
+you want to make a static library, and/or want to learn any details.
 
-If you choose emx, you can either build a static library, or a DLL with
-an import library.
-
-Then, you will be asked if you want to build a debug version; this
-option is mainly intended for the libmikmod developers, so you should
-answer "N" here.
-
-The next step is the driver selection. You'll be asked if you want the
-MMPM/2 and DART drivers. Since DART is not available on OS/2 older than
-Warp 4, the MMPM/2 driver is recommended for pre-Warp 4 systems.
-Otherwise, the DART driver is preferable, but you can include both to be
-sure your libmikmod library will work on every 32 bit version of OS/2.
-
-After the configuration has finished and the Makefiles are created, just
-run
-
-  build
-
-and you'll get your libmikmod library in the libmikmod directory.
 If the build fails, I'd like to hear from you to correct the problem.
 
 To make you library ready to use, copy the file '..\include\mikmod.h'

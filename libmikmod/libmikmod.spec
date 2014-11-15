@@ -1,4 +1,4 @@
-%define version 3.3.6
+%define version 3.3.7
 %define release 1
 
 Summary:    sound library for module files

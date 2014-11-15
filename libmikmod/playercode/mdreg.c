@@ -62,6 +62,9 @@ static void _mm_registeralldrivers(void)
 #endif
 
 	/* Register OS-specific hardware drivers - software mixing */
+#ifdef DRV_AHI
+	_mm_registerdriver(&drv_ahi);
+#endif
 #ifdef DRV_AIX
 	_mm_registerdriver(&drv_aix);
 #endif
@@ -107,10 +110,15 @@ static void _mm_registeralldrivers(void)
 #ifdef DRV_GP32
 	_mm_registerdriver(&drv_gp32);
 #endif
+#ifdef DRV_PSP
+	_mm_registerdriver(&drv_psp);
+#endif
+#ifdef DRV_OSLES
+	_mm_registerdriver(&drv_osles);
+#endif
 
-	/* dos drivers */
+	/* dos drivers - wss first, since some cards emulate sb */
 #ifdef DRV_WSS
-	/* wss first, since some cards emulate sb */
 	_mm_registerdriver(&drv_wss);
 #endif
 #ifdef DRV_SB

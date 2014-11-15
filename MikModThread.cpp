@@ -3,7 +3,7 @@
 #pragma hdrstop
 
 #include "MikModThread.h"
-#include "mikmod_build.h"
+#include "include/mikmod.h"
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 
@@ -20,7 +20,9 @@ __fastcall TMikModThread::TMikModThread() : Classes::TThread(true)
  */
 void __fastcall TMikModThread::Execute()
 {
-    TThread::CurrentThread->NameThreadForDebugging(System::AnsiString("TMikModThread"), TThread::CurrentThread->ThreadID);
+#if defined(_WINDOWS_)
+    TThread::CurrentThread->NameThreadForDebugging(System::UnicodeString("TMikModThread"), TThread::CurrentThread->ThreadID);
+#endif
     while(!Terminated)
     {
         if(Player_Active())

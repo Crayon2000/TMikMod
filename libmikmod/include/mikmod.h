@@ -1,5 +1,5 @@
 /*  MikMod sound library
-    (c) 1998, 1999, 2000 Miodrag Vallat and others - see file AUTHORS
+    (c) 1998-2014 Miodrag Vallat and others - see the AUTHORS file
     for complete list.
 
     This library is free software; you can redistribute it and/or modify
@@ -51,6 +51,12 @@ extern "C" {
 # else
 #   define MIKMODAPI __declspec(dllimport)                      /* using libmikmod dll for windows */
 # endif
+#elif defined(__OS2__) && defined(__WATCOMC__)
+# if defined(MIKMOD_BUILD) && defined(__SW_BD)          /* building libmikmod as a dll for os/2 */
+#   define MIKMODAPI __declspec(dllexport)
+# else
+#   define MIKMODAPI                                    /* using dll or static libmikmod for os/2 */
+# endif
 /* SYM_VISIBILITY should be defined if both the compiler
  * and the target support the visibility attributes. the
  * configury does that automatically. for the standalone
@@ -68,7 +74,7 @@ extern "C" {
 
 #define LIBMIKMOD_VERSION_MAJOR 3L
 #define LIBMIKMOD_VERSION_MINOR 3L
-#define LIBMIKMOD_REVISION      6L
+#define LIBMIKMOD_REVISION      7L
 
 #define LIBMIKMOD_VERSION \
     ((LIBMIKMOD_VERSION_MAJOR<<16)| \
@@ -78,7 +84,7 @@ extern "C" {
 MIKMODAPI extern long MikMod_GetVersion(void);
 
 /*
- *  ========== Platform independent-type definitions
+ *  ========== Dependency platform headers
  */
 
 #ifdef _WIN32
@@ -88,50 +94,79 @@ MIKMODAPI extern long MikMod_GetVersion(void);
 #include <windows.h>
 #include <io.h>
 #include <mmsystem.h>
-/* Avoid conflicts with windef.h */
-#define SBYTE   _mm_SBYTE
-#define UBYTE   _mm_UBYTE
-#define SWORD   _mm_SWORD
-#define UWORD   _mm_UWORD
-#define SLONG   _mm_SLONG
-#define ULONG   _mm_ULONG
-#define BOOL    _mm_BOOL
-#define CHAR    _mm_CHAR
+#define _MIKMOD_WIN32
 #endif
 
-#if defined(__OS2__)||defined(__EMX__)
+#if defined(__DJGPP__) || defined(MSDOS) || defined(__MSDOS__) || defined(__DOS__)
+#define _MIKMOD_DOS
+#endif
+
+#if defined(__OS2__) || defined(__EMX__)
 #define INCL_DOSSEMAPHORES
 #include <os2.h>
-#else
-typedef char CHAR;
+#include <io.h>
+#define _MIKMOD_OS2
 #endif
 
+#if defined(__MORPHOS__) || defined(__AROS__) || defined(AMIGA) || defined(__amigaos__) || defined(AMIGAOS)
+#include <exec/types.h>
+#define _MIKMOD_AMIGA
+#endif
 
+/*
+ *  ========== Platform independent-type definitions
+ * (pain when it comes to cross-platform maintenance..)
+ */
 
-#if defined (_LP64) || defined(__arch64__) || defined(__alpha) || defined(__x86_64) || defined(__powerpc64__)
-/* 64 bit architectures */
+#if !(defined(_MIKMOD_OS2) || defined(_MIKMOD_WIN32))
+typedef char               CHAR;
+#endif
 
-typedef signed char     SBYTE;  /* 1 byte, signed */
-typedef unsigned char   UBYTE;  /* 1 byte, unsigned */
-typedef signed short    SWORD;  /* 2 bytes, signed */
-typedef unsigned short  UWORD;  /* 2 bytes, unsigned */
-typedef signed int      SLONG;  /* 4 bytes, signed */
-typedef unsigned int    ULONG;  /* 4 bytes, unsigned */
-typedef int             BOOL;   /* 0=false, <>0 true */
+/* BOOL:  0=false, <>0 true -- 16 bits on Amiga, int-wide on others. */
+#if !(defined(_MIKMOD_OS2) || defined(_MIKMOD_WIN32) || defined(_MIKMOD_AMIGA))
+typedef int                BOOL;
+#endif
 
-#else
-/* 32 bit architectures */
+/* 1 byte, signed and unsigned: */
+typedef signed char        SBYTE;
+#ifndef _MIKMOD_AMIGA
+typedef unsigned char      UBYTE;
+#endif
 
-typedef signed char     SBYTE;  /* 1 byte, signed */
-typedef unsigned char   UBYTE;  /* 1 byte, unsigned */
-typedef signed short    SWORD;  /* 2 bytes, signed */
-typedef unsigned short  UWORD;  /* 2 bytes, unsigned */
-typedef signed long     SLONG;  /* 4 bytes, signed */
-#if !defined(__OS2__)&&!defined(__EMX__)
-typedef unsigned long   ULONG;  /* 4 bytes, unsigned */
-typedef int             BOOL;   /* 0=false, <>0 true */
+/* 2 bytes, signed and unsigned: */
+#ifndef __LCC__
+typedef signed short int   SWORD;
+#endif
+#if !(defined(__LCC__) || defined(_MIKMOD_AMIGA))
+typedef unsigned short int UWORD;
+#endif
+
+/* 4 bytes, signed and unsigned: */
+#if defined(_LP64) || defined(__LP64__) || defined(__arch64__) || defined(__alpha) || defined(__x86_64) || defined(__powerpc64__)
+        /* 64 bit architectures: */
+typedef signed int         SLONG;
+#if !(defined(_WIN32) || defined(__AROS__))
+typedef unsigned int       ULONG;
+#endif
+
+#else  /* 32 bit architectures: */
+typedef signed long int    SLONG;
+#if !(defined(_MIKMOD_OS2) || defined(_MIKMOD_WIN32) || defined(_MIKMOD_AMIGA))
+typedef unsigned long int  ULONG;
 #endif
 #endif
+
+/* make sure types are of correct sizes: */
+typedef int __mikmod_typetest [
+   (
+        (sizeof(SBYTE)==1) && (sizeof(UBYTE)==1)
+     && (sizeof(SWORD)==2) && (sizeof(UWORD)==2)
+     && (sizeof(SLONG)==4) && (sizeof(ULONG)==4)
+#ifndef _MIKMOD_AMIGA
+     && (sizeof(BOOL) == sizeof(int))
+#endif
+     && (sizeof(CHAR) == sizeof(char))
+   ) * 2 - 1 ];
 
 /*
  *  ========== Error codes
@@ -768,6 +803,7 @@ MIKMODAPI extern struct MDRIVER drv_ultra;  /* Linux Ultrasound driver */
 MIKMODAPI extern struct MDRIVER drv_sam9407;/* Linux sam9407 driver */
 
 MIKMODAPI extern struct MDRIVER drv_AF;     /* Dec Alpha AudioFile */
+MIKMODAPI extern struct MDRIVER drv_ahi;    /* Amiga AHI */
 MIKMODAPI extern struct MDRIVER drv_aix;    /* AIX audio device */
 MIKMODAPI extern struct MDRIVER drv_alsa;   /* Advanced Linux Sound Architecture (ALSA) */
 MIKMODAPI extern struct MDRIVER drv_esd;    /* Enlightened sound daemon (EsounD) */
@@ -791,11 +827,13 @@ MIKMODAPI extern struct MDRIVER drv_mac;    /* Macintosh Sound Manager driver */
 MIKMODAPI extern struct MDRIVER drv_osx;    /* MacOS X CoreAudio Driver */
 
 MIKMODAPI extern struct MDRIVER drv_dc;     /* Dreamcast driver */
-
 MIKMODAPI extern struct MDRIVER drv_gp32;   /* GP32 Sound driver */
+MIKMODAPI extern struct MDRIVER drv_psp;    /* PlayStation Portable driver */
 
 MIKMODAPI extern struct MDRIVER drv_wss;    /* DOS WSS driver */
 MIKMODAPI extern struct MDRIVER drv_sb;     /* DOS S/B driver */
+
+MIKMODAPI extern struct MDRIVER drv_osles;  /* OpenSL ES driver for android */
 
 /*========== Virtual channel mixer interface (for user-supplied drivers only) */
 

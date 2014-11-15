@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{C5192207-5B8A-4129-B9B3-6E91C757BA80}</ProjectGuid>
-        <ProjectVersion>15.4</ProjectVersion>
+        <ProjectVersion>16.0</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
@@ -105,7 +105,7 @@
         <_TCHARMapping>wchar_t</_TCHARMapping>
         <PackageImports>IPIndyImpl;bindcompfmx;fmx;rtl;dbrtl;IndySystem;DbxClientDriver;bindcomp;inetdb;DBXInterBaseDriver;DataSnapCommon;DataSnapClient;DataSnapServer;DataSnapProviderClient;xmlrtl;DbxCommonDriver;IndyProtocols;DBXMySQLDriver;dbxcds;bindengine;soaprtl;DBXOracleDriver;dsnap;DBXInformixDriver;IndyCore;fmxase;DBXFirebirdDriver;inet;fmxobj;inetdbxpress;DBXSybaseASADriver;fmxdae;dbexpress;DataSnapIndy10ServerTransport;$(PackageImports)</PackageImports>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <IncludePath>libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\include\;libmikmod\drivers\;$(BDS)\include;$(IncludePath)</IncludePath>
+        <IncludePath>libmikmod;libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\include\;libmikmod\drivers\;$(BDS)\include;$(IncludePath)</IncludePath>
         <ProjectType>CppStaticLibrary</ProjectType>
         <Manifest_File>None</Manifest_File>
         <VerInfo_Locale>3084</VerInfo_Locale>

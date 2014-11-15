@@ -13,6 +13,9 @@
 /* Define if the DEC AudioFile server driver is compiled */
 #undef DRV_AF
 
+/* Define if the Amiga AHI driver is compiled */
+#undef DRV_AHI
+
 /* Define if you want an .aiff file writer driver */
 #undef DRV_AIFF
 
@@ -45,6 +48,9 @@
 
 /* Define if the OS/2 MCI driver is compiled */
 #undef DRV_OS2
+
+/* Define if the OpenSL ES driver is compiled */
+#undef DRV_OSLES
 
 /* Define if the Open Sound System driver is compiled */
 #undef DRV_OSS
@@ -306,6 +312,9 @@
 
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t
+
+/* Define to empty if compiler does not understand the `signed' keyword. */
+#undef signed
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

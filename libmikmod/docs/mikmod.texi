@@ -16,8 +16,8 @@
 
 @syncodeindex tp vr
 @set documentation-version 1.3
-@set documentation-date January 2014
-@set library-version 3.3.6
+@set documentation-date June 2014
+@set library-version 3.3.7
 @set authorname Miodrag Vallat
 @set authoraddress miod@@mikmod.org
 
@@ -3160,6 +3160,10 @@ Depending on your Unix flavor, you'll end with one or more drivers from this
 list:
 
 @table @code
+@item drv_ahi
+This driver is only available under AmigaOS and its variants like MorphOS
+and AROS, and it outputs to native Amiga AHI device.@*
+This driver only supports software mixing.
 @item drv_aix
 This driver is only available under AIX, and access its audio device.@*
 This driver only supports software mixing.
@@ -3196,6 +3200,9 @@ This driver only supports software mixing.
 This driver is only available under OS/2 version 3 and higher (Warp), and OS/2
 2.x with MMPM/2.@*
 This driver only supports software mixing.
+@item drv_osles
+This driver is only available under Android and uses OpenSL ES.@*
+This driver only supports software mixing.
 @item drv_oss
 This driver is available under any Unix with the Open Sound System drivers
 installed. Linux and FreeBSD also come with the OSS/Lite driver (the
@@ -3203,6 +3210,9 @@ non-commercial version of OSS) and can make use of this driver.@*
 This driver only supports software mixing.
 @item drv_osx
 This driver is available under MacOS X and Darwin, and uses the ``CoreAudio'' interface.@*
+This driver only supports software mixing.
+@item drv_psp
+This driver is only for the Playstation Portable platform, and is not tested yet.@*
 This driver only supports software mixing.
 @item drv_sam9407
 This driver is only available under Linux, and requires the Linux sam9407

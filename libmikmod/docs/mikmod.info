@@ -29,7 +29,7 @@ File: mikmod.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
 MikMod Sound Library
 ********************
 
-This manual documents the MikMod Sound Library, version 3.3.6.
+This manual documents the MikMod Sound Library, version 3.3.7.
 
 * Menu:
 
@@ -3275,6 +3275,11 @@ These drivers access to the sound hardware of the machine they run on.
 Depending on your Unix flavor, you'll end with one or more drivers from
 this list:
 
+`drv_ahi'
+     This driver is only available under AmigaOS and its variants like
+     MorphOS and AROS, and it outputs to native Amiga AHI device.
+     This driver only supports software mixing.
+
 `drv_aix'
      This driver is only available under AIX, and access its audio
      device.
@@ -3329,6 +3334,10 @@ this list:
      (Warp), and OS/2 2.x with MMPM/2.
      This driver only supports software mixing.
 
+`drv_osles'
+     This driver is only available under Android and uses OpenSL ES.
+     This driver only supports software mixing.
+
 `drv_oss'
      This driver is available under any Unix with the Open Sound System
      drivers installed. Linux and FreeBSD also come with the OSS/Lite
@@ -3339,6 +3348,11 @@ this list:
 `drv_osx'
      This driver is available under MacOS X and Darwin, and uses the
      "CoreAudio" interface.
+     This driver only supports software mixing.
+
+`drv_psp'
+     This driver is only for the Playstation Portable platform, and is
+     not tested yet.
      This driver only supports software mixing.
 
 `drv_sam9407'
@@ -3630,10 +3644,10 @@ Node: Sample Loaders103064
 Node: Driver Reference103362
 Node: Network Drivers103615
 Node: Hardware Drivers105088
-Node: Disk Writer Drivers109456
-Node: Other Drivers110297
-Node: Index111337
-Node: Function Index111505
-Node: Type and Variable Index118711
+Node: Disk Writer Drivers109933
+Node: Other Drivers110774
+Node: Index111814
+Node: Function Index111982
+Node: Type and Variable Index119188
 
 End Tag Table

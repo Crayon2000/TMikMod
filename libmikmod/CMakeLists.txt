@@ -29,7 +29,7 @@ LIST(APPEND CMAKE_MODULE_PATH "${libmikmod_SOURCE_DIR}/cmake")
 
 SET(LIBMIKMOD_MAJOR_VERSION 3)
 SET(LIBMIKMOD_MINOR_VERSION 3)
-SET(LIBMIKMOD_MICRO_VERSION 6)
+SET(LIBMIKMOD_MICRO_VERSION 7)
 
 SET(VERSION "${LIBMIKMOD_MAJOR_VERSION}.${LIBMIKMOD_MINOR_VERSION}.${LIBMIKMOD_MICRO_VERSION}")
 SET(LIBMIKMOD_VERSION "${LIBMIKMOD_MAJOR_VERSION}.${LIBMIKMOD_MINOR_VERSION}.${LIBMIKMOD_MICRO_VERSION}")
@@ -60,8 +60,6 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "\\\\.so(\\\\.[0-9]+)*$"
     "/\\\\.svn/"
     "\\\\.(pdf|fo)$"
-    "/t/t/.*\\\\.exe$"
-    "/t/Presets"
     "/CMakeCache\\\\.txt$"
     "/CTestTestfile\\\\.cmake$"
     "/cmake_install\\\\.cmake$"
@@ -71,9 +69,9 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "/libmikmod-config$"
     "^config\\\\.h$"
     "/install_manifest\\\\.txt$"
-    "/t/card-test-(parse|render)\\\\.c$"
+    "/t/"
     "/Testing/"
-    "ids-whitelist\\\\.txt"
+    "run-tests\\\\.pl"
     "/_Inline/"
     "/(B|build|BUILD)/"
     "/autom4te.cache/"
@@ -166,18 +164,18 @@ SET (ENABLE_STATIC 1 CACHE BOOL "Whether to build the static library (which take
 ### under a prefix the executables will find the libraries.
 ### See:  http://www.cmake.org/Wiki/CMake_RPATH_handling
 IF (ENABLE_RPATH)
-    # use, i.e. don't skip the full RPATH for the build tree
+  # use, i.e. don't skip the full RPATH for the build tree
     SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
-    # when building, don't use the install RPATH already
-    # (but later on when installing)
+  # when building, don't use the install RPATH already
+  # (but later on when installing)
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-    # the RPATH to be used when installing
+  # the RPATH to be used when installing
     SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
 
-    # add the automatically determined parts of the RPATH
-    # which point to directories outside the build tree to the install RPATH
+  # add the automatically determined parts of the RPATH
+  # which point to directories outside the build tree to the install RPATH
     SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ELSE(ENABLE_RPATH)
 #   SET (CMAKE_SKIP_RPATH YES)
@@ -194,17 +192,12 @@ include(mik_macros)
 
 ADD_SUBDIRECTORY ("dlapi")
 ADD_SUBDIRECTORY ("docs")
-ADD_SUBDIRECTORY ("dos")
 ADD_SUBDIRECTORY ("drivers")
 ADD_SUBDIRECTORY ("include")
 ADD_SUBDIRECTORY ("loaders")
-ADD_SUBDIRECTORY ("macintosh")
-ADD_SUBDIRECTORY ("macosx")
 ADD_SUBDIRECTORY ("mmio")
-ADD_SUBDIRECTORY ("os2")
 ADD_SUBDIRECTORY ("playercode")
 ADD_SUBDIRECTORY ("posix")
-ADD_SUBDIRECTORY ("win32")
 
 SET(COMPILER_FLAGS_TO_CHECK
     "-Wall" "-Werror=implicit-function-declaration"
@@ -295,10 +288,8 @@ TEST_BIG_ENDIAN(WORDS_BIGENDIAN)
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_SOURCE_DIR})
 INCLUDE_DIRECTORIES(BEFORE "${CMAKE_SOURCE_DIR}/include")
 
-# to find config.h and mikmod[_build].h:
+# to find config.h:
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_BINARY_DIR})
-FILE (MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
-INCLUDE_DIRECTORIES(BEFORE "${CMAKE_BINARY_DIR}/include")
 
 CHECK_MULTI_INCLUDE_FILES(
     "dlfcn.h" "fcntl.h" "limits.h" "malloc.h" "memory.h" "strings.h" "sys/ioctl.h" "unistd.h" "windows.h"
@@ -326,6 +317,7 @@ ADD_DEFINITIONS("-DMIKMOD_BUILD")
 SET (MIKMOD_LIB_MODULES
     drivers/drv_AF.c
     drivers/drv_aiff.c
+    drivers/drv_ahi.c
     drivers/drv_aix.c
     drivers/drv_alsa.c
     drivers/drv_dart.c
@@ -337,9 +329,11 @@ SET (MIKMOD_LIB_MODULES
     drivers/drv_nas.c
     drivers/drv_nos.c
     drivers/drv_openal.c
+    drivers/drv_osles.c
     drivers/drv_oss.c
     drivers/drv_osx.c
     drivers/drv_pipe.c
+    drivers/drv_psp.c
     drivers/drv_pulseaudio.c
     drivers/drv_raw.c
     drivers/drv_sam9407.c
@@ -392,8 +386,8 @@ SET (MIKMOD_LIB_MODULES
 )
 
 REPLACE_FUNCTIONS_FROMDIR(MIKMOD_LIB_MODULES
-                          posix
-                          memcmp strcasecmp strdup strstr)
+    posix
+    memcmp strcasecmp strdup strstr)
 
 SET (LIBMIKMOD_LIBS)
 
@@ -476,11 +470,11 @@ SET(EXTRA_LIBS )
 SET(HAVE_PTHREAD)
 IF (NOT WIN32)
  INCLUDE(FindThreads)
- IF (CMAKE_THREAD_LIBS_INIT)
+ IF (CMAKE_USE_PTHREADS_INIT)
   IF (ENABLE_THREADS)
-    LIST (APPEND EXTRA_LIBS ${CMAKE_THREAD_LIBS_INIT})
-    IF (CMAKE_USE_PTHREADS_INIT)
-        SET (HAVE_PTHREAD 1)
+    SET (HAVE_PTHREAD 1)
+    IF (CMAKE_THREAD_LIBS_INIT)
+        LIST (APPEND EXTRA_LIBS ${CMAKE_THREAD_LIBS_INIT})
     ENDIF()
   ENDIF()
  ENDIF()
@@ -818,16 +812,6 @@ ENDIF(UNIX)
 LIST (APPEND EXTRA_LIBS ${MATH_LIB})
 
 CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/config.h.cmake" "${CMAKE_BINARY_DIR}/config.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/include/mikmod.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/include/mikmod_build.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/macintosh/mikmod.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/macintosh/mikmod_build.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/macosx/mikmod.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/macosx/mikmod_build.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/win32/mikmod.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/include/mikmod.h.in" "${CMAKE_BINARY_DIR}/win32/mikmod_build.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/macosx/Info.plist.in" "${CMAKE_BINARY_DIR}/macosx/Info.plist")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/macosx/InfoPlist.strings.in" "${CMAKE_BINARY_DIR}/macosx/InfoPlist.strings")
 
 SET(prefix ${CMAKE_INSTALL_PREFIX})
 SET(exec_prefix "\${prefix}")
@@ -856,7 +840,7 @@ INSTALL(
 
 INSTALL(
     FILES
-        "${CMAKE_BINARY_DIR}/include/mikmod.h"
+        "${CMAKE_SOURCE_DIR}/include/mikmod.h"
     DESTINATION
         "include"
 )

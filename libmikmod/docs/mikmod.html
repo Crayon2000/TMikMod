@@ -32,7 +32,7 @@ Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
 
 <h2 class="unnumbered">MikMod Sound Library</h2>
 
-<p>This&nbsp;manual&nbsp;documents&nbsp;the&nbsp;MikMod&nbsp;Sound&nbsp;Library,&nbsp;version&nbsp;3.3.6.<!-- /@w -->
+<p>This&nbsp;manual&nbsp;documents&nbsp;the&nbsp;MikMod&nbsp;Sound&nbsp;Library,&nbsp;version&nbsp;3.3.7.<!-- /@w -->
 
 <ul class="menu">
 <li><a accesskey="1" href="#Introduction">Introduction</a>:           What is MikMod ? 
@@ -2528,7 +2528,10 @@ Depending on your Unix flavor, you'll end with one or more drivers from this
 list:
 
      <dl>
-<dt><code>drv_aix</code><dd>This driver is only available under AIX, and access its audio device.<br>
+<dt><code>drv_ahi</code><dd>This driver is only available under AmigaOS and its variants like MorphOS
+and AROS, and it outputs to native Amiga AHI device.<br>
+This driver only supports software mixing. 
+<br><dt><code>drv_aix</code><dd>This driver is only available under AIX, and access its audio device.<br>
 This driver only supports software mixing. 
 <br><dt><code>drv_alsa</code><dd>This driver is only available under Linux, and requires the ALSA driver to be
 compiled for your current kernel.<br>
@@ -2554,11 +2557,15 @@ This driver only supports software mixing.
 <br><dt><code>drv_os2</code><dd>This driver is only available under OS/2 version 3 and higher (Warp), and OS/2
 2.x with MMPM/2.<br>
 This driver only supports software mixing. 
+<br><dt><code>drv_osles</code><dd>This driver is only available under Android and uses OpenSL ES.<br>
+This driver only supports software mixing. 
 <br><dt><code>drv_oss</code><dd>This driver is available under any Unix with the Open Sound System drivers
 installed. Linux and FreeBSD also come with the OSS/Lite driver (the
 non-commercial version of OSS) and can make use of this driver.<br>
 This driver only supports software mixing. 
 <br><dt><code>drv_osx</code><dd>This driver is available under MacOS X and Darwin, and uses the &ldquo;CoreAudio&rdquo; interface.<br>
+This driver only supports software mixing. 
+<br><dt><code>drv_psp</code><dd>This driver is only for the Playstation Portable platform, and is not tested yet.<br>
 This driver only supports software mixing. 
 <br><dt><code>drv_sam9407</code><dd>This driver is only available under Linux, and requires the Linux sam9407
 driver to be compiled for your current kernel.<br>
