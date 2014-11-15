@@ -19,6 +19,7 @@ enum class TModuleDriver : unsigned char
     mdDirectSound,     /**< Win32 DirectSound driver. */
     mdWindows,         /**< Win32 multimedia API driver. */
     mdMacOSX,          /**< MacOS X driver. */
+    mdOpenSLES,        /**< OpenSL ES driver (for Android native code). */
     mdNoSound,         /**< no sound. */
     mdRaw,             /**< raw file disk writer [music.raw]. */
     mdStandardOutput,  /**< output to stdout. */

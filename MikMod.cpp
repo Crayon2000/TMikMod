@@ -102,6 +102,9 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
 #ifdef DRV_OSX
     DriverList[TModuleDriver::mdMacOSX] = &drv_osx;
 #endif /* DRV_OSX */
+#ifdef DRV_OSLES
+    DriverList[TModuleDriver::mdOpenSLES] = &drv_osles;
+#endif
     DriverList[TModuleDriver::mdNoSound] = &drv_nos;
     DriverList[TModuleDriver::mdRaw] = &drv_raw;
     DriverList[TModuleDriver::mdStandardOutput] = &drv_stdout;
