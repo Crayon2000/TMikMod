@@ -201,6 +201,9 @@
         <CppCompile Include="libmikmod\drivers\drv_nos.c">
             <BuildOrder>4</BuildOrder>
         </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_osles.c">
+            <BuildOrder>48</BuildOrder>
+        </CppCompile>
         <CppCompile Include="libmikmod\drivers\drv_osx.c">
             <BuildOrder>46</BuildOrder>
         </CppCompile>

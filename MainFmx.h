@@ -5,6 +5,8 @@
 #include <System.Classes.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Forms.hpp>
+#include <FMX.StdCtrls.hpp>
+#include <FMX.Types.hpp>
 //---------------------------------------------------------------------------
 class TMikMod;
 
