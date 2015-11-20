@@ -98,14 +98,7 @@ static BOOL OPENAL_stream(ALuint buffer)
 	if (!audiobuffer) return FALSE;
 
 	/* write bytes to audio buffer */
-	if (Player_Paused_internal())
-	{
-		VC_SilenceBytes(audiobuffer, buffer_size);
-	}
-	else
-	{
-		VC_WriteBytes(audiobuffer, buffer_size);
-	}
+	VC_WriteBytes(audiobuffer, buffer_size);
 
 	/* copy audio buffer to OpenAL */
 	alBufferData(buffer, format, audiobuffer, buffer_size, md_mixfreq);
@@ -144,7 +137,7 @@ static void OPENAL_CommandLine(const CHAR *cmdline)
 {
 	CHAR *ptr;
 
-	if((ptr=MD_GetAtom("buffersize",cmdline,0)))
+	if((ptr=MD_GetAtom("buffersize",cmdline,0)) != NULL)
 	{
 		buffer_size = atoi(ptr);
 		MikMod_free(ptr);
@@ -156,7 +149,7 @@ static void OPENAL_CommandLine(const CHAR *cmdline)
 
 	if (buffer_size < 4096) buffer_size = 4096;
 
-	if((ptr=MD_GetAtom("bufferqueue",cmdline,0)))
+	if((ptr=MD_GetAtom("bufferqueue",cmdline,0)) != NULL)
 	{
 		buffer_queue = atoi(ptr);
 		MikMod_free(ptr);

@@ -16,14 +16,14 @@ struct MODULE;
  */
 enum class TModuleDriver : unsigned char
 {
-    mdDirectSound,     /**< Win32 DirectSound driver. */
-    mdWindows,         /**< Win32 multimedia API driver. */
-    mdMacOSX,          /**< MacOS X driver. */
-    mdOpenSLES,        /**< OpenSL ES driver (for Android native code). */
-    mdNoSound,         /**< no sound. */
-    mdRaw,             /**< raw file disk writer [music.raw]. */
-    mdStandardOutput,  /**< output to stdout. */
-    mdWAV              /**< RIFF WAVE file disk writer [music.wav]. */
+    DirectSound,     /**< Win32 DirectSound driver. */
+    Windows,         /**< Win32 multimedia API driver. */
+    MacOSX,          /**< MacOS X driver. */
+    OpenSLES,        /**< OpenSL ES driver (for Android native code). */
+    NoSound,         /**< no sound. */
+    Raw,             /**< raw file disk writer [music.raw]. */
+    StandardOutput,  /**< output to stdout. */
+    WAV              /**< RIFF WAVE file disk writer [music.wav]. */
 };
 
 /**
@@ -81,7 +81,7 @@ protected:
     TVoice* __fastcall GetVoice(int Index);
     bool __fastcall GetActive();
 public:
-    __fastcall TMikMod(TModuleDriver ADriver = TModuleDriver::mdNoSound);
+    __fastcall TMikMod(TModuleDriver ADriver = TModuleDriver::NoSound);
     virtual __fastcall ~TMikMod();
 
     void __fastcall LoadFromFile(const System::UnicodeString AFileName, int Maxchan, bool Curious = 0);

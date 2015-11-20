@@ -29,7 +29,7 @@ File: mikmod.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
 MikMod Sound Library
 ********************
 
-This manual documents the MikMod Sound Library, version 3.3.7.
+This manual documents the MikMod Sound Library, version 3.3.8.
 
 * Menu:
 
@@ -3376,6 +3376,11 @@ this list:
      library.
      This driver only supports software mixing.
 
+`drv_sndio'
+     This driver is only available under OpenBSD and uses the "sndio"
+     interface.
+     This driver only supports software mixing.
+
 `drv_sun'
      This driver is only available under Unices which implement
      SunOS-like audio device interfaces, that is, SunOS, Solaris,
@@ -3644,10 +3649,10 @@ Node: Sample Loaders103064
 Node: Driver Reference103362
 Node: Network Drivers103615
 Node: Hardware Drivers105088
-Node: Disk Writer Drivers109933
-Node: Other Drivers110774
-Node: Index111814
-Node: Function Index111982
-Node: Type and Variable Index119188
+Node: Disk Writer Drivers110080
+Node: Other Drivers110921
+Node: Index111961
+Node: Function Index112129
+Node: Type and Variable Index119335
 
 End Tag Table

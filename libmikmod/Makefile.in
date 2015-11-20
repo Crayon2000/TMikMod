@@ -120,22 +120,24 @@ am_libmikmod_la_OBJECTS = dlapi/dl_hpux.lo drivers/drv_AF.lo \
 	drivers/drv_pulseaudio.lo drivers/drv_pipe.lo \
 	drivers/drv_psp.lo drivers/drv_raw.lo drivers/drv_sam9407.lo \
 	drivers/drv_sb.lo drivers/drv_sdl.lo drivers/drv_sgi.lo \
-	drivers/drv_stdout.lo drivers/drv_sun.lo drivers/drv_ultra.lo \
-	drivers/drv_wav.lo drivers/drv_win.lo drivers/drv_wss.lo \
-	drivers/drv_xaudio2.lo loaders/load_669.lo loaders/load_amf.lo \
-	loaders/load_asy.lo loaders/load_dsm.lo loaders/load_far.lo \
-	loaders/load_gdm.lo loaders/load_gt2.lo loaders/load_imf.lo \
-	loaders/load_it.lo loaders/load_m15.lo loaders/load_med.lo \
-	loaders/load_mod.lo loaders/load_mtm.lo loaders/load_okt.lo \
-	loaders/load_s3m.lo loaders/load_stm.lo loaders/load_stx.lo \
-	loaders/load_ult.lo loaders/load_umx.lo loaders/load_uni.lo \
-	loaders/load_xm.lo mmio/mmalloc.lo mmio/mmerror.lo \
-	mmio/mmio.lo playercode/mdreg.lo playercode/mdriver.lo \
-	playercode/mdulaw.lo playercode/mloader.lo playercode/mlreg.lo \
-	playercode/mlutil.lo playercode/mplayer.lo \
-	playercode/munitrk.lo playercode/mwav.lo playercode/npertab.lo \
-	playercode/sloader.lo playercode/virtch.lo \
-	playercode/virtch2.lo playercode/virtch_common.lo
+	drivers/drv_sndio.lo drivers/drv_stdout.lo drivers/drv_sun.lo \
+	drivers/drv_ultra.lo drivers/drv_wav.lo drivers/drv_win.lo \
+	drivers/drv_wss.lo drivers/drv_xaudio2.lo loaders/load_669.lo \
+	loaders/load_amf.lo loaders/load_asy.lo loaders/load_dsm.lo \
+	loaders/load_far.lo loaders/load_gdm.lo loaders/load_gt2.lo \
+	loaders/load_imf.lo loaders/load_it.lo loaders/load_m15.lo \
+	loaders/load_med.lo loaders/load_mod.lo loaders/load_mtm.lo \
+	loaders/load_okt.lo loaders/load_s3m.lo loaders/load_stm.lo \
+	loaders/load_stx.lo loaders/load_ult.lo loaders/load_umx.lo \
+	loaders/load_uni.lo loaders/load_xm.lo mmio/mmalloc.lo \
+	mmio/mmerror.lo mmio/mmio.lo depackers/mmcmp.lo \
+	depackers/pp20.lo depackers/s404.lo depackers/xpk.lo \
+	playercode/mdreg.lo playercode/mdriver.lo playercode/mdulaw.lo \
+	playercode/mloader.lo playercode/mlreg.lo playercode/mlutil.lo \
+	playercode/mplayer.lo playercode/munitrk.lo playercode/mwav.lo \
+	playercode/npertab.lo playercode/sloader.lo \
+	playercode/virtch.lo playercode/virtch2.lo \
+	playercode/virtch_common.lo
 libmikmod_la_OBJECTS = $(am_libmikmod_la_OBJECTS)
 libmikmod_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -176,8 +178,8 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	distdir dist dist-all distcheck
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = drivers include loaders mmio playercode posix dlapi \
-	docs
+DIST_SUBDIRS = drivers include loaders mmio depackers playercode posix \
+	dlapi docs
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -266,6 +268,7 @@ LIB_LDADD = @LIB_LDADD@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
+LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
@@ -356,8 +359,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 @BUILD_DOCS_TRUE@MAYBE_DOCS = docs
-SUBDIRS = drivers include loaders mmio playercode posix \
-	  dlapi $(MAYBE_DOCS)
+SUBDIRS = drivers include loaders mmio depackers playercode \
+	  posix dlapi $(MAYBE_DOCS)
 
 bin_SCRIPTS = libmikmod-config
 EXTRA_DIST = libmikmod-config.in libmikmod.m4 libmikmod.pc.in \
@@ -407,6 +410,7 @@ libmikmod_la_SOURCES = \
 		drivers/drv_sb.c \
 		drivers/drv_sdl.c \
 		drivers/drv_sgi.c \
+		drivers/drv_sndio.c \
 		drivers/drv_stdout.c \
 		drivers/drv_sun.c \
 		drivers/drv_ultra.c \
@@ -438,6 +442,10 @@ libmikmod_la_SOURCES = \
 		mmio/mmalloc.c \
 		mmio/mmerror.c \
 		mmio/mmio.c \
+		depackers/mmcmp.c \
+		depackers/pp20.c \
+		depackers/s404.c \
+		depackers/xpk.c \
 		playercode/mdreg.c \
 		playercode/mdriver.c \
 		playercode/mdulaw.c \
@@ -615,6 +623,8 @@ drivers/drv_sdl.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_sgi.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
+drivers/drv_sndio.lo: drivers/$(am__dirstamp) \
+	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_stdout.lo: drivers/$(am__dirstamp) \
 	drivers/$(DEPDIR)/$(am__dirstamp)
 drivers/drv_sun.lo: drivers/$(am__dirstamp) \
@@ -686,6 +696,20 @@ mmio/$(DEPDIR)/$(am__dirstamp):
 mmio/mmalloc.lo: mmio/$(am__dirstamp) mmio/$(DEPDIR)/$(am__dirstamp)
 mmio/mmerror.lo: mmio/$(am__dirstamp) mmio/$(DEPDIR)/$(am__dirstamp)
 mmio/mmio.lo: mmio/$(am__dirstamp) mmio/$(DEPDIR)/$(am__dirstamp)
+depackers/$(am__dirstamp):
+	@$(MKDIR_P) depackers
+	@: > depackers/$(am__dirstamp)
+depackers/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) depackers/$(DEPDIR)
+	@: > depackers/$(DEPDIR)/$(am__dirstamp)
+depackers/mmcmp.lo: depackers/$(am__dirstamp) \
+	depackers/$(DEPDIR)/$(am__dirstamp)
+depackers/pp20.lo: depackers/$(am__dirstamp) \
+	depackers/$(DEPDIR)/$(am__dirstamp)
+depackers/s404.lo: depackers/$(am__dirstamp) \
+	depackers/$(DEPDIR)/$(am__dirstamp)
+depackers/xpk.lo: depackers/$(am__dirstamp) \
+	depackers/$(DEPDIR)/$(am__dirstamp)
 playercode/$(am__dirstamp):
 	@$(MKDIR_P) playercode
 	@: > playercode/$(am__dirstamp)
@@ -760,6 +784,14 @@ uninstall-binSCRIPTS:
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f depackers/mmcmp.$(OBJEXT)
+	-rm -f depackers/mmcmp.lo
+	-rm -f depackers/pp20.$(OBJEXT)
+	-rm -f depackers/pp20.lo
+	-rm -f depackers/s404.$(OBJEXT)
+	-rm -f depackers/s404.lo
+	-rm -f depackers/xpk.$(OBJEXT)
+	-rm -f depackers/xpk.lo
 	-rm -f dlapi/dl_hpux.$(OBJEXT)
 	-rm -f dlapi/dl_hpux.lo
 	-rm -f drivers/drv_AF.$(OBJEXT)
@@ -816,6 +848,8 @@ mostlyclean-compile:
 	-rm -f drivers/drv_sdl.lo
 	-rm -f drivers/drv_sgi.$(OBJEXT)
 	-rm -f drivers/drv_sgi.lo
+	-rm -f drivers/drv_sndio.$(OBJEXT)
+	-rm -f drivers/drv_sndio.lo
 	-rm -f drivers/drv_stdout.$(OBJEXT)
 	-rm -f drivers/drv_stdout.lo
 	-rm -f drivers/drv_sun.$(OBJEXT)
@@ -910,6 +944,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@depackers/$(DEPDIR)/mmcmp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@depackers/$(DEPDIR)/pp20.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@depackers/$(DEPDIR)/s404.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@depackers/$(DEPDIR)/xpk.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@dlapi/$(DEPDIR)/dl_hpux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_AF.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_ahi.Plo@am__quote@
@@ -938,6 +976,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_sb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_sdl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_sgi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_sndio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_stdout.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_sun.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@drivers/$(DEPDIR)/drv_ultra.Plo@am__quote@
@@ -1017,6 +1056,7 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf depackers/.libs depackers/_libs
 	-rm -rf dlapi/.libs dlapi/_libs
 	-rm -rf drivers/.libs drivers/_libs
 	-rm -rf loaders/.libs loaders/_libs
@@ -1426,6 +1466,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f depackers/$(DEPDIR)/$(am__dirstamp)
+	-rm -f depackers/$(am__dirstamp)
 	-rm -f dlapi/$(DEPDIR)/$(am__dirstamp)
 	-rm -f dlapi/$(am__dirstamp)
 	-rm -f drivers/$(DEPDIR)/$(am__dirstamp)
@@ -1447,7 +1489,7 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf dlapi/$(DEPDIR) drivers/$(DEPDIR) loaders/$(DEPDIR) mmio/$(DEPDIR) playercode/$(DEPDIR) posix/$(DEPDIR)
+	-rm -rf depackers/$(DEPDIR) dlapi/$(DEPDIR) drivers/$(DEPDIR) loaders/$(DEPDIR) mmio/$(DEPDIR) playercode/$(DEPDIR) posix/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -1495,7 +1537,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf dlapi/$(DEPDIR) drivers/$(DEPDIR) loaders/$(DEPDIR) mmio/$(DEPDIR) playercode/$(DEPDIR) posix/$(DEPDIR)
+	-rm -rf depackers/$(DEPDIR) dlapi/$(DEPDIR) drivers/$(DEPDIR) loaders/$(DEPDIR) mmio/$(DEPDIR) playercode/$(DEPDIR) posix/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

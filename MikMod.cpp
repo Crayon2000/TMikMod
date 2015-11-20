@@ -94,21 +94,21 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
 {
     std::map<TModuleDriver, MDRIVER*> DriverList;
 #ifdef DRV_DS
-    DriverList[TModuleDriver::mdDirectSound] = &drv_ds;
+    DriverList[TModuleDriver::DirectSound] = &drv_ds;
 #endif /* DRV_DS */
 #ifdef DRV_WIN
-    DriverList[TModuleDriver::mdWindows] = &drv_win;
+    DriverList[TModuleDriver::Windows] = &drv_win;
 #endif /* DRV_WIN */
 #ifdef DRV_OSX
-    DriverList[TModuleDriver::mdMacOSX] = &drv_osx;
+    DriverList[TModuleDriver::MacOSX] = &drv_osx;
 #endif /* DRV_OSX */
 #ifdef DRV_OSLES
-    DriverList[TModuleDriver::mdOpenSLES] = &drv_osles;
+    DriverList[TModuleDriver::OpenSLES] = &drv_osles;
 #endif
-    DriverList[TModuleDriver::mdNoSound] = &drv_nos;
-    DriverList[TModuleDriver::mdRaw] = &drv_raw;
-    DriverList[TModuleDriver::mdStandardOutput] = &drv_stdout;
-    DriverList[TModuleDriver::mdWAV] = &drv_wav;
+    DriverList[TModuleDriver::NoSound] = &drv_nos;
+    DriverList[TModuleDriver::Raw] = &drv_raw;
+    DriverList[TModuleDriver::StandardOutput] = &drv_stdout;
+    DriverList[TModuleDriver::WAV] = &drv_wav;
 
     // Register a specific driver
     MikMod_RegisterDriver(DriverList[ADriver]);
@@ -118,7 +118,7 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     md_device = 1;
 
     std::string CommandLine; // Do not use AnsiString, there is a problem with OS X
-    if(ADriver == TModuleDriver::mdDirectSound)
+    if(ADriver == TModuleDriver::DirectSound)
     {
         CommandLine = "globalfocus"; // Play if window does not have the focus
     }

@@ -252,6 +252,22 @@ SOURCE=..\..\mmio\mmio.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\depackers\mmcmp.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\depackers\pp20.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\depackers\s404.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\depackers\xpk.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\playercode\mplayer.c
 # End Source File
 # Begin Source File
@@ -286,10 +302,6 @@ SOURCE=..\..\playercode\virtch_common.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
-# Begin Source File
-
-SOURCE=..\mikmod.h
-# End Source File
 # Begin Source File
 
 SOURCE=..\..\include\mikmod.h

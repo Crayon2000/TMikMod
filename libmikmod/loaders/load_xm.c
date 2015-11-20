@@ -444,7 +444,7 @@ static void FixEnvelope(ENVPT *cur, int pts)
 
 static BOOL LoadInstruments(void)
 {
-	int t,u, ck;
+	int t,u;
 	INSTRUMENT *d;
 	ULONG next=0;
 	UWORD wavcnt=0;
@@ -461,13 +461,6 @@ static BOOL LoadInstruments(void)
 		headend     = _mm_ftell(modreader);
 		ih.size     = _mm_read_I_ULONG(modreader);
 		headend    += ih.size;
-		ck = _mm_ftell(modreader);
-		_mm_fseek(modreader,0,SEEK_END);
-		if ((headend<0) || (_mm_ftell(modreader)<headend) || (headend<ck)) {
-			_mm_fseek(modreader,ck,SEEK_SET);
-			break;
-		}
-		_mm_fseek(modreader,ck,SEEK_SET);
 		_mm_read_string(ih.name, 22, modreader);
 		ih.type     = _mm_read_UBYTE(modreader);
 		ih.numsmp   = _mm_read_I_UWORD(modreader);
@@ -501,11 +494,7 @@ static BOOL LoadInstruments(void)
 
 				/* read the remainder of the header
 				   (2 bytes for 1.03, 22 for 1.04) */
-				if (headend>=_mm_ftell(modreader)) {
-					for(u=headend-_mm_ftell(modreader);u;u--) {
-						_mm_skip_BYTE(modreader);
-					}
-				}
+				for(u=headend-_mm_ftell(modreader);u;u--) _mm_read_UBYTE(modreader);
 
 				/* we can't trust the envelope point count here, as some
 				   modules have incorrect values (K_OSPACE.XM reports 32 volume
@@ -617,7 +606,7 @@ static BOOL LoadInstruments(void)
 					next+=s->length;
 
 					/* last instrument is at the end of file in version 0x0104 */
-					if(_mm_eof(modreader) && (mh->version<0x0104 || t<of.numins-1)) {
+					if(_mm_eof(modreader)) {
 						MikMod_free(nextwav);MikMod_free(wh);
 						nextwav=NULL;wh=NULL;
 						_mm_errno = MMERR_LOADING_SAMPLEINFO;
@@ -633,19 +622,10 @@ static BOOL LoadInstruments(void)
 					of.numsmp+=ih.numsmp;
 			} else {
 				/* read the remainder of the header */
-				ck = _mm_ftell(modreader);
-				_mm_fseek(modreader,0,SEEK_END);
-				if ((headend<0) || (_mm_ftell(modreader)<headend) || (headend<ck)) {
-					_mm_fseek(modreader,ck,SEEK_SET);
-					break;
-				}
-				_mm_fseek(modreader,ck,SEEK_SET);
-				for(u=headend-_mm_ftell(modreader);u;u--) {
-					_mm_skip_BYTE(modreader);
-				}
+				for(u=headend-_mm_ftell(modreader);u;u--) _mm_read_UBYTE(modreader);
 
 				/* last instrument is at the end of file in version 0x0104 */
-				if(_mm_eof(modreader) && (mh->version<0x0104 || t<of.numins-1)) {
+				if(_mm_eof(modreader)) {
 					MikMod_free(nextwav);MikMod_free(wh);
 					nextwav=NULL;wh=NULL;
 					_mm_errno = MMERR_LOADING_SAMPLEINFO;
@@ -696,11 +676,9 @@ static BOOL XM_Load(BOOL curious)
 		_mm_errno=MMERR_NOT_A_MODULE;
 		return 0;
 	}
-/*	_mm_read_UBYTES(mh->orders,256,modreader);*/
-/*	_mm_read_UBYTES(mh->orders,mh->headersize-20,modreader);*/
-	_mm_read_UBYTES(mh->orders,mh->songlength,modreader);
-	if(_mm_fseek(modreader, mh->headersize+60, SEEK_SET) ||
-	   _mm_eof(modreader)) {
+	_mm_read_UBYTES(mh->orders,256,modreader);
+
+	if(_mm_eof(modreader)) {
 		_mm_errno = MMERR_LOADING_HEADER;
 		return 0;
 	}

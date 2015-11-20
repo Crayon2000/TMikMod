@@ -43,9 +43,9 @@
 #include <windows.h>
 
 #if defined(_MSC_VER)
-#pragma comment(lib,"winmm")
+#pragma comment(lib,"winmm.lib")
 #if (_MSC_VER < 1300)
-typedef ULONG_PTR DWORD_PTR;
+typedef DWORD DWORD_PTR;
 #endif
 #endif
 

@@ -15,7 +15,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 {
     try
     {
-        FMikMod = new TMikMod(TModuleDriver::mdWindows);
+        FMikMod = new TMikMod(TModuleDriver::Windows);
     }
     catch(...)
     {
@@ -34,7 +34,7 @@ void __fastcall TForm1::FormCreate(TObject *Sender)
     TStream *Res = NULL;
     //Res = new TResourceStream((unsigned)HInstance, "MOD_MUSIC", (System::WideChar *)RT_RCDATA);
     //Res = new TFileStream("music.it", fmOpenRead);
-    String FileName = "music.xm";
+    String FileName = "../../music/music.xm";
 
     //FMikMod->LoadFromFile(FileName, 32, 0);
     //FMikMod->LoadFromStream(Res, 32);

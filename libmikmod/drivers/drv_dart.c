@@ -68,21 +68,21 @@ static void Dart_CommandLine(const CHAR *cmdline)
 	char *ptr;
 	int buf;
 
-	if ((ptr = MD_GetAtom("buffer", cmdline, 0))) {
+	if ((ptr = MD_GetAtom("buffer", cmdline, 0)) != NULL) {
 		buf = atoi(ptr);
 		if (buf >= 12 && buf <= 16)
 			BufferSize = 1 << buf;
 		MikMod_free(ptr);
 	}
 
-	if ((ptr = MD_GetAtom("count", cmdline, 0))) {
+	if ((ptr = MD_GetAtom("count", cmdline, 0)) != NULL) {
 		buf = atoi(ptr);
 		if (buf >= 2 && buf <= MAX_BUFFERCOUNT)
 			BufferCount = buf;
 		MikMod_free(ptr);
 	}
 
-	if ((ptr = MD_GetAtom("device", cmdline, 0))) {
+	if ((ptr = MD_GetAtom("device", cmdline, 0)) != NULL) {
 		buf = atoi(ptr);
 		if (buf >= 0 && buf <= 8)
 			DeviceIndex = buf;
@@ -217,7 +217,6 @@ static void Dart_Exit(void)
 {
 	MCI_GENERIC_PARMS GenericParms;
 
-	VC_Exit();
 	if (MixBuffers[0].pBuffer) {
 		mciSendCommand(DeviceID, MCI_BUFFER, MCI_WAIT | MCI_DEALLOCATE_MEMORY,
 					   &BufferParms, 0);
@@ -227,6 +226,7 @@ static void Dart_Exit(void)
 		mciSendCommand(DeviceID, MCI_CLOSE, MCI_WAIT, (PVOID) &GenericParms, 0);
 		DeviceID = 0;
 	}
+	VC_Exit();
 }
 
 static int Dart_PlayStart(void)

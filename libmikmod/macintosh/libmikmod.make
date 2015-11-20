@@ -58,6 +58,7 @@ Headers    = -i "{MikModDir}include:" ¶
 		     -i ":"
 			   
 Sources      =	"{MikModDir}playercode:" ¶
+				"{MikModDir}depackers:" ¶
 				"{MikModDir}loaders:" ¶
 				"{MikModDir}drivers:" ¶
 				"{MikModDir}mmio:" ¶
@@ -152,6 +153,10 @@ LibObjects68K		=	¶
 					{obj68k}virtch_common.c.o ¶
 					{obj68k}virtch.c.o ¶
 					{obj68k}virtch2.c.o ¶
+					{obj68k}mmcmp.c.o ¶
+					{obj68k}pp20.c.o ¶
+					{obj68k}s404.c.o ¶
+					{obj68k}xpk.c.o ¶
 					{obj68k}load_669.c.o ¶
 					{obj68k}load_amf.c.o ¶
 					{obj68k}load_asy.c.o ¶
@@ -198,6 +203,10 @@ LibObjectsPPC	=	¶
 					{objppc}virtch_common.c.x ¶
 					{objppc}virtch.c.x ¶
 					{objppc}virtch2.c.x ¶
+					{objppc}mmcmp.c.x ¶
+					{objppc}pp20.c.x ¶
+					{objppc}s404.c.x ¶
+					{objppc}xpk.c.x ¶
 					{objppc}load_669.c.x ¶
 					{objppc}load_amf.c.x ¶
 					{objppc}load_asy.c.x ¶

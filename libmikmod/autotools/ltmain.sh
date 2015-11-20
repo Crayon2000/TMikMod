@@ -2,11 +2,11 @@
 ## DO NOT EDIT - This file generated from ./build-aux/ltmain.in
 ##               by inline-source v2014-01-03.01
 
-# libtool (GNU libtool) 2.4.2.444.31-13aa
+# libtool (GNU libtool) 2.4.6
 # Provide generalized library-building support services.
 # Written by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 
-# Copyright (C) 1996-2014 Free Software Foundation, Inc.
+# Copyright (C) 1996-2015 Free Software Foundation, Inc.
 # This is free software; see the source for copying conditions.  There is NO
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -31,8 +31,8 @@
 
 PROGRAM=libtool
 PACKAGE=libtool
-VERSION=2.4.2.444.31-13aa
-package_revision=2.4.2.444.31
+VERSION=2.4.6
+package_revision=2.4.6
 
 
 ## ------ ##
@@ -64,12 +64,12 @@ package_revision=2.4.2.444.31
 # libraries, which are installed to $pkgauxdir.
 
 # Set a version string for this script.
-scriptversion=2014-02-10.13; # UTC
+scriptversion=2015-01-20.17; # UTC
 
 # General shell script boiler plate, and helper functions.
 # Written by Gary V. Vaughan, 2004
 
-# Copyright (C) 2004-2014 Free Software Foundation, Inc.
+# Copyright (C) 2004-2015 Free Software Foundation, Inc.
 # This is free software; see the source for copying conditions.  There is NO
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -192,7 +192,7 @@ func_path_progs ()
 
     _G_path_prog_max=0
     _G_path_prog_found=false
-    _G_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+    _G_save_IFS=$IFS; IFS=${PATH_SEPARATOR-:}
     for _G_dir in $_G_PATH; do
       IFS=$_G_save_IFS
       test -z "$_G_dir" && _G_dir=.
@@ -1333,7 +1333,7 @@ func_warning ()
 # -----------------------
 # 'sort -V' is not generally available.
 # Note this deviates from the version comparison in automake
-# in that it treats 1.5 < 1.5.0, and treats 1.4-p12a < 1.4-p3a
+# in that it treats 1.5 < 1.5.0, and treats 1.4.4a < 1.4-p3a
 # but this should suffice as we won't be specifying old
 # version formats or redundant trailing .0 in bootstrap.conf.
 # If we did want full compatibility then we should probably
@@ -1375,7 +1375,7 @@ scriptversion=2014-01-07.03; # UTC
 # A portable, pluggable option parser for Bourne shell.
 # Written by Gary V. Vaughan, 2010
 
-# Copyright (C) 2010-2014 Free Software Foundation, Inc.
+# Copyright (C) 2010-2015 Free Software Foundation, Inc.
 # This is free software; see the source for copying conditions.  There is NO
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -1977,7 +1977,7 @@ func_version ()
 # End:
 
 # Set a version string.
-scriptversion='(GNU libtool) 2.4.2.444.31-13aa'
+scriptversion='(GNU libtool) 2.4.6'
 
 
 # func_echo ARG...
@@ -2039,7 +2039,12 @@ usage_message="Options:
 "
 
 # Additional text appended to 'usage_message' in response to '--help'.
-long_help_message=$long_help_message"
+func_help ()
+{
+    $debug_cmd
+
+    func_usage_message
+    $ECHO "$long_help_message
 
 MODE must be one of the following:
 
@@ -2063,13 +2068,15 @@ include the following information:
        compiler:       $LTCC
        compiler flags: $LTCFLAGS
        linker:         $LD (gnu? $with_gnu_ld)
-       version:        $progname (GNU libtool) 2.4.2.444.31-13aa
+       version:        $progname (GNU libtool) 2.4.6
        automake:       `($AUTOMAKE --version) 2>/dev/null |$SED 1q`
        autoconf:       `($AUTOCONF --version) 2>/dev/null |$SED 1q`
 
 Report bugs to <bug-libtool@gnu.org>.
 GNU libtool home page: <http://www.gnu.org/software/libtool/>.
 General help using GNU software: <http://www.gnu.org/gethelp/>."
+    exit 0
+}
 
 
 # func_lo2o OBJECT-NAME
@@ -3730,14 +3737,14 @@ The following components of LINK-COMMAND are treated specially:
   -no-install       link a not-installable executable
   -no-undefined     declare that a library does not refer to external symbols
   -o OUTPUT-FILE    create OUTPUT-FILE from the specified objects
-  -objectlist FILE  Use a list of object files found in FILE to specify objects
+  -objectlist FILE  use a list of object files found in FILE to specify objects
+  -os2dllname NAME  force a short DLL name on OS/2 (no effect on other OSes)
   -precious-files-regex REGEX
                     don't remove output files matching REGEX
   -release RELEASE  specify package release information
   -rpath LIBDIR     the created library will eventually be installed in LIBDIR
   -R[ ]LIBDIR       add LIBDIR to the runtime path of programs and libraries
   -shared           only do dynamic linking of libtool libraries
-  -shortname NAME   specify a short name for a DLL(effect on OS/2 only)
   -shrext SUFFIX    override the standard shared library file extension
   -static           do not do any dynamic linking of uninstalled libtool libraries
   -static-libtool-libs
@@ -4313,6 +4320,13 @@ func_mode_install ()
 	      ;;
 	    esac
 	    ;;
+	  os2*)
+	    case $realname in
+	    *_dll.a)
+	      tstripme=
+	      ;;
+	    esac
+	    ;;
 	  esac
 	  if test -n "$tstripme" && test -n "$striplib"; then
 	    func_show_eval "$striplib $destdir/$realname" 'exit $?'
@@ -4325,17 +4339,8 @@ func_mode_install ()
 	    # so we also need to try rm && ln -s.
 	    for linkname
 	    do
-	      if test "$linkname" != "$realname"; then
-		case $host_os in
-		os2*)
-		  # Create import libraries instead of links on OS/2
-		  func_show_eval "(emximp -o $destdir/$linkname $dir/${linkname%%_dll.$libext}.def)"
-		  ;;
-		*)
-		  func_show_eval "(cd $destdir && { $LN_S -f $realname $linkname || { $RM $linkname && $LN_S $realname $linkname; }; })"
-		  ;;
-		esac
-	      fi
+	      test "$linkname" != "$realname" \
+		&& func_show_eval "(cd $destdir && { $LN_S -f $realname $linkname || { $RM $linkname && $LN_S $realname $linkname; }; })"
 	    done
 	  fi
 
@@ -5163,7 +5168,7 @@ func_extract_archives ()
 	      $RM "unfat-$$/$darwin_base_archive-$darwin_arch/$darwin_base_archive"
 	    done # $darwin_arches
             ## Okay now we've a bunch of thin objects, gotta fatten them up :)
-	    darwin_filelist=`find unfat-$$ -type f -name \*.o -print -o -name \*.lo -print | $SED -e "$basename" | sort -u`
+	    darwin_filelist=`find unfat-$$ -type f -name \*.o -print -o -name \*.lo -print | $SED -e "$sed_basename" | sort -u`
 	    darwin_file=
 	    darwin_files=
 	    for darwin_file in $darwin_filelist; do
@@ -6463,6 +6468,24 @@ func_win32_import_lib_p ()
     esac
 }
 
+# func_suncc_cstd_abi
+# !!ONLY CALL THIS FOR SUN CC AFTER $compile_command IS FULLY EXPANDED!!
+# Several compiler flags select an ABI that is incompatible with the
+# Cstd library. Avoid specifying it if any are in CXXFLAGS.
+func_suncc_cstd_abi ()
+{
+    $debug_cmd
+
+    case " $compile_command " in
+    *" -compat=g "*|*\ -std=c++[0-9][0-9]\ *|*" -library=stdcxx4 "*|*" -library=stlport4 "*)
+      suncc_use_cstd_abi=no
+      ;;
+    *)
+      suncc_use_cstd_abi=yes
+      ;;
+    esac
+}
+
 # func_mode_link arg...
 func_mode_link ()
 {
@@ -6521,6 +6544,7 @@ func_mode_link ()
     module=no
     no_install=no
     objs=
+    os2dllname=
     non_pic_objects=
     precious_files_regex=
     prefer_static_libs=no
@@ -6778,6 +6802,11 @@ func_mode_link ()
 	  prev=
 	  continue
 	  ;;
+	os2dllname)
+	  os2dllname=$arg
+	  prev=
+	  continue
+	  ;;
 	precious_regex)
 	  precious_files_regex=$arg
 	  prev=
@@ -6807,11 +6836,6 @@ func_mode_link ()
 	    *) func_append xrpath " $arg" ;;
 	    esac
 	  fi
-	  prev=
-	  continue
-	  ;;
-	shortname)
-	  shortname_cmds="$ECHO $arg | cut -b -8"
 	  prev=
 	  continue
 	  ;;
@@ -7092,6 +7116,11 @@ func_mode_link ()
 	continue
 	;;
 
+      -os2dllname)
+	prev=os2dllname
+	continue
+	;;
+
       -o) prev=output ;;
 
       -precious-files-regex)
@@ -7137,11 +7166,6 @@ func_mode_link ()
 
       -shared)
 	# The effects of -shared are defined in a previous loop.
-	continue
-	;;
-
-      -shortname)
-	prev=shortname
 	continue
 	;;
 
@@ -7243,6 +7267,7 @@ func_mode_link ()
       # -m*, -t[45]*, -txscale* architecture-specific flags for GCC
       # -F/path              path to uninstalled frameworks, gcc on darwin
       # -p, -pg, --coverage, -fprofile-*  profiling flags for GCC
+      # -fstack-protector*   stack protector flags for GCC
       # @file                GCC response files
       # -tp=*                Portland pgcc target processor selection
       # --sysroot=*          for sysroot support
@@ -7250,7 +7275,7 @@ func_mode_link ()
       # -stdlib=*            select c++ std lib with clang
       -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
       -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
-      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-stdlib=*)
+      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*)
         func_quote_for_eval "$arg"
 	arg=$func_quote_for_eval_result
         func_append compile_command " $arg"
@@ -7259,16 +7284,24 @@ func_mode_link ()
         continue
         ;;
 
-      # OS/2 uses -Zxxx to specify OS/2-specific options
       -Z*)
-       compiler_flags="$compiler_flags $arg"
-       func_append compile_command " $arg"
-       func_append finalize_command " $arg"
-       case $arg in
-       -Zlinker | -Zstack) prev=xcompiler;;
-       esac
-       continue
-       ;;
+        if test os2 = "`expr $host : '.*\(os2\)'`"; then
+          # OS/2 uses -Zxxx to specify OS/2-specific options
+	  compiler_flags="$compiler_flags $arg"
+	  func_append compile_command " $arg"
+	  func_append finalize_command " $arg"
+	  case $arg in
+	  -Zlinker | -Zstack)
+	    prev=xcompiler
+	    ;;
+	  esac
+	  continue
+        else
+	  # Otherwise treat like 'Some other compiler flag' below
+	  func_quote_for_eval "$arg"
+	  arg=$func_quote_for_eval_result
+        fi
+	;;
 
       # Some other compiler flag.
       -* | +*)
@@ -7428,6 +7461,9 @@ func_mode_link ()
     fi
     eval sys_lib_search_path=\"$sys_lib_search_path_spec\"
     eval sys_lib_dlsearch_path=\"$sys_lib_dlsearch_path_spec\"
+
+    # Definition is injected by LT_CONFIG during libtool generation.
+    func_munge_path_list sys_lib_dlsearch_path "$LT_SYS_LIBRARY_PATH"
 
     func_dirname "$output" "/" ""
     output_objdir=$func_dirname_result$objdir
@@ -7615,66 +7651,33 @@ func_mode_link ()
 	    # If $allow_libtool_libs_with_static_runtimes && $deplib is a stdlib,
 	    # We need to do some special things here, and not later.
 	    if test yes = "$allow_libtool_libs_with_static_runtimes"; then
-	      case $host_os in
-	      os2*)
-		case " $predeps $postdeps " in
-		*" $deplib "*) ;;
-		*)
-		  if func_lalib_p "$lib"; then
-		    library_names=
-		    old_library=
-		    func_source "$lib"
-		    for l in $old_library $library_names; do
-		      ll="$l"
-		    done
-		    if test "X$ll" = "X$old_library" ; then # only static version available
-		      found=false
-		      func_dirname "$lib" "" "."
-		      ladir="$func_dirname_result"
-		      lib=$ladir/$old_library
-		      if test prog,link = "$linkmode,$pass"; then
-			compile_deplibs="$deplib $compile_deplibs"
-			finalize_deplibs="$deplib $finalize_deplibs"
-		      else
-			deplibs="$deplib $deplibs"
-			test lib = "$linkmode" && newdependency_libs="$deplib $newdependency_libs"
-		      fi
-		      continue
+	      case " $predeps $postdeps " in
+	      *" $deplib "*)
+		if func_lalib_p "$lib"; then
+		  library_names=
+		  old_library=
+		  func_source "$lib"
+		  for l in $old_library $library_names; do
+		    ll=$l
+		  done
+		  if test "X$ll" = "X$old_library"; then # only static version available
+		    found=false
+		    func_dirname "$lib" "" "."
+		    ladir=$func_dirname_result
+		    lib=$ladir/$old_library
+		    if test prog,link = "$linkmode,$pass"; then
+		      compile_deplibs="$deplib $compile_deplibs"
+		      finalize_deplibs="$deplib $finalize_deplibs"
+		    else
+		      deplibs="$deplib $deplibs"
+		      test lib = "$linkmode" && newdependency_libs="$deplib $newdependency_libs"
 		    fi
+		    continue
 		  fi
-		  ;;
-		esac
+		fi
 		;;
-	      *)
-		case " $predeps $postdeps " in
-		*" $deplib "*)
-		  if func_lalib_p "$lib"; then
-		    library_names=
-		    old_library=
-		    func_source "$lib"
-		    for l in $old_library $library_names; do
-		      ll="$l"
-		    done
-		    if test "X$ll" = "X$old_library" ; then # only static version available
-		      found=false
-		      func_dirname "$lib" "" "."
-		      ladir="$func_dirname_result"
-		      lib=$ladir/$old_library
-		      if test prog,link = "$linkmode,$pass"; then
-			compile_deplibs="$deplib $compile_deplibs"
-			finalize_deplibs="$deplib $finalize_deplibs"
-		      else
-			deplibs="$deplib $deplibs"
-			test lib = "$linkmode" && newdependency_libs="$deplib $newdependency_libs"
-		      fi
-		      continue
-		    fi
-		  fi
-		  ;;
-		*) ;;
-		esac
-		;;
-	      esac # case $host_os in
+	      *) ;;
+	      esac
 	    fi
 	  else
 	    # deplib doesn't seem to be a libtool library
@@ -8199,7 +8202,7 @@ func_mode_link ()
 	    elif test -n "$soname_spec"; then
 	      # bleh windows
 	      case $host in
-	      *cygwin* | mingw* | *cegcc*)
+	      *cygwin* | mingw* | *cegcc* | *os2*)
 	        func_arith $current - $age
 		major=$func_arith_result
 		versuffix=-$major
@@ -8512,28 +8515,6 @@ func_mode_link ()
 		    fi
 		  fi
 		  ;;
-		*-*-os2*)
-		  depdepl=
-		  deplibrary_names=
-		  if test "$build_old_libs" != yes && test "$link_static" != yes ; then
-		    eval deplibrary_names=`${SED} -n -e 's/^library_names=\(.*\)$/\1/p' $deplib`
-		  fi
-		  if test -z "$deplibrary_names" ; then
-		    # fall back to static library
-		    eval deplibrary_names=`${SED} -n -e 's/^old_library=\(.*\)$/\1/p' $deplib`
-		  fi
-		  if test -n "$deplibrary_names" ; then
-		    for tmp in $deplibrary_names ; do
-		      depdepl=$tmp
-		    done
-		    if test -f "$absdir/$objdir/$depdepl" ; then
-		      depdepl="$absdir/$objdir/$depdepl"
-		      compiler_flags="$compiler_flags $depdepl"
-		      linker_flags="$linker_flags $depdepl"
-		    fi
-		  fi
-		  path=
-		  ;;
 		*)
 		  path=-L$absdir/$objdir
 		  ;;
@@ -8646,6 +8627,37 @@ func_mode_link ()
 	  eval $var=\"$tmp_libs\"
 	done # for var
       fi
+
+      # Add Sun CC postdeps if required:
+      test CXX = "$tagname" && {
+        case $host_os in
+        linux*)
+          case `$CC -V 2>&1 | sed 5q` in
+          *Sun\ C*) # Sun C++ 5.9
+            func_suncc_cstd_abi
+
+            if test no != "$suncc_use_cstd_abi"; then
+              func_append postdeps ' -library=Cstd -library=Crun'
+            fi
+            ;;
+          esac
+          ;;
+
+        solaris*)
+          func_cc_basename "$CC"
+          case $func_cc_basename_result in
+          CC* | sunCC*)
+            func_suncc_cstd_abi
+
+            if test no != "$suncc_use_cstd_abi"; then
+              func_append postdeps ' -library=Cstd -library=Crun'
+            fi
+            ;;
+          esac
+          ;;
+        esac
+      }
+
       # Last step: remove runtime libs from dependency_libs
       # (they stay in deplibs)
       tmp_libs=
@@ -8793,13 +8805,13 @@ func_mode_link ()
 	  #
 	  case $version_type in
 	  # correct linux to gnu/linux during the next big refactor
-	  darwin|linux|osf|windows|none)
+	  darwin|freebsd-elf|linux|osf|windows|none)
 	    func_arith $number_major + $number_minor
 	    current=$func_arith_result
 	    age=$number_minor
 	    revision=$number_revision
 	    ;;
-	  freebsd-aout|freebsd-elf|qnx|sunos)
+	  freebsd-aout|qnx|sunos)
 	    current=$number_major
 	    revision=$number_minor
 	    age=0
@@ -8885,8 +8897,9 @@ func_mode_link ()
 	  ;;
 
 	freebsd-elf)
-	  major=.$current
-	  versuffix=.$current
+	  func_arith $current - $age
+	  major=.$func_arith_result
+	  versuffix=$major.$age.$revision
 	  ;;
 
 	irix | nonstopux)
@@ -8945,6 +8958,11 @@ func_mode_link ()
 	  ;;
 
 	qnx)
+	  major=.$current
+	  versuffix=.$current
+	  ;;
+
+	sco)
 	  major=.$current
 	  versuffix=.$current
 	  ;;
@@ -10043,15 +10061,7 @@ EOF
 	# Create links to the real library.
 	for linkname in $linknames; do
 	  if test "$realname" != "$linkname"; then
-	    case $host_os in
-	    os2*)
-	      # Create import libraries instead of links on OS/2
-	      func_show_eval '(emximp -o $output_objdir/$linkname $output_objdir/$libname.def)' 'exit $?'
-	      ;;
-	    *)
-	      func_show_eval '(cd "$output_objdir" && $RM "$linkname" && $LN_S "$realname" "$linkname")' 'exit $?'
-	      ;;
-	    esac
+	    func_show_eval '(cd "$output_objdir" && $RM "$linkname" && $LN_S "$realname" "$linkname")' 'exit $?'
 	  fi
 	done
 

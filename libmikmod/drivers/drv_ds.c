@@ -140,7 +140,8 @@ static void DS_CommandLine(const CHAR *cmdline)
 		MikMod_free(ptr);
 	}
 
-	if ((ptr=MD_GetAtom("globalfocus",cmdline,1))) {
+	ptr=MD_GetAtom("globalfocus",cmdline,1);
+	if (ptr) {
 		controlflags |= DSBCAPS_GLOBALFOCUS;
 		MikMod_free(ptr);
 	} else
@@ -227,7 +228,7 @@ static int DS_Init(void)
 	pSoundBufferNotify = (LPDIRECTSOUNDNOTIFY) p;
 
 	notifyUpdateHandle=CreateEvent
-				(NULL,FALSE,FALSE,TEXT("libmikmod DirectSound Driver positionNotify Event"));
+				(NULL,FALSE,FALSE,"libmikmod DirectSound Driver positionNotify Event");
 	if (!notifyUpdateHandle) {
 		_mm_errno=MMERR_DS_EVENT;
 		return 1;
