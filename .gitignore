@@ -2,6 +2,9 @@
 Debug
 Release
 
+# Compiled resource file
+*.res
+
 # Machine generated header from .pas file
 *.hpp
 
