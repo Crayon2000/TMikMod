@@ -1,0 +1,18 @@
+# Folder
+Debug
+Release
+
+# Machine generated header from .pas file
+*.hpp
+
+# User-specific project options
+*.local
+
+# History file
+*.~*~
+
+# Windows thumbnail cache
+Thumbs.db
+
+# Temporary file
+*.tmp
