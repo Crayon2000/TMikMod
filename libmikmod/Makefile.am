@@ -10,7 +10,7 @@ bin_SCRIPTS = libmikmod-config
 
 EXTRA_DIST = libmikmod-config.in libmikmod.m4 libmikmod.pc.in \
 	     libmikmod.spec.in libmikmod.spec COPYING.LESSER \
-	     android macosx win32 \
+	     amiga android macosx win32 \
 	     dos dc gp32 macintosh os2 psp \
 	     examples \
 	     config.h.cmake CMakeLists.txt cmake
@@ -96,6 +96,7 @@ libmikmod_la_SOURCES = \
 		depackers/pp20.c \
 		depackers/s404.c \
 		depackers/xpk.c \
+		posix/strcasecmp.c \
 		playercode/mdreg.c \
 		playercode/mdriver.c \
 		playercode/mdulaw.c \

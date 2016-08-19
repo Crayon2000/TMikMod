@@ -29,7 +29,7 @@ LIST(APPEND CMAKE_MODULE_PATH "${libmikmod_SOURCE_DIR}/cmake")
 
 SET(LIBMIKMOD_MAJOR_VERSION 3)
 SET(LIBMIKMOD_MINOR_VERSION 3)
-SET(LIBMIKMOD_MICRO_VERSION 8)
+SET(LIBMIKMOD_MICRO_VERSION 9)
 
 SET(VERSION "${LIBMIKMOD_MAJOR_VERSION}.${LIBMIKMOD_MINOR_VERSION}.${LIBMIKMOD_MICRO_VERSION}")
 SET(LIBMIKMOD_VERSION "${LIBMIKMOD_MAJOR_VERSION}.${LIBMIKMOD_MINOR_VERSION}.${LIBMIKMOD_MICRO_VERSION}")
@@ -162,6 +162,8 @@ SET (ENABLE_DL 0)
 SET (ENABLE_THREADS 0) # windows builds have it using win32api already.
 ENDIF()
 
+SET (DISABLE_HQMIXER 0 CACHE BOOL "Exclude support for high quality mixer")
+
 SET (ENABLE_SIMD 0 CACHE BOOL "Use SIMD (AltiVec or SSE2) optimizations (Unstable!)")
 SET (ENABLE_RPATH 1 CACHE BOOL "Whether to use an rpath when linking" )
 SET (ENABLE_STATIC 1 CACHE BOOL "Whether to build the static library (which takes more time)" )
@@ -273,6 +275,14 @@ FOREACH (CFLAG_TO_CHECK ${COMPILER_FLAGS_TO_CHECK})
     ENDIF (${FLAG_EXISTS_VAR})
 ENDFOREACH(CFLAG_TO_CHECK)
 
+# check inline keyword
+CHECK_C_SOURCE_COMPILES("static inline int static_foo() {return 0;}
+                         int main(void) {return 0;}" HAVE_C_INLINE)
+CHECK_C_SOURCE_COMPILES("static __inline__ int static_foo() {return 0;}
+                         int main(void) {return 0;}" HAVE_C___INLINE__)
+CHECK_C_SOURCE_COMPILES("static __inline int static_foo() {return 0;}
+                         int main(void) {return 0;}" HAVE_C___INLINE)
+
 # check for symbol visibility attributes
 IF(NOT WIN32 AND NOT CYGWIN)
     SET(OLD_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS}")
@@ -299,7 +309,7 @@ INCLUDE_DIRECTORIES(BEFORE "${CMAKE_SOURCE_DIR}/include")
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_BINARY_DIR})
 
 CHECK_MULTI_INCLUDE_FILES(
-    "dlfcn.h" "fcntl.h" "limits.h" "malloc.h" "memory.h" "strings.h" "sys/ioctl.h" "unistd.h" "windows.h"
+    "dlfcn.h" "fcntl.h" "limits.h" "malloc.h" "memory.h" "sys/ioctl.h" "unistd.h" "windows.h"
 )
 
 IF(WIN32 AND NOT HAVE_WINDOWS_H)
@@ -381,6 +391,7 @@ SET (MIKMOD_LIB_MODULES
     depackers/pp20.c
     depackers/s404.c
     depackers/xpk.c
+    posix/strcasecmp.c
     playercode/mdreg.c
     playercode/mdriver.c
     playercode/mdulaw.c
@@ -399,7 +410,7 @@ SET (MIKMOD_LIB_MODULES
 
 REPLACE_FUNCTIONS_FROMDIR(MIKMOD_LIB_MODULES
     posix
-    memcmp strcasecmp strdup strstr)
+    memcmp strstr)
 
 SET (LIBMIKMOD_LIBS)
 
@@ -434,6 +445,12 @@ IF(WIN32)
         PROPERTIES DEFINE_SYMBOL DLL_EXPORT
     )
 ENDIF(WIN32)
+
+IF(DISABLE_HQMIXER)
+  SET(NO_HQMIXER 1)
+ELSE()
+  SET(NO_HQMIXER)
+ENDIF()
 
 IF(ENABLE_PIPE)
   SET(DRV_PIPE 1)
@@ -763,7 +780,7 @@ IF (ENABLE_XAUDIO2)
     CHECK_INCLUDE_FILE("xaudio2.h" HAVE_XAUDIO2_H)
     SET(CMAKE_REQUIRED_DEFINITIONS "${OLD_REQUIRED_DEFINITIONS}")
     IF(HAVE_XAUDIO2_H)
-      CHECK_SYMBOL_EXISTS(XAUDIO2_DEBUG_ENGINE xaudio2.h XAUDIO2_7_HEADER)
+      CHECK_SYMBOL_EXISTS(XAUDIO2_VOICE_NOSAMPLESPLAYED xaudio2.h XAUDIO2_7_HEADER)
       IF (XAUDIO2_7_HEADER AND ENABLE_XAUDIO28)
         MESSAGE(WARNING "xaudio2.h <= 2.7 and xaudio2.8 enabled - build will likely fail.")
       ELSEIF((NOT XAUDIO2_7_HEADER) AND (NOT ENABLE_XAUDIO28))

@@ -70,6 +70,9 @@
 /* Define to 0 or 1 to override MIKMOD_UNIX in mikmod_internals.h. */
 #cmakedefine MIKMOD_UNIX 1
 
+/* disable the high quality mixer (build only with the standart mixer) */
+#cmakedefine  NO_HQMIXER 1
+
 /* ========== Build environment information */
 
 /* Define if your system is SunOS 4.* */
@@ -175,15 +178,6 @@
 /* Define to 1 if you have the <soundcard.h> header file. */
 #cmakedefine HAVE_SOUNDCARD_H 1
 
-/* Define to 1 if you have the `strcasecmp' function. */
-#cmakedefine HAVE_STRCASECMP 1
-
-/* Define to 1 if you have the `strdup' function. */
-#cmakedefine HAVE_STRDUP 1
-
-/* Define to 1 if you have the <strings.h> header file. */
-#cmakedefine HAVE_STRINGS_H 1
-
 /* Define to 1 if you have the <string.h> header file. */
 #cmakedefine HAVE_STRING_H 1
 
@@ -237,6 +231,22 @@
 
 /* Version number of package */
 #cmakedefine VERSION "${VERSION}"
+
+/* Define if the C compiler supports the `inline' keyword. */
+#cmakedefine HAVE_C_INLINE
+/* Define if the C compiler supports the `__inline__' keyword. */
+#cmakedefine HAVE_C___INLINE__
+/* Define if the C compiler supports the `__inline' keyword. */
+#cmakedefine HAVE_C___INLINE
+#if !defined(HAVE_C_INLINE) && !defined(__cplusplus)
+# ifdef HAVE_C___INLINE__
+#  define inline __inline__
+# elif defined(HAVE_C___INLINE)
+#  define inline __inline
+# else
+#  define inline
+# endif
+#endif
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #cmakedefine const

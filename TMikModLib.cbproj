@@ -122,7 +122,7 @@
         <_TCHARMapping>wchar_t</_TCHARMapping>
         <PackageImports>IPIndyImpl;bindcompfmx;fmx;rtl;dbrtl;IndySystem;DbxClientDriver;bindcomp;inetdb;DBXInterBaseDriver;DataSnapCommon;DataSnapClient;DataSnapServer;DataSnapProviderClient;xmlrtl;DbxCommonDriver;IndyProtocols;DBXMySQLDriver;dbxcds;bindengine;soaprtl;DBXOracleDriver;dsnap;DBXInformixDriver;IndyCore;fmxase;DBXFirebirdDriver;inet;fmxobj;inetdbxpress;DBXSybaseASADriver;fmxdae;dbexpress;DataSnapIndy10ServerTransport;$(PackageImports)</PackageImports>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <IncludePath>libmikmod\depackers\;libmikmod;libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\include\;libmikmod\drivers\;$(BDS)\include;$(IncludePath)</IncludePath>
+        <IncludePath>libmikmod\posix\;libmikmod\depackers\;libmikmod;libmikmod\mmio\;libmikmod\playercode\;libmikmod\loaders\;libmikmod\include\;libmikmod\drivers\;$(BDS)\include;$(IncludePath)</IncludePath>
         <ProjectType>CppStaticLibrary</ProjectType>
         <Manifest_File>None</Manifest_File>
         <VerInfo_Locale>3084</VerInfo_Locale>
@@ -393,6 +393,9 @@
         </CppCompile>
         <CppCompile Include="libmikmod\playercode\virtch_common.c">
             <BuildOrder>40</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\posix\strcasecmp.c">
+            <BuildOrder>53</BuildOrder>
         </CppCompile>
         <CppCompile Include="MikMod.cpp">
             <DependentOn>MikMod.h</DependentOn>
@@ -838,13 +841,13 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
                 <Platform value="Android">False</Platform>

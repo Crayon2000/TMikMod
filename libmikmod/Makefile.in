@@ -132,12 +132,12 @@ am_libmikmod_la_OBJECTS = dlapi/dl_hpux.lo drivers/drv_AF.lo \
 	loaders/load_uni.lo loaders/load_xm.lo mmio/mmalloc.lo \
 	mmio/mmerror.lo mmio/mmio.lo depackers/mmcmp.lo \
 	depackers/pp20.lo depackers/s404.lo depackers/xpk.lo \
-	playercode/mdreg.lo playercode/mdriver.lo playercode/mdulaw.lo \
-	playercode/mloader.lo playercode/mlreg.lo playercode/mlutil.lo \
-	playercode/mplayer.lo playercode/munitrk.lo playercode/mwav.lo \
-	playercode/npertab.lo playercode/sloader.lo \
-	playercode/virtch.lo playercode/virtch2.lo \
-	playercode/virtch_common.lo
+	posix/strcasecmp.lo playercode/mdreg.lo playercode/mdriver.lo \
+	playercode/mdulaw.lo playercode/mloader.lo playercode/mlreg.lo \
+	playercode/mlutil.lo playercode/mplayer.lo \
+	playercode/munitrk.lo playercode/mwav.lo playercode/npertab.lo \
+	playercode/sloader.lo playercode/virtch.lo \
+	playercode/virtch2.lo playercode/virtch_common.lo
 libmikmod_la_OBJECTS = $(am_libmikmod_la_OBJECTS)
 libmikmod_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -365,7 +365,7 @@ SUBDIRS = drivers include loaders mmio depackers playercode \
 bin_SCRIPTS = libmikmod-config
 EXTRA_DIST = libmikmod-config.in libmikmod.m4 libmikmod.pc.in \
 	     libmikmod.spec.in libmikmod.spec COPYING.LESSER \
-	     android macosx win32 \
+	     amiga android macosx win32 \
 	     dos dc gp32 macintosh os2 psp \
 	     examples \
 	     config.h.cmake CMakeLists.txt cmake
@@ -446,6 +446,7 @@ libmikmod_la_SOURCES = \
 		depackers/pp20.c \
 		depackers/s404.c \
 		depackers/xpk.c \
+		posix/strcasecmp.c \
 		playercode/mdreg.c \
 		playercode/mdriver.c \
 		playercode/mdulaw.c \
@@ -710,6 +711,14 @@ depackers/s404.lo: depackers/$(am__dirstamp) \
 	depackers/$(DEPDIR)/$(am__dirstamp)
 depackers/xpk.lo: depackers/$(am__dirstamp) \
 	depackers/$(DEPDIR)/$(am__dirstamp)
+posix/$(am__dirstamp):
+	@$(MKDIR_P) posix
+	@: > posix/$(am__dirstamp)
+posix/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) posix/$(DEPDIR)
+	@: > posix/$(DEPDIR)/$(am__dirstamp)
+posix/strcasecmp.lo: posix/$(am__dirstamp) \
+	posix/$(DEPDIR)/$(am__dirstamp)
 playercode/$(am__dirstamp):
 	@$(MKDIR_P) playercode
 	@: > playercode/$(am__dirstamp)
@@ -940,6 +949,8 @@ mostlyclean-compile:
 	-rm -f playercode/virtch2.lo
 	-rm -f playercode/virtch_common.$(OBJEXT)
 	-rm -f playercode/virtch_common.lo
+	-rm -f posix/strcasecmp.$(OBJEXT)
+	-rm -f posix/strcasecmp.lo
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -1024,7 +1035,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@playercode/$(DEPDIR)/virtch_common.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@posix/$(DEPDIR)/memcmp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@posix/$(DEPDIR)/strcasecmp.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@posix/$(DEPDIR)/strdup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@posix/$(DEPDIR)/strstr.Plo@am__quote@
 
 .c.o:
@@ -1062,6 +1072,7 @@ clean-libtool:
 	-rm -rf loaders/.libs loaders/_libs
 	-rm -rf mmio/.libs mmio/_libs
 	-rm -rf playercode/.libs playercode/_libs
+	-rm -rf posix/.libs posix/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
@@ -1478,6 +1489,8 @@ distclean-generic:
 	-rm -f mmio/$(am__dirstamp)
 	-rm -f playercode/$(DEPDIR)/$(am__dirstamp)
 	-rm -f playercode/$(am__dirstamp)
+	-rm -f posix/$(DEPDIR)/$(am__dirstamp)
+	-rm -f posix/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"

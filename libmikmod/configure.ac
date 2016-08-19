@@ -2,10 +2,10 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
 
-AC_INIT([libmikmod],[3.3.8])
+AC_INIT([libmikmod],[3.3.9])
 LIBMIKMOD_MAJOR_VERSION=3
 LIBMIKMOD_MINOR_VERSION=3
-LIBMIKMOD_MICRO_VERSION=8
+LIBMIKMOD_MICRO_VERSION=9
 LIBMIKMOD_VERSION=$LIBMIKMOD_MAJOR_VERSION.$LIBMIKMOD_MINOR_VERSION.$LIBMIKMOD_MICRO_VERSION
 
 AC_CONFIG_AUX_DIR([autotools])
@@ -80,6 +80,8 @@ esac
 # libmikmod specific control variables and their default values.
 # ==============================================================
 
+libmikmod_hqmixer=yes
+
 libmikmod_driverlist=nosound
 
 libmikmod_driver_af=no
@@ -136,6 +138,48 @@ libmikmod_docs=yes
 # =========================
 # Configure script options.
 # =========================
+
+AC_ARG_ENABLE([hqmixer], [AS_HELP_STRING([--disable-hqmixer],[exclude support for high quality mixer [default=no]])],
+[if test "$enableval" = "no"
+then
+  libmikmod_hqmixer=no
+else
+  libmikmod_hqmixer=yes
+fi])
+
+AC_ARG_ENABLE([alldrv], [AS_HELP_STRING([--disable-alldrv],[disable all of the audio drivers. using additional --enable-XXX options enables the specified drivers.])],
+[if test "$enableval" = "no"
+then
+  libmikmod_driver_af=no
+  libmikmod_driver_ahi=no
+  libmikmod_driver_aix=no
+  libmikmod_driver_alsa=no
+  libmikmod_driver_pulseaudio=no
+  libmikmod_driver_esd=no
+  libmikmod_driver_nas=no
+  libmikmod_driver_hp=no
+  libmikmod_driver_sdl=no
+  libmikmod_driver_openal=no
+  libmikmod_driver_oss=no
+  libmikmod_driver_sam9407=no
+  libmikmod_driver_sgi=no
+  libmikmod_driver_sndio=no
+  libmikmod_driver_sun=no
+  libmikmod_driver_osx=no
+  libmikmod_driver_mac=no
+  libmikmod_driver_win=no
+  libmikmod_driver_ds=no
+  libmikmod_driver_xaudio2=no
+  libmikmod_driver_ultra=no
+  libmikmod_driver_os2=no
+  libmikmod_driver_dart=no
+  libmikmod_driver_aiff=no
+  libmikmod_driver_wav=no
+  libmikmod_driver_raw=no
+  libmikmod_driver_stdout=no
+  libmikmod_driver_pipe=no
+  libmikmod_driver_osles=no
+fi])
 
 AC_ARG_ENABLE([af], [AS_HELP_STRING([--enable-af],[include DEC AudioFile server driver [default=no]])],
 [if test "$enableval" = "yes"
@@ -480,6 +524,7 @@ AC_PROG_LIBTOOL
 
 AC_PROG_GCC_TRADITIONAL
 AC_C_CONST
+AC_C_INLINE
 AC_CACHE_CHECK([if compiler understands the signed keyword],[libmikmod_cv_gcc_signed],
 	AC_LANG_SAVE
 	AC_LANG_C
@@ -500,14 +545,14 @@ AC_C_BIGENDIAN
 
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h limits.h malloc.h memory.h strings.h sys/ioctl.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h limits.h malloc.h memory.h sys/ioctl.h unistd.h])
 
 # ============================
 # Check for library functions.
 # ============================
 
 AC_CHECK_FUNCS([posix_memalign setenv snprintf srandom])
-AC_REPLACE_FUNCS([memcmp strcasecmp strdup strstr])
+AC_REPLACE_FUNCS([memcmp strstr])
 AC_CHECK_LIB([m],[floor],LIBRARY_LIB="-lm $LIBRARY_LIB")
 AC_EGREP_HEADER([srandom],[math.h],AC_DEFINE([SRANDOM_IN_MATH_H], 1,
 					 [Define if your system defines random(3) and srandom(3) in math.h instead of stdlib.h]))
@@ -766,8 +811,8 @@ case $host_os in
 		AC_CHECK_HEADERS([xaudio2.h],[libmikmod_driver_xaudio2=yes])
 		if test $libmikmod_driver_xaudio2 = yes
 		then
-			AC_CACHE_CHECK([if XAUDIO2_DEBUG_ENGINE is defined],[libmikmod_cv_xaudio2_7_header],
-			 [AC_TRY_COMPILE([#include <xaudio2.h>],[int flag=XAUDIO2_DEBUG_ENGINE;],
+			AC_CACHE_CHECK([if XAUDIO2_VOICE_NOSAMPLESPLAYED is defined],[libmikmod_cv_xaudio2_7_header],
+			 [AC_TRY_COMPILE([#include <xaudio2.h>],[int flag=XAUDIO2_VOICE_NOSAMPLESPLAYED;],
 					[libmikmod_cv_xaudio2_7_header=yes],[libmikmod_cv_xaudio2_7_header=no])])
 			if test $libmikmod_cv_xaudio2_7_header = yes && test $use_xaudio28 = yes
 			then
@@ -1289,6 +1334,11 @@ then
    AC_DEFINE_UNQUOTED([MIKMOD_UNIX], $libmikmod_unix, [Define to 0 or 1 to override MIKMOD_UNIX in mikmod_internals.h.])
 fi
 
+if test $libmikmod_hqmixer = no
+then
+	AC_DEFINE([NO_HQMIXER], 1, [disable the high quality mixer (build only with the standart mixer)])
+fi
+
 # symbol visibility
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -fvisibility=hidden -Werror"
@@ -1374,5 +1424,6 @@ Library configuration:
   SIMD optimizations: $libmikmod_simd
   Dynamically loaded drivers whenever possible: $libmikmod_dynload
   Drivers to be compiled: $libmikmod_driverlist
+  HQ Mixer: $libmikmod_hqmixer
   Install path: $prefix/lib, $prefix/include
 "

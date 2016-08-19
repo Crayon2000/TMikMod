@@ -20,8 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
-
   Driver for output to a file called MUSIC.WAV
 
 ==============================================================================*/
@@ -42,6 +40,12 @@
 
 #ifdef SUNOS
 extern int fclose(FILE *);
+#endif
+#ifdef __VBCC__
+#define unlink remove
+#endif
+#ifdef _WIN32
+#define unlink _unlink
 #endif
 
 #define BUFFERSIZE 32768

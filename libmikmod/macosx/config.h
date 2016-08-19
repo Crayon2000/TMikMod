@@ -10,6 +10,9 @@
 /* Define if you have the ANSI C header files.  */
 #define STDC_HEADERS 1
 
+/* disable the high quality mixer (build only with the standart mixer) */
+/* #define NO_HQMIXER */
+
 /* Define if you want support for output to stdout */
 #define DRV_STDOUT 1
 
@@ -55,12 +58,6 @@
 /* Define if you have the srandom function.  */
 #define HAVE_SRANDOM 1
 
-/* Define if you have the strcasecmp function.  */
-#define HAVE_STRCASECMP 1
-
-/* Define if you have the strdup function.  */
-#define HAVE_STRDUP 1
-
 /* Define if you have the strstr function.  */
 #define HAVE_STRSTR 1
 
@@ -78,9 +75,6 @@
 
 /* Define if you have the <memory.h> header file.  */
 #define HAVE_MEMORY_H 1
-
-/* Define if you have the <strings.h> header file.  */
-#define HAVE_STRINGS_H 1
 
 /* Define if you have the <sys/ioctl.h> header file.  */
 #define HAVE_SYS_IOCTL_H 1
