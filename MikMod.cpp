@@ -162,7 +162,7 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
     {
         throw Exception("Module did not load properly.");
     }
-    if(FModule)
+    if(FModule != NULL)
     {
         UnLoad();
     }
@@ -245,7 +245,7 @@ void __fastcall TMikMod::LoadFromResourceName(unsigned Instance, const System::U
  */
 void __fastcall TMikMod::UnLoad()
 {
-    if(FModule)
+    if(FModule != NULL)
     {
         Player_Stop();
         Player_Free(FModule);

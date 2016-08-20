@@ -1,6 +1,6 @@
 # Folder
-Debug
-Release
+[Dd]ebug/
+[Rr]elease/
 
 # Compiled resource file
 *.res
@@ -13,6 +13,9 @@ Release
 
 # History file
 *.~*~
+
+# Castalia statistics file
+*.stat
 
 # Windows thumbnail cache
 Thumbs.db
