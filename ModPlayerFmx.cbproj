@@ -311,11 +311,11 @@
         <CppCompile Include="ModPlayerFmx.cpp">
             <BuildOrder>0</BuildOrder>
         </CppCompile>
-        <RcItem Include="music\aegwynn.mod">
-            <ContainerId>ResourceItem</ContainerId>
-            <ResourceType>RCDATA</ResourceType>
-            <ResourceId>MOD_MUSIC</ResourceId>
-        </RcItem>
+        <ResourceCompile Include="ModPlayerResources.rc">
+            <ModuleName>ModPlayerResources.rc</ModuleName>
+            <Form>ModPlayerResources.res</Form>
+            <BuildOrder>2</BuildOrder>
+        </ResourceCompile>
         <FormResources Include="MainFmx.fmx"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
