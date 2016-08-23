@@ -86,7 +86,7 @@ public:
 
     void __fastcall LoadFromFile(const System::UnicodeString AFileName, int Maxchan, bool Curious = 0);
     void __fastcall LoadFromStream(System::Classes::TStream *AStream, int Maxchan, bool Curious = 0);
-    void __fastcall LoadFromResourceName(unsigned Instance, const System::UnicodeString ResName, int Maxchan, bool Curious = 0);
+    void __fastcall LoadFromResourceName(NativeUInt Instance, const System::UnicodeString ResName, int Maxchan, bool Curious = 0);
 
     void __fastcall Start();
     void __fastcall Stop();

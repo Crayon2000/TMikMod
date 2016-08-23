@@ -23,6 +23,9 @@ void AutoRegMediaCodecClass()
     TMediaCodecManager::RegisterMediaCodecClass(".s3m", "Scream Tracker 3 File", TMediaType::Audio, __classid(TMikModMediaCodec));
     TMediaCodecManager::RegisterMediaCodecClass(".it", "Impulse Tracker File", TMediaType::Audio, __classid(TMikModMediaCodec));
     TMediaCodecManager::RegisterMediaCodecClass(".xm", "FastTracker 2 File", TMediaType::Audio, __classid(TMikModMediaCodec));
+    TMediaCodecManager::RegisterMediaCodecClass(".med", "OctaMED File", TMediaType::Audio, __classid(TMikModMediaCodec));
+    TMediaCodecManager::RegisterMediaCodecClass(".669", "Composer 669 File", TMediaType::Audio, __classid(TMikModMediaCodec));
+    TMediaCodecManager::RegisterMediaCodecClass(".mtm", "MultiTracker Module File", TMediaType::Audio, __classid(TMikModMediaCodec));
 }
 #pragma startup AutoRegMediaCodecClass
 

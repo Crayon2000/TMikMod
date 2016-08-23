@@ -226,7 +226,7 @@ void __fastcall TMikMod::LoadFromStream(System::Classes::TStream *ASream, int Ma
  * @param Maxchan The maximum number of channels the song is allowed to request from the mixer.
  * @param Curious The curiosity level to use.
  */
-void __fastcall TMikMod::LoadFromResourceName(unsigned Instance, const System::UnicodeString ResName, int Maxchan, bool Curious)
+void __fastcall TMikMod::LoadFromResourceName(NativeUInt Instance, const System::UnicodeString ResName, int Maxchan, bool Curious)
 {
     TResourceStream *ResStream = NULL;
     try
