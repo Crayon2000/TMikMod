@@ -18,8 +18,6 @@ __published:	// IDE-managed Components
     TButton *Button1;
     TButton *Button2;
     TEdit *Edit1;
-    void __fastcall FormDestroy(TObject *Sender);
-    void __fastcall FormCreate(TObject *Sender);
     void __fastcall TrackBar1Change(TObject *Sender);
     void __fastcall Button1Click(TObject *Sender);
     void __fastcall Button2Click(TObject *Sender);
@@ -27,6 +25,7 @@ private:	// User declarations
     TMikMod *FMikMod;
 public:		// User declarations
     __fastcall TForm1(TComponent* Owner);
+    __fastcall virtual ~TForm1(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm1 *Form1;

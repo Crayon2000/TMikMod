@@ -34,7 +34,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TForm1::FormDestroy(TObject *Sender)
+__fastcall TForm1::~TForm1()
 {
     delete FMikMod;
 }

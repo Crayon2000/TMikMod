@@ -13,11 +13,11 @@ class TMikMod;
 class TForm1 : public TForm
 {
 __published:	// IDE-managed Components
-    void __fastcall FormDestroy(TObject *Sender);
 private:	// User declarations
     TMikMod* FMikMod;
 public:		// User declarations
     __fastcall TForm1(TComponent* Owner);
+    __fastcall virtual ~TForm1(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm1 *Form1;
