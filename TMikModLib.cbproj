@@ -262,6 +262,9 @@
         <CppCompile Include="libmikmod\drivers\drv_nos.c">
             <BuildOrder>4</BuildOrder>
         </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_openal.c">
+            <BuildOrder>54</BuildOrder>
+        </CppCompile>
         <CppCompile Include="libmikmod\drivers\drv_osles.c">
             <BuildOrder>48</BuildOrder>
         </CppCompile>
@@ -270,6 +273,9 @@
         </CppCompile>
         <CppCompile Include="libmikmod\drivers\drv_raw.c">
             <BuildOrder>5</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_sdl.c">
+            <BuildOrder>55</BuildOrder>
         </CppCompile>
         <CppCompile Include="libmikmod\drivers\drv_stdout.c">
             <BuildOrder>0</BuildOrder>

@@ -392,7 +392,7 @@ bool __fastcall TMikMod::GetActive()
  */
 static BOOL GST_READER_Eof(MREADER * reader)
 {
-    MOD_READER *pReader = (MOD_READER *) reader;
+    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
 
     return (pReader->Stream->Size == (pReader->Stream->Position)) ? true : false;
 }
@@ -402,7 +402,7 @@ static BOOL GST_READER_Eof(MREADER * reader)
  */
 static BOOL GST_READER_Read(MREADER * reader, void *ptr, size_t size)
 {
-    MOD_READER *pReader = (MOD_READER *) reader;
+    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
 
     pReader->Stream->Read(ptr, size);
 
@@ -414,7 +414,7 @@ static BOOL GST_READER_Read(MREADER * reader, void *ptr, size_t size)
  */
 static int GST_READER_Get(MREADER * reader)
 {
-    MOD_READER *pReader = (MOD_READER *) reader;
+    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
     char buf;
 
     pReader->Stream->Read(&buf, 1);
@@ -427,7 +427,7 @@ static int GST_READER_Get(MREADER * reader)
  */
 static int GST_READER_Seek(MREADER * reader, long offset, int whence)
 {
-    MOD_READER *pReader = (MOD_READER *) reader;
+    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
 
     if(whence == SEEK_SET)
     {
@@ -446,7 +446,7 @@ static int GST_READER_Seek(MREADER * reader, long offset, int whence)
  */
 static long GST_READER_Tell(MREADER * reader)
 {
-    MOD_READER *pReader = (MOD_READER *) reader;
+    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
 
     return pReader->Stream->Position;
 }
