@@ -22,9 +22,9 @@ void __fastcall TMikModThread::Execute()
 #if defined(_WINDOWS_)
     TThread::CurrentThread->NameThreadForDebugging(System::UnicodeString("TMikModThread"), TThread::CurrentThread->ThreadID);
 #endif
-    while(!Terminated)
+    while(Terminated == false)
     {
-        if(Player_Active())
+        if(Player_Active() == true)
         {
             MikMod_Update();
             Sleep(10);
