@@ -227,7 +227,7 @@ static int DS_Init(void)
 	}
 	pSoundBufferNotify = (LPDIRECTSOUNDNOTIFY) p;
 
-	notifyUpdateHandle=CreateEvent
+	notifyUpdateHandle=CreateEventA
 				(NULL,FALSE,FALSE,"libmikmod DirectSound Driver positionNotify Event");
 	if (!notifyUpdateHandle) {
 		_mm_errno=MMERR_DS_EVENT;

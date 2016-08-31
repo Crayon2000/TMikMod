@@ -127,6 +127,8 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     MikMod_RegisterAllLoaders();
     // Only one device is used, this is needed to use command line
     md_device = 1;
+    // Set compact disc quality (default value)
+    md_mixfreq = 44100;
 
     std::string CommandLine; // Do not use AnsiString, there is a problem with OS X
     if(ADriver == TModuleDriver::DirectSound)
