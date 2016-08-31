@@ -23,7 +23,9 @@ enum class TModuleDriver : unsigned char
     NoSound,         /**< no sound. */
     Raw,             /**< raw file disk writer [music.raw]. */
     StandardOutput,  /**< output to stdout. */
-    WAV              /**< RIFF WAVE file disk writer [music.wav]. */
+    WAV,             /**< RIFF WAVE file disk writer [music.wav]. */
+    SDL,             /**< Simple DirectMedia Layer driver. */
+    OpenAL           /**< OpenAL driver. */
 };
 
 /**

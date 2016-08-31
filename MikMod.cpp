@@ -104,11 +104,22 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
 #endif /* DRV_OSX */
 #ifdef DRV_OSLES
     DriverList[TModuleDriver::OpenSLES] = &drv_osles;
-#endif
+#endif /* DRV_OSLES */
+#ifdef DRV_SDL
+    DriverList[TModuleDriver::SDL] = &drv_sdl;
+#endif /* DRV_SDL */
+#ifdef DRV_OPENAL
+    DriverList[TModuleDriver::OpenAL] = &drv_openal;
+#endif /* DRV_OPENAL */
     DriverList[TModuleDriver::NoSound] = &drv_nos;
     DriverList[TModuleDriver::Raw] = &drv_raw;
     DriverList[TModuleDriver::StandardOutput] = &drv_stdout;
     DriverList[TModuleDriver::WAV] = &drv_wav;
+
+    if(DriverList[ADriver] == NULL)
+    {
+        throw Exception("Invalid driver.");
+    }
 
     // Register a specific driver
     MikMod_RegisterDriver(DriverList[ADriver]);
@@ -124,11 +135,11 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     }
 
     // Initialize the library
-    if(MikMod_Init(CommandLine.c_str()))
+    if(MikMod_Init(CommandLine.c_str()) != 0)
     {
         String LException = "An error occurred during initialization.";
         String LError = MikMod_strerror(MikMod_errno); // Get last error
-        if(!LError.IsEmpty())
+        if(LError.IsEmpty() == false)
         {
             LException += " " + LError + ".";
         }
