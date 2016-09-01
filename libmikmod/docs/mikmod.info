@@ -29,7 +29,7 @@ File: mikmod.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
 MikMod Sound Library
 ********************
 
-This manual documents the MikMod Sound Library, version 3.3.9.
+This manual documents the MikMod Sound Library, version 3.3.10.
 
 * Menu:
 
@@ -3616,43 +3616,43 @@ Type and Variable Index
 
 Tag Table:
 Node: Top998
-Node: Introduction1449
-Node: Tutorial2328
-Node: MikMod Concepts3058
-Node: A Skeleton Program4023
-Node: Playing Modules5581
-Node: Playing Sound Effects9383
-Node: More Sound Effects13353
-Ref: More Sound Effects-Footnote-115781
-Node: Using the Library15967
-Node: Library Version16368
-Node: Type Definitions18543
-Node: Error Handling19594
-Node: Library Initialization21230
-Ref: Library Initialization-Footnote-124465
-Node: Samples and Voice Control24569
-Node: Modules and Player Control27431
-Node: Loading Data from Memory31731
-Node: Library Reference32649
-Node: Variable Reference33081
-Node: Structure Reference38131
-Node: Error Reference49344
-Ref: Error Reference-Footnote-162648
-Node: Function Reference62809
-Node: Library Core Functions63204
-Node: Module Player Functions75844
-Node: Sample Functions87297
-Node: Voice Functions89475
-Node: Loader Reference95867
-Node: Module Loaders96075
-Node: Sample Loaders103064
-Node: Driver Reference103362
-Node: Network Drivers103615
-Node: Hardware Drivers105088
-Node: Disk Writer Drivers110080
-Node: Other Drivers110921
-Node: Index111961
-Node: Function Index112129
-Node: Type and Variable Index119335
+Node: Introduction1450
+Node: Tutorial2329
+Node: MikMod Concepts3059
+Node: A Skeleton Program4024
+Node: Playing Modules5582
+Node: Playing Sound Effects9384
+Node: More Sound Effects13354
+Ref: More Sound Effects-Footnote-115782
+Node: Using the Library15968
+Node: Library Version16369
+Node: Type Definitions18544
+Node: Error Handling19595
+Node: Library Initialization21231
+Ref: Library Initialization-Footnote-124466
+Node: Samples and Voice Control24570
+Node: Modules and Player Control27432
+Node: Loading Data from Memory31732
+Node: Library Reference32650
+Node: Variable Reference33082
+Node: Structure Reference38132
+Node: Error Reference49345
+Ref: Error Reference-Footnote-162649
+Node: Function Reference62810
+Node: Library Core Functions63205
+Node: Module Player Functions75845
+Node: Sample Functions87298
+Node: Voice Functions89476
+Node: Loader Reference95868
+Node: Module Loaders96076
+Node: Sample Loaders103065
+Node: Driver Reference103363
+Node: Network Drivers103616
+Node: Hardware Drivers105089
+Node: Disk Writer Drivers110081
+Node: Other Drivers110922
+Node: Index111962
+Node: Function Index112130
+Node: Type and Variable Index119336
 
 End Tag Table
