@@ -133,7 +133,8 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     std::string CommandLine; // Do not use AnsiString, there is a problem with OS X
     if(ADriver == TModuleDriver::DirectSound)
     {
-        CommandLine = "globalfocus"; // Play if window does not have the focus
+        CommandLine = "globalfocus,"; // Play if window does not have the focus
+        CommandLine += "buffer=15"; // Size of the buffer
     }
 
     // Initialize the library
