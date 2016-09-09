@@ -3,6 +3,7 @@
 #pragma hdrstop
 #include "Main.h"
 #include "MikMod.h"
+#include <Vcl.Imaging.pngimage.hpp>
 //---------------------------------------------------------------------------
 #pragma comment(lib, "TMikModLib")
 #pragma package(smart_init)
@@ -24,6 +25,16 @@ __fastcall TForm1::TForm1(TComponent* Owner)
     OpenDialog1->Title = "Open Module File";
     OpenDialog1->Filter = "Module File|*.669;*.it;*.med;*.mod;*.mtm;*.xm;|";
     OpenDialog1->Options << TOpenOption::ofFileMustExist;
+
+    ImageListAddRes(ImageList1, "PNG_PLAY");
+    ImageListAddRes(ImageList1, "PNG_STOP");
+    ImageListAddRes(ImageList1, "PNG_PAUSE");
+    ImageListAddRes(ImageList1, "PNG_OPEN");
+    ImageListAddRes(ImageList1, "PNG_VOLUME0");
+    ImageListAddRes(ImageList1, "PNG_VOLUME1");
+    ImageListAddRes(ImageList1, "PNG_VOLUME2");
+    ImageListAddRes(ImageList1, "PNG_VOLUME3");
+    ImageListAddRes(ImageList1, "PNG_VOLUMEMUTE");
 
     const int LCount = ControlCount;
     for(int i = 0; i < LCount; ++i)
@@ -157,5 +168,36 @@ void __fastcall TForm1::SetVolumeImageIndex()
     {
         tbMute->ImageIndex = 7;
     }
+}
+//---------------------------------------------------------------------------
+
+int __fastcall TForm1::ImageListAddRes(TImageList* AImageList, String Identifier)
+{
+    if(AImageList == NULL)
+    {
+        return -1;
+    }
+
+    int Result;
+
+    Pngimage::TPngImage* PngImage = NULL;
+    Graphics::TBitmap* BitmapImage = NULL;
+    try
+    {
+        PngImage = new Pngimage::TPngImage();
+        PngImage->LoadFromResourceName((NativeUInt)HInstance, Identifier);
+
+        Graphics::TBitmap* BitmapImage = new Graphics::TBitmap();
+        BitmapImage->Assign(PngImage);
+
+        Result = AImageList->Add(BitmapImage, NULL);
+    }
+    __finally
+    {
+        delete PngImage;
+        delete BitmapImage;
+    }
+
+    return Result;
 }
 //---------------------------------------------------------------------------

@@ -54,6 +54,7 @@ private:	// User declarations
 
     void __fastcall Start();
     void __fastcall SetVolumeImageIndex();
+    int __fastcall ImageListAddRes(TImageList* AImageList, String Identifier);
 public:		// User declarations
     __fastcall TForm1(TComponent* Owner);
     __fastcall virtual ~TForm1(void);
