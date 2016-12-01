@@ -27,8 +27,8 @@ __fastcall TForm1::TForm1(TComponent* Owner)
     OpenDialog1->Options << TOpenOption::ofFileMustExist;
 
     ImageListAddRes(ImageList1, "PNG_PLAY");
-    ImageListAddRes(ImageList1, "PNG_STOP");
     ImageListAddRes(ImageList1, "PNG_PAUSE");
+    ImageListAddRes(ImageList1, "PNG_STOP");
     ImageListAddRes(ImageList1, "PNG_OPEN");
     ImageListAddRes(ImageList1, "PNG_VOLUME0");
     ImageListAddRes(ImageList1, "PNG_VOLUME1");
