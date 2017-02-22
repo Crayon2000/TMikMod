@@ -408,7 +408,7 @@ static BOOL GST_READER_Eof(MREADER * reader)
 {
     MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
 
-    return (pReader->Stream->Size == (pReader->Stream->Position)) ? true : false;
+    return (pReader->Stream->Position == pReader->Stream->Size) ? true : false;
 }
 
 /**
