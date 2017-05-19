@@ -11,11 +11,17 @@
 # User-specific project options
 *.local
 
+# File used to save the project desktop
+*.dsk
+
 # History file
-*.~*~
+*.~*
 
 # Castalia statistics file
 *.stat
+
+# Modeling configuration file
+*.tvsconfig
 
 # Windows thumbnail cache
 Thumbs.db
