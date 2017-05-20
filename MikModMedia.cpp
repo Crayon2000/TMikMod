@@ -7,8 +7,10 @@
 #if defined(_WINDOWS_)
 #pragma comment(lib, "TMikModLib")
 #define MODULEDRIVER TModuleDriver::mdWindows
+#elif defined(__ANDROID__)
+#define MODULEDRIVER TModuleDriver::OpenSLES
 #else
-#pragma link "TMikModLib.a"
+#pragma link "TMikModLib"
 #define MODULEDRIVER TModuleDriver::mdMacOSX
 #endif
 //---------------------------------------------------------------------------
