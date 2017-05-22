@@ -5,7 +5,7 @@
 #include "MikMod.h"
 #include <Vcl.Imaging.pngimage.hpp>
 //---------------------------------------------------------------------------
-#pragma comment(lib, "TMikModLib")
+#pragma comment(lib, "TMikModLib") // Include the TMikMod library
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 TForm1 *Form1;
@@ -38,16 +38,6 @@ __fastcall TForm1::TForm1(TComponent* Owner)
     ImageListAddRes(ImageList1, "PNG_VOLUME3");
     ImageListAddRes(ImageList1, "PNG_VOLUMEMUTE");
 
-    const int LCount = ControlCount;
-    for(int i = 0; i < LCount; ++i)
-    {
-        TProgressBar* LProgressBar = dynamic_cast<TProgressBar*>(Controls[i]);
-        if(LProgressBar != NULL)
-        {
-            LProgressBar->Max = 100000;
-        }
-    }
-
     FMikMod = new TMikMod(TModuleDriver::Windows);
 
     TStream *Res = NULL;
@@ -70,6 +60,10 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 
 __fastcall TForm1::~TForm1()
 {
+    for(int i = 0; i < FBars.Length; ++i)
+    {   // Free memory
+        delete FBars[i];
+    }
     delete FMikMod;
 }
 //---------------------------------------------------------------------------
@@ -83,17 +77,16 @@ void __fastcall TForm1::TrackBar1Change(TObject *Sender)
 
 void __fastcall TForm1::Timer1Timer(TObject *Sender)
 {
-    try
+    for(int i = 0; i < FBars.Length; ++i)
     {
-        ProgressBar1->Position = FMikMod->Voices[0]->Frequency;
-        ProgressBar2->Position = FMikMod->Voices[1]->Frequency;
-        ProgressBar3->Position = FMikMod->Voices[2]->Frequency;
-        ProgressBar4->Position = FMikMod->Voices[3]->Frequency;
-        ProgressBar5->Position = FMikMod->Voices[4]->Frequency;
-        ProgressBar6->Position = FMikMod->Voices[5]->Frequency;
-    }
-    catch(...)
-    {
+        if(FMikMod->Voices[i]->RealVolume > 0)
+        {
+            FBars[i]->Position = FMikMod->Voices[i]->Frequency;
+        }
+        else
+        {
+            FBars[i]->Position = 0;
+        }
     }
 }
 //---------------------------------------------------------------------------
@@ -104,6 +97,25 @@ void __fastcall TForm1::Start()
     txtModuleType->Text = FMikMod->ModuleType;
     txtSongTitle->Text = FMikMod->SongTitle;
     memoComment->Lines->Text = FMikMod->Comment;
+
+    for(int i = 0; i < FBars.Length; ++i)
+    {   // Free memory
+        delete FBars[i];
+    }
+
+    FBars.Length = FMikMod->VoiceCount;
+    for(int i = FBars.Length - 1; i >= 0; --i)
+    {
+        TProgressBar* LBar = new TProgressBar((System::Classes::TComponent*)NULL);
+        LBar->Parent = Panel1;
+        LBar->Min = 0;
+        LBar->Max = 80000;
+        LBar->Orientation = TProgressBarOrientation::pbVertical;
+        LBar->Align = TAlign::alLeft;
+        LBar->Hint = "Voice " + String(i);
+        LBar->Width = 35;
+        FBars[i] = LBar;
+    }
 }
 //---------------------------------------------------------------------------
 

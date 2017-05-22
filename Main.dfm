@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Module Player'
-  ClientHeight = 420
+  ClientHeight = 407
   ClientWidth = 426
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,80 +15,32 @@ object Form1: TForm1
   TextHeight = 13
   object Label1: TLabel
     Left = 8
-    Top = 42
+    Top = 50
     Width = 65
     Height = 13
     Caption = 'Module Type:'
   end
   object Label2: TLabel
     Left = 8
-    Top = 66
+    Top = 74
     Width = 51
     Height = 13
     Caption = 'Song Title:'
   end
   object Label3: TLabel
     Left = 8
-    Top = 93
+    Top = 101
     Width = 49
     Height = 13
     Caption = 'Comment:'
   end
   object txtModuleType: TEdit
     Left = 89
-    Top = 36
+    Top = 44
     Width = 273
     Height = 21
     ReadOnly = True
     TabOrder = 0
-  end
-  object ProgressBar1: TProgressBar
-    Left = 40
-    Top = 176
-    Width = 33
-    Height = 224
-    Orientation = pbVertical
-    TabOrder = 1
-  end
-  object ProgressBar2: TProgressBar
-    Left = 79
-    Top = 176
-    Width = 33
-    Height = 224
-    Orientation = pbVertical
-    TabOrder = 2
-  end
-  object ProgressBar3: TProgressBar
-    Left = 118
-    Top = 176
-    Width = 33
-    Height = 224
-    Orientation = pbVertical
-    TabOrder = 3
-  end
-  object ProgressBar4: TProgressBar
-    Left = 157
-    Top = 176
-    Width = 33
-    Height = 224
-    Orientation = pbVertical
-    TabOrder = 4
-  end
-  object ProgressBar5: TProgressBar
-    Left = 196
-    Top = 176
-    Width = 33
-    Height = 224
-    Orientation = pbVertical
-    TabOrder = 5
-  end
-  object ProgressBar6: TProgressBar
-    Left = 235
-    Top = 176
-    Width = 33
-    Height = 224
-    Orientation = pbVertical
-    TabOrder = 6
   end
   object ToolBar1: TToolBar
     Left = 0
@@ -99,7 +51,7 @@ object Form1: TForm1
     ButtonWidth = 31
     Caption = 'ToolBar1'
     Images = ImageList1
-    TabOrder = 7
+    TabOrder = 3
     object tbOpenFile: TToolButton
       Left = 0
       Top = 0
@@ -160,23 +112,41 @@ object Form1: TForm1
   end
   object txtSongTitle: TEdit
     Left = 89
-    Top = 63
+    Top = 71
     Width = 273
     Height = 21
     ReadOnly = True
-    TabOrder = 8
+    TabOrder = 1
   end
   object memoComment: TMemo
     Left = 89
-    Top = 90
+    Top = 98
     Width = 273
     Height = 56
     ReadOnly = True
     ScrollBars = ssVertical
-    TabOrder = 9
+    TabOrder = 2
+  end
+  object Panel1: TPanel
+    AlignWithMargins = True
+    Left = 8
+    Top = 163
+    Width = 410
+    Height = 236
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
+    Align = alBottom
+    BevelOuter = bvLowered
+    ShowCaption = False
+    TabOrder = 4
+    ExplicitLeft = 15
+    ExplicitTop = 176
+    ExplicitWidth = 394
   end
   object Timer1: TTimer
-    Interval = 33
+    Interval = 30
     OnTimer = Timer1Timer
     Left = 368
     Top = 240

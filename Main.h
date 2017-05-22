@@ -19,13 +19,7 @@ class TForm1 : public TForm
 {
 __published:	// IDE-managed Components
     TEdit *txtModuleType;
-    TProgressBar *ProgressBar1;
     TTimer *Timer1;
-    TProgressBar *ProgressBar2;
-    TProgressBar *ProgressBar3;
-    TProgressBar *ProgressBar4;
-    TProgressBar *ProgressBar5;
-    TProgressBar *ProgressBar6;
     TToolBar *ToolBar1;
     TToolButton *tbPlay;
     TToolButton *tbPause;
@@ -42,6 +36,7 @@ __published:	// IDE-managed Components
     TLabel *Label3;
     TMemo *memoComment;
     TToolButton *tbMute;
+    TPanel *Panel1;
     void __fastcall TrackBar1Change(TObject *Sender);
     void __fastcall Timer1Timer(TObject *Sender);
     void __fastcall tbPlayClick(TObject *Sender);
@@ -51,6 +46,7 @@ __published:	// IDE-managed Components
     void __fastcall tbMuteClick(TObject *Sender);
 private:	// User declarations
     TMikMod *FMikMod;
+    DynamicArray<TProgressBar *> FBars;
 
     void __fastcall Start();
     void __fastcall SetVolumeImageIndex();
