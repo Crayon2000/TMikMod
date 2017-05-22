@@ -44,7 +44,6 @@ __fastcall TVoice::~TVoice()
 
 /**
  * This function returns the volume of the sample currently playing on the specified voice.
- * @param AVoice The number of the voice to get volume.
  * @return The current volume of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
  */
 unsigned short __fastcall TVoice::GetVolume()
@@ -54,7 +53,6 @@ unsigned short __fastcall TVoice::GetVolume()
 
  /**
  * This function returns the frequency of the sample currently playing on the specified voice.
- * @param AVoice The number of the voice to get frequency.
  * @return The current frequency of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
  */
 unsigned long __fastcall TVoice::GetFrequency()
@@ -64,7 +62,6 @@ unsigned long __fastcall TVoice::GetFrequency()
 
 /**
  * This function returns the actual playing volume of the specified voice.
- * @param AVoice The number of the voice to analyze (starting from zero).
  * @return The real volume of the voice when the function was called, in the range 0-65535.
  */
 unsigned long __fastcall TVoice::GetRealVolume()
@@ -74,7 +71,6 @@ unsigned long __fastcall TVoice::GetRealVolume()
 
 /**
  * This function returns the panning position of the sample currently playing on the specified voice.
- * @param AVoice The number of the voice to get panning position.
  * @return The current panning position of the sample playing on the specified voice, or PAN_CENTER if no sample is currently playing on the voice.
  */
 unsigned long __fastcall TVoice::GetPanning()
@@ -168,7 +164,8 @@ __fastcall TMikMod::~TMikMod()
 }
 
 /**
- *
+ * Set a module.
+ * @param AModule The module to set.
  */
 void __fastcall TMikMod::SetModule(MODULE* AModule)
 {
@@ -195,7 +192,7 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
 
 /**
  * This function loads a music module from a file.
- * @param AFilename The name of the module file.
+ * @param AFileName The name of the module file.
  * @param Maxchan The maximum number of channels the song is allowed to request from the mixer.
  * @param Curious The curiosity level to use.
  */

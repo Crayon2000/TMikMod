@@ -48,10 +48,10 @@ public:
     __fastcall TVoice(Int8 AVoiceNumber = 0);
     virtual __fastcall ~TVoice();
 
-    __property unsigned short Volume = {read=GetVolume};
-    __property unsigned long Frequency = {read=GetFrequency};
-    __property unsigned long RealVolume = {read=GetRealVolume};
-    __property unsigned long Panning = {read=GetPanning};
+    __property unsigned short Volume = {read=GetVolume}; /**< The volume of the sample currently playing. */
+    __property unsigned long Frequency = {read=GetFrequency}; /**< The frequency of the sample currently playing. */
+    __property unsigned long RealVolume = {read=GetRealVolume}; /**< The panning position of the sample currently playing. */
+    __property unsigned long Panning = {read=GetPanning}; /**< The actual playing volume. */
 };
 
 /**

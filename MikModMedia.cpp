@@ -40,6 +40,7 @@ void AutoRegMediaCodecClass()
 /**
  * Creates a TMikModMedia from a given file.
  * @param AFileName The parameter specifies the name of the file from which to create the TMikModMedia.
+ * @return A TMedia created from a specified file.
  */
 TMedia* __fastcall TMikModMediaCodec::CreateFromFile(const System::UnicodeString AFileName)
 {
@@ -94,7 +95,7 @@ void __fastcall TMikModMedia::SetCurrent(const __int64 Value)
 
 /**
  * Getter function for the VideoSize property.
- * @param The media file is audio only and does not have a window, so the VideoSize is (0,0).
+ * @return The media file is audio only and does not have a window, so the VideoSize is (0,0).
  */
 System::Types::TPointF __fastcall TMikModMedia::GetVideoSize(void)
 {
@@ -112,7 +113,7 @@ TMediaState __fastcall TMikModMedia::GetMediaState(void)
 
 /**
  * Getter function for the Volume property.
- * @param The audio volume of the current media file.
+ * @return The audio volume of the current media file.
  */
 float __fastcall TMikModMedia::GetVolume(void)
 {

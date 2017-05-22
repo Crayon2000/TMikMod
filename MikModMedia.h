@@ -6,6 +6,9 @@
 //---------------------------------------------------------------------------
 class TMikMod;
 
+/**
+ * Media class for TMikMod.
+ */
 class TMikModMedia : public Media::TMedia
 {
     typedef Media::TMedia inherited;
@@ -30,6 +33,9 @@ public:
     __fastcall virtual ~TMikModMedia(void);
 };
 
+/**
+ * Media codec for TMikMod.
+ */
 class TMikModMediaCodec : public Media::TCustomMediaCodec
 {
 public:
