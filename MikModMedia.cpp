@@ -6,12 +6,12 @@
 //---------------------------------------------------------------------------
 #if defined(_WINDOWS_)
 #pragma comment(lib, "TMikModLib")
-#define MODULEDRIVER TModuleDriver::mdWindows
+#define MODULEDRIVER TModuleDriver::Windows
 #elif defined(__ANDROID__)
 #define MODULEDRIVER TModuleDriver::OpenSLES
 #else
 #pragma link "TMikModLib"
-#define MODULEDRIVER TModuleDriver::mdMacOSX
+#define MODULEDRIVER TModuleDriver::MacOSX
 #endif
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -127,6 +127,15 @@ float __fastcall TMikModMedia::GetVolume(void)
 void __fastcall TMikModMedia::SetVolume(const float Value)
 {
     FMikMod->Volume = Value * 128;
+}
+
+/**
+ * Updates the current Media, depending on the TMediaPlayerControl associated with it.
+ * The TMediaPlayerControl associated with the current media is specified through the Control property.
+ */
+void __fastcall TMikModMedia::UpdateMediaFromControl()
+{
+    inherited::UpdateMediaFromControl();
 }
 
 /**

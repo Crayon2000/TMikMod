@@ -24,7 +24,7 @@ protected:
     virtual TMediaState __fastcall GetMediaState(void);
     virtual float __fastcall GetVolume(void);
     virtual void __fastcall SetVolume(const float Value);
-    virtual void __fastcall UpdateMediaFromControl(void) {inherited::UpdateMediaFromControl();};
+    virtual void __fastcall UpdateMediaFromControl(void);
     virtual void __fastcall DoPlay(void);
     virtual void __fastcall DoStop(void);
 

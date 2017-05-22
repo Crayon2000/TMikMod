@@ -20,9 +20,9 @@ enum class TModuleDriver : unsigned char
     Windows,         /**< Win32 multimedia API driver. */
     MacOSX,          /**< MacOS X driver. */
     OpenSLES,        /**< OpenSL ES driver (for Android native code). */
-    NoSound,         /**< no sound. */
-    Raw,             /**< raw file disk writer [music.raw]. */
-    StandardOutput,  /**< output to stdout. */
+    NoSound,         /**< No sound. */
+    Raw,             /**< Raw file disk writer [music.raw]. */
+    StandardOutput,  /**< Output to stdout. */
     WAV,             /**< RIFF WAVE file disk writer [music.wav]. */
     SDL,             /**< Simple DirectMedia Layer driver. */
     OpenAL           /**< OpenAL driver. */

@@ -16,8 +16,8 @@
 
 typedef struct _MOD_READER
 {
-    MREADER Core;
-    System::Classes::TStream *Stream;
+    MREADER Core; /**< A MREADER struct. */
+    System::Classes::TStream *Stream; /**< A stream. */
 } MOD_READER;
 
 static BOOL GST_READER_Eof(MREADER *reader);

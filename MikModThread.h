@@ -7,6 +7,9 @@
 namespace Mikmod
 {
 
+/**
+ * The thread where TMikMod is updated.
+ */
 class TMikModThread : public Classes::TThread
 {
     typedef Classes::TThread inherited;
