@@ -136,7 +136,7 @@
         <ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\release\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
-        <Defines>DRV_OSLES;HAVE_MALLOC_H;HAVE_LIMITS_H;_MIKMOD_WIN32;BOOL=int;ULONG=unsigned int;CHAR=char;_BOOL_DEFINED;_ULONG_DEFINED;$(Defines)</Defines>
+        <Defines>DRV_OSLES;DRV_WAV;DRV_AIFF;DRV_RAW;HAVE_MALLOC_H;HAVE_LIMITS_H;HAVE_UNISTD_H;HAVE_SNPRINTF;_MIKMOD_WIN32;BOOL=int;ULONG=unsigned int;CHAR=char;_BOOL_DEFINED;_ULONG_DEFINED;$(Defines)</Defines>
         <EnabledSysJars>android-support-v4.dex.jar;apk-expansion.dex.jar;cloud-messaging.dex.jar;fmx.dex.jar;google-analytics-v2.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar;google-play-services.dex.jar</EnabledSysJars>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=preferExternal;largeHeap=False;theme=TitleBar;hardwareAccelerated=true</VerInfo_Keys>
@@ -169,14 +169,14 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <IncludePath>libmikmod\win32\;$(IncludePath)</IncludePath>
-        <Defines>WIN32;DRV_WIN;DRV_DS;HAVE_MALLOC_H;HAVE_FCNTL_H;HAVE_LIMITS_H;_MSC_VER=1;MIKMOD_STATIC;$(Defines)</Defines>
+        <Defines>WIN32;DRV_WIN;DRV_DS;DRV_WAV;DRV_STDOUT;DRV_RAW;DRV_AIFF;HAVE_MALLOC_H;HAVE_FCNTL_H;HAVE_LIMITS_H;HAVE_SNPRINTF;_MSC_VER=1;MIKMOD_STATIC;$(Defines)</Defines>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <PackageImports>vcldbx;frx16;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;DBXSybaseASEDriver;ibxpress;vclimg;frxDB16;intrawebdb_120_160;fs16;TeeUI;FMXTee;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;bcbsmp;websnap;vclribbon;frxe16;VclSmp;fsDB16;vcl;DataSnapConnectors;CloudService;DBXMSSQLDriver;CodeSiteExpressPkg;FmxTeeUI;dsnapcon;vclx;webdsnap;bdertl;adortl;bcbie;$(PackageImports)</PackageImports>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <IncludePath>libmikmod\win32\;$(IncludePath)</IncludePath>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
-        <Defines>DRV_WIN;DRV_DS;HAVE_MALLOC_H;HAVE_FCNTL_H;HAVE_LIMITS_H;MIKMOD_STATIC;__STDC__;$(Defines)</Defines>
+        <Defines>DRV_WIN;DRV_DS;DRV_WAV;DRV_STDOUT;DRV_RAW;DRV_AIFF;HAVE_MALLOC_H;HAVE_FCNTL_H;HAVE_LIMITS_H;HAVE_SNPRINTF;MIKMOD_STATIC;__STDC__;$(Defines)</Defines>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <BCC_OptimizeForSpeed>false</BCC_OptimizeForSpeed>
@@ -257,6 +257,9 @@
         <CppCompile Include="libmikmod\depackers\xpk.c">
             <BuildOrder>52</BuildOrder>
         </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_aiff.c">
+            <BuildOrder>56</BuildOrder>
+        </CppCompile>
         <CppCompile Include="libmikmod\drivers\drv_ds.c">
             <BuildOrder>3</BuildOrder>
         </CppCompile>
@@ -271,6 +274,9 @@
         </CppCompile>
         <CppCompile Include="libmikmod\drivers\drv_osx.c">
             <BuildOrder>46</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="libmikmod\drivers\drv_pipe.c">
+            <BuildOrder>57</BuildOrder>
         </CppCompile>
         <CppCompile Include="libmikmod\drivers\drv_raw.c">
             <BuildOrder>5</BuildOrder>
@@ -848,13 +854,13 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
                 <Platform value="Android">True</Platform>

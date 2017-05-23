@@ -89,6 +89,7 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     FVoiceCount(0)
 {
     std::map<TModuleDriver, MDRIVER*> DriverList;
+    DriverList[TModuleDriver::NoSound] = &drv_nos;
 #ifdef DRV_DS
     DriverList[TModuleDriver::DirectSound] = &drv_ds;
 #endif /* DRV_DS */
@@ -107,10 +108,18 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
 #ifdef DRV_OPENAL
     DriverList[TModuleDriver::OpenAL] = &drv_openal;
 #endif /* DRV_OPENAL */
-    DriverList[TModuleDriver::NoSound] = &drv_nos;
+#ifdef DRV_RAW
     DriverList[TModuleDriver::Raw] = &drv_raw;
-    DriverList[TModuleDriver::StandardOutput] = &drv_stdout;
+#endif /* DRV_RAW */
+#ifdef DRV_WAV
     DriverList[TModuleDriver::WAV] = &drv_wav;
+#endif /* DRV_WAV */
+#ifdef DRV_AIFF
+    DriverList[TModuleDriver::AIFF] = &drv_aiff;
+#endif /* DRV_AIFF */
+#ifdef DRV_STDOUT
+    DriverList[TModuleDriver::StandardOutput] = &drv_stdout;
+#endif /* DRV_STDOUT */
 
     if(DriverList[ADriver] == NULL)
     {
