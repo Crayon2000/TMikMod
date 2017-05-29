@@ -27,7 +27,7 @@ protected:
      */
     virtual void __fastcall Notify(void * Ptr, System::Classes::TListNotification Action)
     {
-        if(Action == lnDeleted && OwnsObjects)
+        if(Action == TListNotification::lnDeleted && OwnsObjects == true)
         {
             delete static_cast<T>(Ptr);
         }
@@ -176,8 +176,8 @@ public:
 
         for(int i = AStartAt; i < Count; ++i)
         {
-            if( (AExact && (Items[i]->ClassType() == AClass)) ||
-                (!AExact &&  Items[i]->InheritsFrom(AClass)))
+            if( (AExact == true && (Items[i]->ClassType() == AClass)) ||
+                (AExact == false &&  Items[i]->InheritsFrom(AClass)))
             {
                 Result = i;
                 break;
@@ -245,7 +245,7 @@ public:
      * Set Items to change the reference at a specific location.
      * Use Items with the Count property to iterate through all of the objects in the list.
      */
-    __property T Items[int Index] = {read=GetItem, write=SetItem/*, default*/};
+    __property T Items[int Index] = {read=GetItem, write=SetItem};
 };
 
 
