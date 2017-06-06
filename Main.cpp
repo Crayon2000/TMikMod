@@ -23,8 +23,8 @@ __fastcall TForm1::TForm1(TComponent* Owner)
     TrackBar1->Hint = "Volume";
 
     OpenDialog1->Title = "Open Module File";
-    const String LExtension = "*.669;*.far;*.gdm;*.imf;*.it;*.med;*.mod;*.mtm;"
-        "*.okta;*.s3m;*.stm;*.ult;*.xm;";
+    const String LExtension = "*.669;*.amf;*.dsm;*.far;*.gdm;*.imf;*.it;*.med;"
+        "*.mod;*.mtm;*.okta;*.s3m;*.stm;*.ult;*.xm;";
     OpenDialog1->Filter = "Module File|" + LExtension + "|";
     OpenDialog1->Options << TOpenOption::ofFileMustExist;
 

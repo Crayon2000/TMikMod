@@ -444,21 +444,32 @@ static int GST_READER_Get(MREADER * reader)
 
 /**
  * This function has the same behaviour as fseek, with offset 0 meaning the start of the object (module, sample) being loaded.
+ * @param offset Number of bytes to offset from whence.
+ * @param whence Position used as reference for the offset.
+ * @return If successful, the function returns zero. Otherwise, it returns non-zero value.
  */
 static int GST_READER_Seek(MREADER * reader, long offset, int whence)
 {
+    int Result = 0;
     MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
 
-    if(whence == SEEK_SET)
+    switch(whence)
     {
-        pReader->Stream->Position = offset;
-    }
-    else
-    {
-        pReader->Stream->Position += offset;
+        case SEEK_SET:
+            pReader->Stream->Position = offset;
+            break;
+        case SEEK_CUR:
+            pReader->Stream->Position += offset;
+            break;
+        case SEEK_END:
+            pReader->Stream->Position += pReader->Stream->Size + offset;
+            break;
+        default:
+            Result = 1;
+            break;
     }
 
-    return 1;
+    return Result;
 }
 
 /**

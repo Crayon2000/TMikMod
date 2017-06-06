@@ -22,6 +22,8 @@
 void AutoRegMediaCodecClass()
 {
     TMediaCodecManager::RegisterMediaCodecClass(".669", "Composer 669 File", TMediaType::Audio, __classid(TMikModMediaCodec));
+    TMediaCodecManager::RegisterMediaCodecClass(".amf", "DSMI Advanced Module Format File", TMediaType::Audio, __classid(TMikModMediaCodec));
+    TMediaCodecManager::RegisterMediaCodecClass(".dsm", "DSIK Internal Format File", TMediaType::Audio, __classid(TMikModMediaCodec));
     TMediaCodecManager::RegisterMediaCodecClass(".far", "Farandole Composer File", TMediaType::Audio, __classid(TMikModMediaCodec));
     TMediaCodecManager::RegisterMediaCodecClass(".gdm", "General DigiMusic File", TMediaType::Audio, __classid(TMikModMediaCodec));
     TMediaCodecManager::RegisterMediaCodecClass(".imf", "Imago Orpheus File", TMediaType::Audio, __classid(TMikModMediaCodec));
