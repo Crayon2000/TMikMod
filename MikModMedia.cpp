@@ -34,7 +34,9 @@ void AutoRegMediaCodecClass()
     TMediaCodecManager::RegisterMediaCodecClass(".okta", "Amiga Oktalyzer File", TMediaType::Audio, __classid(TMikModMediaCodec));
     TMediaCodecManager::RegisterMediaCodecClass(".s3m", "Scream Tracker 3 File", TMediaType::Audio, __classid(TMikModMediaCodec));
     TMediaCodecManager::RegisterMediaCodecClass(".stm", "Scream Tracker File", TMediaType::Audio, __classid(TMikModMediaCodec));
+    TMediaCodecManager::RegisterMediaCodecClass(".stx", "Scream Tracker Music Interface Kit File", TMediaType::Audio, __classid(TMikModMediaCodec));
     TMediaCodecManager::RegisterMediaCodecClass(".ult", "UltraTracker File", TMediaType::Audio, __classid(TMikModMediaCodec));
+    TMediaCodecManager::RegisterMediaCodecClass(".uni", "MikMod File", TMediaType::Audio, __classid(TMikModMediaCodec));
     TMediaCodecManager::RegisterMediaCodecClass(".xm", "FastTracker 2 File", TMediaType::Audio, __classid(TMikModMediaCodec));
 }
 #pragma startup AutoRegMediaCodecClass

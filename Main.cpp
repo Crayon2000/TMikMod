@@ -24,7 +24,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 
     OpenDialog1->Title = "Open Module File";
     const String LExtension = "*.669;*.amf;*.dsm;*.far;*.gdm;*.imf;*.it;*.med;"
-        "*.mod;*.mtm;*.okta;*.s3m;*.stm;*.ult;*.xm;";
+        "*.mod;*.mtm;*.okta;*.s3m;*.stm;*.stx;*.ult;*.uni;*.xm;";
     OpenDialog1->Filter = "Module File|" + LExtension + "|";
     OpenDialog1->Options << TOpenOption::ofFileMustExist;
 
