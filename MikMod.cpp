@@ -439,7 +439,7 @@ static int GST_READER_Get(MREADER * reader)
 
     pReader->Stream->Read(&buf, 1);
 
-    return((int)buf);
+    return (int)buf;
 }
 
 /**
