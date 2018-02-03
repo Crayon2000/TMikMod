@@ -281,7 +281,7 @@ void __fastcall TMikMod::UnLoad()
  */
 void __fastcall TMikMod::SetVolume(int AVolume)
 {
-    FVolume = (AVolume<0) ? 0 : (AVolume>128) ? 128 : AVolume;
+    FVolume = (AVolume < 0) ? 0 : (AVolume > 128) ? 128 : AVolume;
     Player_SetVolume(FVolume);
 }
 
@@ -304,6 +304,7 @@ void __fastcall TMikMod::Start()
 {
     CheckIfOpen();
     Player_Start(FModule);
+    Player_SetVolume(FVolume);
     FMikModThread->Suspended = false;
 }
 
@@ -481,3 +482,4 @@ static long GST_READER_Tell(MREADER * reader)
 
     return pReader->Stream->Position;
 }
+

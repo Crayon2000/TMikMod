@@ -215,3 +215,4 @@ int __fastcall TForm1::ImageListAddRes(TImageList* AImageList, String Identifier
     return Result;
 }
 //---------------------------------------------------------------------------
+
