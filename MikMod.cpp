@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 #include <map>
 #pragma hdrstop
 
@@ -7,17 +7,19 @@
 #include "MikModContnrs.h"
 #include "include/mikmod.h"
 #include "include/mikmod_internals.h"
-//---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 #pragma package(smart_init)
 
 #if defined(DRV_DS)
 #pragma comment(lib, "dsound") // Needed for the DirectSound driver
 #endif                      // DRV_DS
 
-typedef struct _MOD_READER
-{
-    MREADER Core; /**< A MREADER struct. */
-    System::Classes::TStream *Stream; /**< A stream. */
+typedef struct _MOD_READER {
+    MREADER Core;
+
+    /** < A MREADER struct. */
+    System::Classes::TStream *Stream;
+    /** < A stream. */
 } MOD_READER;
 
 static BOOL GST_READER_Eof(MREADER *reader);
@@ -29,34 +31,29 @@ static long GST_READER_Tell(MREADER *reader);
 /**
  * Constructor.
  */
-__fastcall TVoice::TVoice(Int8 AVoiceNumber) :
-    System::TObject(),
-    FVoiceNumber(AVoiceNumber)
-{
+__fastcall TVoice::TVoice(Int8 AVoiceNumber)
+    : System::TObject(), FVoiceNumber(AVoiceNumber) {
 }
 
 /**
  * Destructor.
  */
-__fastcall TVoice::~TVoice()
-{
+__fastcall TVoice::~TVoice() {
 }
 
 /**
  * This function returns the volume of the sample currently playing on the specified voice.
  * @return The current volume of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
  */
-unsigned short __fastcall TVoice::GetVolume()
-{
+unsigned short __fastcall TVoice::GetVolume() {
     return Voice_GetVolume(FVoiceNumber);
 }
 
- /**
+/**
  * This function returns the frequency of the sample currently playing on the specified voice.
  * @return The current frequency of the sample playing on the specified voice, or zero if no sample is currently playing on the voice.
  */
-unsigned long __fastcall TVoice::GetFrequency()
-{
+unsigned long __fastcall TVoice::GetFrequency() {
     return Voice_GetFrequency(FVoiceNumber);
 }
 
@@ -64,8 +61,7 @@ unsigned long __fastcall TVoice::GetFrequency()
  * This function returns the actual playing volume of the specified voice.
  * @return The real volume of the voice when the function was called, in the range 0-65535.
  */
-unsigned long __fastcall TVoice::GetRealVolume()
-{
+unsigned long __fastcall TVoice::GetRealVolume() {
     return Voice_RealVolume(FVoiceNumber);
 }
 
@@ -73,8 +69,7 @@ unsigned long __fastcall TVoice::GetRealVolume()
  * This function returns the panning position of the sample currently playing on the specified voice.
  * @return The current panning position of the sample playing on the specified voice, or PAN_CENTER if no sample is currently playing on the voice.
  */
-unsigned long __fastcall TVoice::GetPanning()
-{
+unsigned long __fastcall TVoice::GetPanning() {
     return Voice_GetPanning(FVoiceNumber);
 }
 
@@ -82,13 +77,9 @@ unsigned long __fastcall TVoice::GetPanning()
  * Constructor.
  * @param ADriver The driver to use. If not specify, mdNoSound will be used.
  */
-__fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
-    System::TObject(),
-    FModule(NULL),
-    FVolume(128),
-    FVoiceCount(0)
-{
-    std::map<TModuleDriver, MDRIVER*> DriverList;
+__fastcall TMikMod::TMikMod(TModuleDriver ADriver, std::string CommandLine)
+    : System::TObject(), FModule(NULL), FVolume(128), FVoiceCount(0) {
+    std::map<TModuleDriver, MDRIVER*>DriverList;
     DriverList[TModuleDriver::NoSound] = &drv_nos;
 #ifdef DRV_DS
     DriverList[TModuleDriver::DirectSound] = &drv_ds;
@@ -121,8 +112,7 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     DriverList[TModuleDriver::StandardOutput] = &drv_stdout;
 #endif /* DRV_STDOUT */
 
-    if(DriverList[ADriver] == NULL)
-    {
+    if (DriverList[ADriver] == NULL) {
         throw Exception("Invalid driver.");
     }
 
@@ -135,20 +125,19 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     // Set compact disc quality (default value)
     md_mixfreq = 44100;
 
-    std::string CommandLine; // Do not use AnsiString, there is a problem with OS X
-    if(ADriver == TModuleDriver::DirectSound)
-    {
-        CommandLine = "globalfocus,"; // Play if window does not have the focus
+    // std::string CommandLine; // Do not use AnsiString, there is a problem with OS X
+    if (ADriver == TModuleDriver::DirectSound) {
+        (UnicodeString(CommandLine.c_str()).Trim().Compare("") != 0) ?
+            CommandLine += ",globalfocus," : CommandLine = "globalfocus,";
+        // Play if window does not have the focus
         CommandLine += "buffer=15"; // Size of the buffer
     }
 
     // Initialize the library
-    if(MikMod_Init(CommandLine.c_str()) != 0)
-    {
+    if (MikMod_Init(CommandLine.c_str()) != 0) {
         String LException = "An error occurred during initialization.";
         String LError = MikMod_strerror(MikMod_errno); // Get last error
-        if(LError.IsEmpty() == false)
-        {
+        if (LError.IsEmpty() == false) {
             LException += " " + LError + ".";
         }
         throw Exception(LException, MikMod_errno);
@@ -164,8 +153,7 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
 /**
  * Destructor.
  */
-__fastcall TMikMod::~TMikMod()
-{
+__fastcall TMikMod::~TMikMod() {
     UnLoad();
     MikMod_Exit();
     delete FMikModThread;
@@ -176,25 +164,26 @@ __fastcall TMikMod::~TMikMod()
  * Set a module.
  * @param AModule The module to set.
  */
-void __fastcall TMikMod::SetModule(MODULE* AModule)
-{
-    if(AModule == NULL)
-    {
+void __fastcall TMikMod::SetModule(MODULE* AModule, bool Wrap, bool FadeOut,
+    bool Loop) {
+    if (AModule == NULL) {
         throw Exception("Module did not load properly.");
     }
-    if(FModule != NULL)
-    {
+    if (FModule != NULL) {
         UnLoad();
     }
     FModule = AModule;
-    FModule->wrap = true; // The module will restart when it's finished
+    FModule->wrap = Wrap;
+    // The module will restart when it's finished by default
+    FModule->fadeout = FadeOut;
+    // The module will fadeout while running lastpos if true
+    FModule->loop = Loop;
 
     MikMod_Lock();
     FVoiceCount = md_numchn;
     MikMod_Unlock();
 
-    for(char i = 0; i < FVoiceCount; ++i)
-    {
+    for (char i = 0; i < FVoiceCount; ++i) {
         FVoiceList->Add(new TVoice(i));
     }
 }
@@ -205,16 +194,14 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
  * @param Maxchan The maximum number of channels the song is allowed to request from the mixer.
  * @param Curious The curiosity level to use.
  */
-void __fastcall TMikMod::LoadFromFile(const System::UnicodeString AFileName, int Maxchan, bool Curious)
-{
+void __fastcall TMikMod::LoadFromFile(const System::UnicodeString AFileName,
+    int Maxchan, bool Curious, bool Wrap, bool FadeOut, bool Loop) {
     TFileStream *FileStream = NULL;
-    try
-    {
+    try {
         FileStream = new TFileStream(AFileName, fmOpenRead);
-        LoadFromStream(FileStream, Maxchan, Curious);
+        LoadFromStream(FileStream, Maxchan, Curious, Wrap, FadeOut, Loop);
     }
-    __finally
-    {
+    __finally {
         delete FileStream;
     }
 }
@@ -225,8 +212,8 @@ void __fastcall TMikMod::LoadFromFile(const System::UnicodeString AFileName, int
  * @param Maxchan The maximum number of channels the song is allowed to request from the mixer.
  * @param Curious The curiosity level to use.
  */
-void __fastcall TMikMod::LoadFromStream(System::Classes::TStream *ASream, int Maxchan, bool Curious)
-{
+void __fastcall TMikMod::LoadFromStream(System::Classes::TStream *ASream,
+    int Maxchan, bool Curious, bool Wrap, bool FadeOut, bool Loop) {
     MOD_READER Reader;
     Reader.Stream = ASream;
     Reader.Core.Eof = &GST_READER_Eof;
@@ -235,8 +222,8 @@ void __fastcall TMikMod::LoadFromStream(System::Classes::TStream *ASream, int Ma
     Reader.Core.Seek = &GST_READER_Seek;
     Reader.Core.Tell = &GST_READER_Tell;
 
-    MODULE *Module = Player_LoadGeneric((MREADER *)&Reader, Maxchan, Curious);
-    SetModule(Module);
+    MODULE *Module = Player_LoadGeneric((MREADER*)&Reader, Maxchan, Curious);
+    SetModule(Module, Wrap, FadeOut, Loop);
 }
 
 /**
@@ -246,16 +233,16 @@ void __fastcall TMikMod::LoadFromStream(System::Classes::TStream *ASream, int Ma
  * @param Maxchan The maximum number of channels the song is allowed to request from the mixer.
  * @param Curious The curiosity level to use.
  */
-void __fastcall TMikMod::LoadFromResourceName(NativeUInt Instance, const System::UnicodeString ResName, int Maxchan, bool Curious)
-{
+void __fastcall TMikMod::LoadFromResourceName(NativeUInt Instance,
+    const System::UnicodeString ResName, int Maxchan, bool Curious, bool Wrap,
+    bool FadeOut, bool Loop) {
     TResourceStream *ResStream = NULL;
-    try
-    {
-        ResStream = new TResourceStream(Instance, ResName, (System::WideChar *)RT_RCDATA);
-        LoadFromStream(ResStream, Maxchan, Curious);
+    try {
+        ResStream = new TResourceStream(Instance, ResName,
+            (System::WideChar*)RT_RCDATA);
+        LoadFromStream(ResStream, Maxchan, Curious, Wrap, FadeOut, Loop);
     }
-    __finally
-    {
+    __finally {
         delete ResStream;
     }
 }
@@ -263,10 +250,8 @@ void __fastcall TMikMod::LoadFromResourceName(NativeUInt Instance, const System:
 /**
  * Unload a MOD file.
  */
-void __fastcall TMikMod::UnLoad()
-{
-    if(FModule != NULL)
-    {
+void __fastcall TMikMod::UnLoad() {
+    if (FModule != NULL) {
         Player_Stop();
         Player_Free(FModule);
         FModule = NULL;
@@ -279,8 +264,7 @@ void __fastcall TMikMod::UnLoad()
  * This function sets the module volume.
  * @param AVolume The new overall module playback volume, in the range 0-128.
  */
-void __fastcall TMikMod::SetVolume(int AVolume)
-{
+void __fastcall TMikMod::SetVolume(int AVolume) {
     FVolume = (AVolume < 0) ? 0 : (AVolume > 128) ? 128 : AVolume;
     Player_SetVolume(FVolume);
 }
@@ -289,8 +273,7 @@ void __fastcall TMikMod::SetVolume(int AVolume)
  * This function stops the currently playing module.
  * @see Start
  */
-void __fastcall TMikMod::Stop()
-{
+void __fastcall TMikMod::Stop() {
     Player_SetPosition(0);
     Player_Stop();
     FMikModThread->Suspended = true;
@@ -300,8 +283,7 @@ void __fastcall TMikMod::Stop()
  * This function starts the specified module playback.
  * @see Stop
  */
-void __fastcall TMikMod::Start()
-{
+void __fastcall TMikMod::Start() {
     CheckIfOpen();
     Player_Start(FModule);
     Player_SetVolume(FVolume);
@@ -311,27 +293,89 @@ void __fastcall TMikMod::Start()
 /**
  * This function toggles the playing/paused status of the module.
  */
-void __fastcall TMikMod::Pause()
-{
+void __fastcall TMikMod::Pause() {
     Player_TogglePause();
+}
+
+/**
+ * This function returns the status of the Module->wrap property.
+ * @return 1 if active, 0 if not active.
+ */
+int __fastcall TMikMod::GetWrap() {
+    if (FModule == NULL) {
+        throw Exception("Load a module first.");
+    }
+    return FModule->wrap;
+}
+
+/**
+ * This function sets the module wrap property.
+ * @param AWrap The new wrap setup.
+ */
+void __fastcall TMikMod::SetWrap(bool AWrap) {
+    if (FModule == NULL) {
+        throw Exception("Load a module first.");
+    }
+    FModule->wrap = AWrap;
+}
+
+/**
+ * This function returns the status of Module->fadeout property.
+ * @return 1 if active, 0 if not active.
+ */
+int __fastcall TMikMod::GetFadeOut() {
+    if (FModule == NULL) {
+        throw Exception("Load a module first.");
+    }
+    return FModule->fadeout;
+}
+
+/**
+ * This function sets the module fadeout property.
+ * @param AWrap The new fadeout setup.
+ */
+void __fastcall TMikMod::SetFadeOut(bool AFadeOut) {
+    if (FModule == NULL) {
+        throw Exception("Load a module first.");
+    }
+    FModule->fadeout = AFadeOut;
+}
+
+/**
+ * This function returns the status of Module->loop flag.
+ * @return 1 if active, 0 if not active.
+ */
+int __fastcall TMikMod::GetLoop() {
+    if (FModule == NULL) {
+        throw Exception("Load a module first.");
+    }
+    return FModule->loop;
+}
+
+/**
+ * This function sets the module loop property.
+ * @param AWrap The new loop setup.
+ */
+void __fastcall TMikMod::SetLoop(bool ALoop) {
+    if (FModule == NULL) {
+        throw Exception("Load a module first.");
+    }
+    FModule->loop = ALoop;
 }
 
 /**
  * This function returns the version number of the library.
  * @return The version number, encoded as follows: (maj<<16)|(min<<8)|(rev), where maj is the major version number, min is the minor version number, and rev is the revision number.
  */
-long __fastcall TMikMod::GetVersion()
-{
+long __fastcall TMikMod::GetVersion() {
     return MikMod_GetVersion();
 }
 
 /**
  * Make sure a module is open, else raise exception.
  */
-void __fastcall TMikMod::CheckIfOpen()
-{
-    if(FModule == NULL)
-    {
+void __fastcall TMikMod::CheckIfOpen() {
+    if (FModule == NULL) {
         throw Exception("Load a module first.");
     }
 }
@@ -339,8 +383,7 @@ void __fastcall TMikMod::CheckIfOpen()
 /**
  * Returns the song title.
  */
-String __fastcall TMikMod::GetSongTitle()
-{
+String __fastcall TMikMod::GetSongTitle() {
     CheckIfOpen();
     return FModule->songname;
 }
@@ -348,8 +391,7 @@ String __fastcall TMikMod::GetSongTitle()
 /**
  * Returns the name of the tracker used to create the song.
  */
-String __fastcall TMikMod::GetModType()
-{
+String __fastcall TMikMod::GetModType() {
     CheckIfOpen();
     return FModule->modtype;
 }
@@ -357,8 +399,7 @@ String __fastcall TMikMod::GetModType()
 /**
  * Returns the song comment, if it has one.
  */
-String __fastcall TMikMod::GetComment()
-{
+String __fastcall TMikMod::GetComment() {
     CheckIfOpen();
     return FModule->comment;
 }
@@ -366,8 +407,7 @@ String __fastcall TMikMod::GetComment()
 /**
  * Returns the number of sound positions in the module.
  */
-unsigned short __fastcall TMikMod::GetNumberPos()
-{
+unsigned short __fastcall TMikMod::GetNumberPos() {
     CheckIfOpen();
     return FModule->numpos;
 }
@@ -375,8 +415,7 @@ unsigned short __fastcall TMikMod::GetNumberPos()
 /**
  * Returns the song position.
  */
-unsigned short __fastcall TMikMod::GetPosition()
-{
+unsigned short __fastcall TMikMod::GetPosition() {
     CheckIfOpen();
     return FModule->sngpos;
 }
@@ -384,8 +423,7 @@ unsigned short __fastcall TMikMod::GetPosition()
 /**
  * Set the song position.
  */
-void __fastcall TMikMod::SetPosition(unsigned short APosition)
-{
+void __fastcall TMikMod::SetPosition(unsigned short APosition) {
     Player_SetPosition(APosition);
 }
 
@@ -394,8 +432,7 @@ void __fastcall TMikMod::SetPosition(unsigned short APosition)
  * @param Index The number of the voice to get.
  * @return A pointer to the voice at Index.
  */
-TVoice* __fastcall TMikMod::GetVoice(int Index)
-{
+TVoice* __fastcall TMikMod::GetVoice(int Index) {
     return FVoiceList->Items[Index];
 }
 
@@ -403,17 +440,15 @@ TVoice* __fastcall TMikMod::GetVoice(int Index)
  * This function returns whether sound output is enabled or not.
  * @return Returns true if sound output is enabled, false otherwise.
  */
-bool __fastcall TMikMod::GetActive()
-{
+bool __fastcall TMikMod::GetActive() {
     return MikMod_Active();
 }
 
 /**
  * This function has the same behaviour as feof.
  */
-static BOOL GST_READER_Eof(MREADER * reader)
-{
-    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
+static BOOL GST_READER_Eof(MREADER * reader) {
+    MOD_READER *pReader = reinterpret_cast<MOD_READER*>(reader);
 
     return (pReader->Stream->Position == pReader->Stream->Size) ? true : false;
 }
@@ -421,9 +456,8 @@ static BOOL GST_READER_Eof(MREADER * reader)
 /**
  * This function copies length bytes of data into dest, and return zero if an error occured, and any nonzero value otherwise. Note that an end-of-file condition will not be considered as an error in this case.
  */
-static BOOL GST_READER_Read(MREADER * reader, void *ptr, size_t size)
-{
-    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
+static BOOL GST_READER_Read(MREADER * reader, void *ptr, size_t size) {
+    MOD_READER *pReader = reinterpret_cast<MOD_READER*>(reader);
 
     pReader->Stream->Read(ptr, size);
 
@@ -433,9 +467,8 @@ static BOOL GST_READER_Read(MREADER * reader, void *ptr, size_t size)
 /**
  * This function has the same behaviour as fgetc.
  */
-static int GST_READER_Get(MREADER * reader)
-{
-    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
+static int GST_READER_Get(MREADER * reader) {
+    MOD_READER *pReader = reinterpret_cast<MOD_READER*>(reader);
     char buf;
 
     pReader->Stream->Read(&buf, 1);
@@ -449,25 +482,23 @@ static int GST_READER_Get(MREADER * reader)
  * @param whence Position used as reference for the offset.
  * @return If successful, the function returns zero. Otherwise, it returns non-zero value.
  */
-static int GST_READER_Seek(MREADER * reader, long offset, int whence)
-{
+static int GST_READER_Seek(MREADER * reader, long offset, int whence) {
     int Result = 0;
-    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
+    MOD_READER *pReader = reinterpret_cast<MOD_READER*>(reader);
 
-    switch(whence)
-    {
-        case SEEK_SET:
-            pReader->Stream->Position = offset;
-            break;
-        case SEEK_CUR:
-            pReader->Stream->Position += offset;
-            break;
-        case SEEK_END:
-            pReader->Stream->Position += pReader->Stream->Size + offset;
-            break;
-        default:
-            Result = 1;
-            break;
+    switch (whence) {
+    case SEEK_SET:
+        pReader->Stream->Position = offset;
+        break;
+    case SEEK_CUR:
+        pReader->Stream->Position += offset;
+        break;
+    case SEEK_END:
+        pReader->Stream->Position += pReader->Stream->Size + offset;
+        break;
+    default:
+        Result = 1;
+        break;
     }
 
     return Result;
@@ -476,10 +507,8 @@ static int GST_READER_Seek(MREADER * reader, long offset, int whence)
 /**
  * This function has the same behaviour as ftell, with offset 0 meaning the start of the object being loaded.
  */
-static long GST_READER_Tell(MREADER * reader)
-{
-    MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
+static long GST_READER_Tell(MREADER * reader) {
+    MOD_READER *pReader = reinterpret_cast<MOD_READER*>(reader);
 
     return pReader->Stream->Position;
 }
-
