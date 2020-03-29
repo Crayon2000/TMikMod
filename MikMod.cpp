@@ -173,10 +173,11 @@ void __fastcall TMikMod::SetModule(MODULE* AModule, bool Wrap, bool FadeOut,
         UnLoad();
     }
     FModule = AModule;
-    FModule->wrap = Wrap;
     // The module will restart when it's finished by default
-    FModule->fadeout = FadeOut;
+    FModule->wrap = Wrap;
     // The module will fadeout while running lastpos if true
+    FModule->fadeout = FadeOut;
+    // The module will loop if true
     FModule->loop = Loop;
 
     MikMod_Lock();
