@@ -8,8 +8,12 @@
 
 /**
  * Constructor.
+ * @param ACreateSuspended If set to true, Execute is not called until after the Start method is called.
+ *                         If set to false, Execute is called immediately after the constructor.
+ *                         The default value is true.
  */
-__fastcall TMikModThread::TMikModThread() : Classes::TThread(true)
+__fastcall TMikModThread::TMikModThread(bool ACreateSuspended) :
+    Classes::TThread(ACreateSuspended)
 {
 }
 

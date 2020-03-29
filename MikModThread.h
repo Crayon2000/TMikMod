@@ -18,7 +18,8 @@ private:
 protected:
     void __fastcall Execute();
 public:
-    __fastcall TMikModThread();
+    __fastcall TMikModThread(bool ACreateSuspended = true);
+    inline __fastcall virtual ~TMikModThread(void) { }
 };
 
 }   /* namespace Mikmod */
