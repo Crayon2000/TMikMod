@@ -166,9 +166,11 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
  */
 __fastcall TMikMod::~TMikMod()
 {
+    // The thread must be deleted first in order to stop updating the sound
+    delete FMikModThread;
+
     UnLoad();
     MikMod_Exit();
-    delete FMikModThread;
     delete FVoiceList;
 }
 
@@ -291,7 +293,7 @@ void __fastcall TMikMod::SetVolume(int AVolume)
  */
 void __fastcall TMikMod::Stop()
 {
-    Player_SetPosition(0);
+    Player_SetPosition(0); // Position must be changed before player stops
     Player_Stop();
     FMikModThread->Suspended = true;
 }
