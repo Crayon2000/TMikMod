@@ -26,7 +26,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
     {
         FMikMod = new TMikMod(MODULEDRIVER);
         //FMikMod->LoadFromFile("E:\\Musique\\MOD\\A\\aaaahhh.mod", 32);
-        FMikMod->LoadFromResourceName((unsigned)HInstance, "MOD_MUSIC", 32);
+        FMikMod->LoadFromResourceName((NativeUInt)HInstance, "MOD_MUSIC", 32);
         FMikMod->Start();
     }
     catch(...)

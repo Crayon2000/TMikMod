@@ -51,8 +51,8 @@ public:
 
     __property unsigned short Volume = {read=GetVolume}; /**< The volume of the sample currently playing. */
     __property unsigned long Frequency = {read=GetFrequency}; /**< The frequency of the sample currently playing. */
-    __property unsigned long RealVolume = {read=GetRealVolume}; /**< The panning position of the sample currently playing. */
-    __property unsigned long Panning = {read=GetPanning}; /**< The actual playing volume. */
+    __property unsigned long RealVolume = {read=GetRealVolume}; /**< The actual playing volume. */
+    __property unsigned long Panning = {read=GetPanning}; /**< The panning position of the sample currently playing. */
 };
 
 /**

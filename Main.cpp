@@ -52,7 +52,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
         delete Res;
     }
 
-    FMikMod->LoadFromResourceName((unsigned)HInstance, "MOD_MUSIC", 32);
+    FMikMod->LoadFromResourceName((NativeUInt)HInstance, "MOD_MUSIC", 32);
 
     Start();
 }
