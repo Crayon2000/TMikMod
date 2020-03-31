@@ -7,6 +7,16 @@
 //---------------------------------------------------------------------------
 
 /**
+ * Module states.
+ */
+enum class TModuleState : unsigned char
+{
+    Playing, /**< The module is playing. */
+    Stopped, /**< The module is stopped. */
+    Completed /**< The module is completed. */
+};
+
+/**
  * Constructor.
  * @param ACreateSuspended If set to true, Execute is not called until after the Start method is called.
  *                         If set to false, Execute is called immediately after the constructor.
@@ -28,7 +38,24 @@ void __fastcall TMikModThread::Execute()
 #endif
     while(Terminated == false)
     {
-        if(Player_Active() == true)
+        TModuleState LState;
+        MikMod_Lock();
+        const MODULE* pf = Player_GetModule();
+        if(pf == NULL)
+        {
+            LState = TModuleState::Stopped;
+        }
+        else if(pf->sngpos >= pf->numpos)
+        {
+            LState = TModuleState::Completed;
+        }
+        else
+        {
+            LState = TModuleState::Playing;
+        }
+        MikMod_Unlock();
+
+        if(LState == TModuleState::Playing)
         {
             MikMod_Update();
             Sleep(10);
