@@ -195,7 +195,7 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
     FVoiceCount = md_numchn;
     MikMod_Unlock();
 
-    for(char i = 0; i < FVoiceCount; ++i)
+    for(int i = 0; i < FVoiceCount; ++i)
     {
         FVoiceList->Add(new TVoice(i));
     }
@@ -269,7 +269,6 @@ void __fastcall TMikMod::UnLoad()
 {
     if(FModule != NULL)
     {
-        Player_Stop();
         Player_Free(FModule);
         FModule = NULL;
         FVoiceCount = 0;
@@ -306,7 +305,7 @@ void __fastcall TMikMod::Start()
 {
     CheckIfOpen();
     Player_Start(FModule);
-    Player_SetVolume(FVolume);
+    Player_SetVolume(FVolume); // Volume must be changed after player is started
     FMikModThread->Suspended = false;
 }
 
