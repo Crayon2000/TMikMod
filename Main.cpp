@@ -154,12 +154,14 @@ void __fastcall TForm1::tbMuteClick(TObject *Sender)
         tbMute->ImageIndex = 8;
         TrackBar1->Enabled = false;
         FMikMod->Volume = 0;
+        tbMute->Hint = "Unmute";
     }
     else
     {
         SetVolumeImageIndex();
         TrackBar1->Enabled = true;
         FMikMod->Volume = TrackBar1->Position;
+        tbMute->Hint = "Mute";
     }
 }
 //---------------------------------------------------------------------------
