@@ -86,6 +86,9 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
     System::TObject(),
     FModule(NULL),
     FVolume(128),
+    FWrap(true),
+    FLoop(true),
+    FFadeOut(false),
     FVoiceCount(0)
 {
     std::map<TModuleDriver, MDRIVER*> DriverList;
@@ -190,7 +193,9 @@ void __fastcall TMikMod::SetModule(MODULE* AModule)
         UnLoad();
     }
     FModule = AModule;
-    FModule->wrap = true; // The module will restart when it's finished
+    FModule->wrap = FWrap; // The module will restart when it's finished
+    FModule->loop = FLoop; // Allow module to loop
+    FModule->fadeout = FFadeOut; // The module will fadeout while running lastpos if true
 
     MikMod_Lock();
     FVoiceCount = md_numchn;
@@ -285,6 +290,45 @@ void __fastcall TMikMod::SetVolume(int AVolume)
 {
     FVolume = (AVolume < 0) ? 0 : (AVolume > 128) ? 128 : AVolume;
     Player_SetVolume(FVolume);
+}
+
+/**
+ * This function sets the module wrap property.
+ * @param AWrap The new wrap setup.
+ */
+void __fastcall TMikMod::SetWrap(bool AWrap)
+{
+    FWrap = AWrap;
+    if(FModule != NULL)
+    {   // If a module is loaded, set it to the current module
+        FModule->wrap = FWrap;
+    }
+}
+
+/**
+ * This function sets the module loop property.
+ * @param ALoop The new loop setup.
+ */
+void __fastcall TMikMod::SetLoop(bool ALoop)
+{
+    FLoop = ALoop;
+    if(FModule != NULL)
+    {   // If a module is loaded, set it to the current module
+        FModule->loop = FLoop;
+    }
+}
+
+/**
+ * This function sets the module fadeout property.
+ * @param AFadeOut The new fadeout setup.
+ */
+void __fastcall TMikMod::SetFadeOut(bool AFadeOut)
+{
+    FFadeOut = AFadeOut;
+    if(FModule != NULL)
+    {   // If a module is loaded, set it to the current module
+        FModule->fadeout = FFadeOut;
+    }
 }
 
 /**

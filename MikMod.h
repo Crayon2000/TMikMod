@@ -66,6 +66,9 @@ private:
     MODULE* FModule;
     bool FIsThreadSafe;
     int FVolume;
+    bool FWrap;
+    bool FLoop;
+    bool FFadeOut;
     int FVoiceCount;
     Mikmod::TMikModThread* FMikModThread;
     Mikmod::TVoiceList *FVoiceList;
@@ -75,6 +78,9 @@ protected:
     void __fastcall UnLoad();
     void __fastcall SetModule(MODULE* AModule);
     void __fastcall SetVolume(int AVolume);
+    void __fastcall SetWrap(bool AWrap);
+    void __fastcall SetLoop(bool ALoop);
+    void __fastcall SetFadeOut(bool AFadeOut);
     long __fastcall GetVersion();
     String __fastcall GetSongTitle();
     String __fastcall GetModType();
@@ -107,6 +113,9 @@ public:
     __property bool Active = {read=GetActive}; /**< Returns whether sound output is enabled or not. */
 __published:
     __property int Volume = {read=FVolume, write=SetVolume, default = 128}; /**< Volume. */
+    __property bool Wrap = {read = FWrap, write = SetWrap, default = true}; /**< If true, the module wraps to its restart position when it is finished, to play continuously. */
+    __property bool Loop = {read = FLoop, write = SetLoop, default = true}; /**< If true, all in-module loops are processed; otherwise, backward loops which decrease the current position are not processed (i.e. only forward loops, and backward loops in the same pattern, are processed). This ensures that the module never loops endlessly. */
+    __property bool FadeOut = {read = FFadeOut, write = SetFadeOut, default = false}; /**< If true, the volume fades out when the last position of the module is being played. */
 };
 //---------------------------------------------------------------------------
 #endif
