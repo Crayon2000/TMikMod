@@ -83,22 +83,30 @@ object Form1: TForm1
       ImageIndex = 2
       OnClick = tbStopClick
     end
-    object tbSeparator2: TToolButton
+    object tbRepeat: TToolButton
       Left = 132
+      Top = 0
+      Caption = 'tbRepeat'
+      ImageIndex = 9
+      Style = tbsCheck
+      OnClick = tbRepeatClick
+    end
+    object tbSeparator2: TToolButton
+      Left = 163
       Top = 0
       Width = 8
       ImageIndex = 3
       Style = tbsSeparator
     end
     object tbMute: TToolButton
-      Left = 140
+      Left = 171
       Top = 0
       ImageIndex = 7
       Style = tbsCheck
       OnClick = tbMuteClick
     end
     object TrackBar1: TTrackBar
-      Left = 171
+      Left = 202
       Top = 0
       Width = 165
       Height = 30
@@ -141,9 +149,6 @@ object Form1: TForm1
     BevelOuter = bvLowered
     ShowCaption = False
     TabOrder = 4
-    ExplicitLeft = 15
-    ExplicitTop = 176
-    ExplicitWidth = 394
   end
   object Timer1: TTimer
     Interval = 30

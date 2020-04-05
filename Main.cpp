@@ -19,6 +19,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
     tbPlay->Hint = "Play";
     tbPause->Hint = "Pause";
     tbStop->Hint = "Stop";
+    tbRepeat->Hint = "Repeat";
     tbMute->Hint = "Mute";
     TrackBar1->Hint = "Volume";
 
@@ -37,22 +38,14 @@ __fastcall TForm1::TForm1(TComponent* Owner)
     ImageListAddRes(ImageList1, "PNG_VOLUME2");
     ImageListAddRes(ImageList1, "PNG_VOLUME3");
     ImageListAddRes(ImageList1, "PNG_VOLUMEMUTE");
+    ImageListAddRes(ImageList1, "PNG_REPEAT");
 
     FMikMod = new TMikMod(TModuleDriver::Windows);
 
-    TStream *Res = NULL;
-    try
-    {
-        //Res = new TResourceStream((NativeUInt)HInstance, "MOD_MUSIC", (System::WideChar *)RT_RCDATA);
-        //Res = new TFileStream("music.it", fmOpenRead);
-        //FMikMod->LoadFromStream(Res, 32);
-    }
-    __finally
-    {
-        delete Res;
-    }
+    tbRepeat->Down = FMikMod->Wrap;
 
-    FMikMod->LoadFromResourceName((NativeUInt)HInstance, "MOD_MUSIC", 32);
+    // Play a module in the resource
+    FMikMod->LoadFromResourceName(reinterpret_cast<NativeUInt>(HInstance), "MOD_MUSIC", 32);
 
     Start();
 }
@@ -106,7 +99,7 @@ void __fastcall TForm1::Start()
     FBars.Length = FMikMod->VoiceCount;
     for(int i = FBars.Length - 1; i >= 0; --i)
     {
-        TProgressBar* LBar = new TProgressBar((System::Classes::TComponent*)NULL);
+        TProgressBar* LBar = new TProgressBar(static_cast<System::Classes::TComponent*>(NULL));
         LBar->Parent = Panel1;
         LBar->Min = 0;
         LBar->Max = 80000;
@@ -134,6 +127,12 @@ void __fastcall TForm1::tbPauseClick(TObject *Sender)
 void __fastcall TForm1::tbStopClick(TObject *Sender)
 {
     FMikMod->Stop();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::tbRepeatClick(TObject *Sender)
+{
+    FMikMod->Wrap = tbRepeat->Down;
 }
 //---------------------------------------------------------------------------
 
@@ -201,7 +200,7 @@ int __fastcall TForm1::ImageListAddRes(TImageList* AImageList, String Identifier
     try
     {
         PngImage = new Pngimage::TPngImage();
-        PngImage->LoadFromResourceName((NativeUInt)HInstance, Identifier);
+        PngImage->LoadFromResourceName(reinterpret_cast<NativeUInt>(HInstance), Identifier);
 
         Graphics::TBitmap* BitmapImage = new Graphics::TBitmap();
         BitmapImage->Assign(PngImage);

@@ -37,6 +37,7 @@ __published:	// IDE-managed Components
     TMemo *memoComment;
     TToolButton *tbMute;
     TPanel *Panel1;
+    TToolButton *tbRepeat;
     void __fastcall TrackBar1Change(TObject *Sender);
     void __fastcall Timer1Timer(TObject *Sender);
     void __fastcall tbPlayClick(TObject *Sender);
@@ -44,6 +45,7 @@ __published:	// IDE-managed Components
     void __fastcall tbStopClick(TObject *Sender);
     void __fastcall tbOpenFileClick(TObject *Sender);
     void __fastcall tbMuteClick(TObject *Sender);
+    void __fastcall tbRepeatClick(TObject *Sender);
 private:	// User declarations
     TMikMod *FMikMod;
     DynamicArray<TProgressBar *> FBars;
