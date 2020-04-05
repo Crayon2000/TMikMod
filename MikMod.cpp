@@ -392,6 +392,7 @@ void __fastcall TMikMod::ModuleCompleted(System::TObject* Sender)
 
 /**
  * Returns the song title.
+ * @return The song title.
  */
 String __fastcall TMikMod::GetSongTitle()
 {
@@ -401,6 +402,7 @@ String __fastcall TMikMod::GetSongTitle()
 
 /**
  * Returns the name of the tracker used to create the song.
+ * @return The name of the tracker used to create the song.
  */
 String __fastcall TMikMod::GetModType()
 {
@@ -410,6 +412,7 @@ String __fastcall TMikMod::GetModType()
 
 /**
  * Returns the song comment, if it has one.
+ * @return The song comment.
  */
 String __fastcall TMikMod::GetComment()
 {
@@ -419,6 +422,7 @@ String __fastcall TMikMod::GetComment()
 
 /**
  * Returns the number of sound positions in the module.
+ * @return The number of sound positions in the module.
  */
 unsigned short __fastcall TMikMod::GetNumberPos()
 {
@@ -428,6 +432,7 @@ unsigned short __fastcall TMikMod::GetNumberPos()
 
 /**
  * Returns the song position.
+ * @return The song position.
  */
 unsigned short __fastcall TMikMod::GetPosition()
 {
@@ -437,6 +442,7 @@ unsigned short __fastcall TMikMod::GetPosition()
 
 /**
  * Set the song position.
+ * @param The song position.
  */
 void __fastcall TMikMod::SetPosition(unsigned short APosition)
 {
@@ -464,6 +470,7 @@ bool __fastcall TMikMod::GetActive()
 
 /**
  * This function has the same behaviour as feof.
+ * @return Returns true if the end-of-file has been reached, false otherwise.
  */
 static BOOL GST_READER_Eof(MREADER * reader)
 {
