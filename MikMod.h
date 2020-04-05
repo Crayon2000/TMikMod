@@ -70,6 +70,7 @@ private:
     Mikmod::TMikModThread* FMikModThread;
     Mikmod::TVoiceList *FVoiceList;
     void __fastcall CheckIfOpen();
+    void __fastcall ModuleCompleted(System::TObject* Sender);
 protected:
     void __fastcall UnLoad();
     void __fastcall SetModule(MODULE* AModule);

@@ -156,6 +156,7 @@ __fastcall TMikMod::TMikMod(TModuleDriver ADriver) :
 
     // This should be at the end of the constructor in case an exception is thrown
     FMikModThread = new Mikmod::TMikModThread();
+    FMikModThread->OnModuleCompleted = ModuleCompleted;
     FVoiceList = new Mikmod::TVoiceList();
 
     FIsThreadSafe = MikMod_InitThreads();
@@ -293,8 +294,8 @@ void __fastcall TMikMod::SetVolume(int AVolume)
 void __fastcall TMikMod::Stop()
 {
     Player_SetPosition(0); // Position must be changed before player stops
-    Player_Stop();
     FMikModThread->Suspended = true;
+    Player_Stop();
 }
 
 /**
@@ -335,6 +336,14 @@ void __fastcall TMikMod::CheckIfOpen()
     {
         throw Exception("Load a module first.");
     }
+}
+
+/**
+ * Event call when the module is completed.
+ */
+void __fastcall TMikMod::ModuleCompleted(System::TObject* Sender)
+{
+    Stop();
 }
 
 /**

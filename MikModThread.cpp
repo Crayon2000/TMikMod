@@ -60,6 +60,36 @@ void __fastcall TMikModThread::Execute()
             MikMod_Update();
             Sleep(10);
         }
+        else if(LState == TModuleState::Completed)
+        {
+            DoModuleCompleted();
+        }
+        else
+        {
+            Sleep(1);
+        }
+    }
+}
+
+/**
+ * Generates an OnModuleCompleted event.
+ */
+void __fastcall TMikModThread::CallModuleCompleted(void)
+{
+    if(FOnModuleCompleted)
+    {
+        OnModuleCompleted(this);
+    }
+}
+
+/**
+ * Generates an OnModuleCompleted event within the main thread.
+ */
+void __fastcall TMikModThread::DoModuleCompleted(void)
+{
+    if(FOnModuleCompleted)
+    {
+        Synchronize(CallModuleCompleted);
     }
 }
 
