@@ -14,7 +14,9 @@
 # File used to save the project desktop
 *.dsk
 
-# History file
+# History and backup files
+__history/
+__recovery/
 *.~*
 
 # Castalia statistics file
