@@ -17,6 +17,8 @@ class TMikMod;
 
 class TForm1 : public TForm
 {
+    typedef TForm inherited;
+
 __published:	// IDE-managed Components
     TEdit *txtModuleType;
     TTimer *Timer1;
