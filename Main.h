@@ -12,6 +12,7 @@
 #include <System.ImageList.hpp>
 #include <Vcl.ImgList.hpp>
 #include <Vcl.Dialogs.hpp>
+#include <vector>
 //---------------------------------------------------------------------------
 class TMikMod;
 
@@ -50,7 +51,7 @@ __published:	// IDE-managed Components
     void __fastcall tbRepeatClick(TObject *Sender);
 private:	// User declarations
     TMikMod *FMikMod;
-    DynamicArray<TProgressBar *> FBars;
+    std::vector<TProgressBar *> FBars;
 
     void __fastcall Start();
     void __fastcall SetVolumeImageIndex();

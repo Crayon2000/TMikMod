@@ -53,10 +53,11 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 
 __fastcall TForm1::~TForm1()
 {
-    for(int i = 0; i < FBars.Length; ++i)
+    for(std::vector<TProgressBar*>::iterator it = FBars.begin(); it != FBars.end(); ++it)
     {   // Free memory
-        delete FBars[i];
+        delete *it;
     }
+    FBars.clear();
     delete FMikMod;
 }
 //---------------------------------------------------------------------------
@@ -70,7 +71,7 @@ void __fastcall TForm1::TrackBar1Change(TObject *Sender)
 
 void __fastcall TForm1::Timer1Timer(TObject *Sender)
 {
-    for(int i = 0; i < FBars.Length; ++i)
+    for(int i = 0; i < FBars.size(); ++i)
     {
         if(FMikMod->Voices[i]->RealVolume > 0)
         {
@@ -91,13 +92,13 @@ void __fastcall TForm1::Start()
     txtSongTitle->Text = FMikMod->SongTitle;
     memoComment->Lines->Text = FMikMod->Comment;
 
-    for(int i = 0; i < FBars.Length; ++i)
+    for(std::vector<TProgressBar*>::iterator it = FBars.begin(); it != FBars.end(); ++it)
     {   // Free memory
-        delete FBars[i];
+        delete *it;
     }
+    FBars.clear();
 
-    FBars.Length = FMikMod->VoiceCount;
-    for(int i = FBars.Length - 1; i >= 0; --i)
+    for(int i = FMikMod->VoiceCount - 1; i >= 0; --i)
     {
         TProgressBar* LBar = new TProgressBar(static_cast<System::Classes::TComponent*>(NULL));
         LBar->Parent = Panel1;
@@ -107,7 +108,7 @@ void __fastcall TForm1::Start()
         LBar->Align = TAlign::alLeft;
         LBar->Hint = "Voice " + String(i);
         LBar->Width = 35;
-        FBars[i] = LBar;
+        FBars.push_back(LBar);
     }
 }
 //---------------------------------------------------------------------------
