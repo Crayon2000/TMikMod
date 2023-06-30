@@ -3,7 +3,6 @@
 #pragma hdrstop
 #include "Main.h"
 #include "MikMod.h"
-#include <Vcl.Imaging.pngimage.hpp>
 //---------------------------------------------------------------------------
 #pragma comment(lib, "TMikModLib") // Include the TMikMod library
 #pragma package(smart_init)
@@ -187,7 +186,7 @@ void __fastcall TForm1::SetVolumeImageIndex()
 }
 //---------------------------------------------------------------------------
 
-int __fastcall TForm1::ImageListAddRes(TImageList* AImageList, String Identifier)
+int __fastcall TForm1::ImageListAddRes(TImageList* AImageList, const String Identifier)
 {
     if(AImageList == NULL)
     {
@@ -196,11 +195,11 @@ int __fastcall TForm1::ImageListAddRes(TImageList* AImageList, String Identifier
 
     int Result;
 
-    Pngimage::TPngImage* PngImage = NULL;
+    TWICImage* PngImage = NULL;
     Graphics::TBitmap* BitmapImage = NULL;
     try
     {
-        PngImage = new Pngimage::TPngImage();
+        PngImage = new TWICImage();
         PngImage->LoadFromResourceName(reinterpret_cast<NativeUInt>(HInstance), Identifier);
 
         Graphics::TBitmap* BitmapImage = new Graphics::TBitmap();

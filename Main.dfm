@@ -2,16 +2,14 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Module Player'
-  ClientHeight = 407
-  ClientWidth = 426
+  ClientHeight = 406
+  ClientWidth = 422
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
-  PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 8
@@ -45,7 +43,7 @@ object Form1: TForm1
   object ToolBar1: TToolBar
     Left = 0
     Top = 0
-    Width = 426
+    Width = 422
     Height = 33
     ButtonHeight = 30
     ButtonWidth = 31
@@ -138,8 +136,8 @@ object Form1: TForm1
   object Panel1: TPanel
     AlignWithMargins = True
     Left = 8
-    Top = 163
-    Width = 410
+    Top = 162
+    Width = 406
     Height = 236
     Margins.Left = 8
     Margins.Top = 8
