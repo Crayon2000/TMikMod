@@ -486,7 +486,7 @@ static BOOL GST_READER_Read(MREADER * reader, void *ptr, size_t size)
 {
     MOD_READER *pReader = reinterpret_cast<MOD_READER *>(reader);
 
-    pReader->Stream->Read(ptr, size);
+    pReader->Stream->Read(ptr, static_cast<System::LongInt>(size));
 
     return 1;
 }
@@ -501,7 +501,7 @@ static int GST_READER_Get(MREADER * reader)
 
     pReader->Stream->Read(&buf, 1);
 
-    return (int)buf;
+    return static_cast<int>(buf);
 }
 
 /**
