@@ -1,36 +1,52 @@
-/*
-    Interface for IRQ routines on DOS
-    Copyright (C) 1999 by Andrew Zabolotny, <bit@eltech.ru>
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
-
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+/* Interface for IRQ routines on DOS
+ * Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
 
 #ifndef __DOSIRQ_H__
 #define __DOSIRQ_H__
 
-#include <pc.h>
+#include "dosutil.h"
 
 #define PIC1_BASE	0x20		/* PIC1 base */
 #define PIC2_BASE	0xA0		/* PIC2 base */
 
+#if defined(__GNUC__) && (__GNUC__ >= 5)
+#define NO_REORDER __attribute__((no_reorder,no_icf,noinline,noclone))
+#else
+#define NO_REORDER
+#endif
+
+#ifdef __WATCOMC__
+#define INTERRUPT_ATTRIBUTES __interrupt __far
+#else
+#define INTERRUPT_ATTRIBUTES
+#endif
+typedef void (INTERRUPT_ATTRIBUTES *irq_handler) ();
+
 struct irq_handle {
-	void (*c_handler) ();		/* The real interrupt handler */
+	irq_handler c_handler;		/* The real interrupt handler */
 	unsigned long handler_size;	/* The size of interrupt handler */
+#ifdef __DJGPP__
 	unsigned long handler;		/* Interrupt wrapper address */
 	unsigned long prev_selector;	/* Selector of previous handler */
 	unsigned long prev_offset;	/* Offset of previous handler */
+#else
+	irq_handler   prev_vect;	/* The previous interrupt handler */
+#endif
 	unsigned char irq_num;		/* IRQ number */
 	unsigned char int_num;		/* Interrupt number */
 	unsigned char pic_base;		/* PIC base (0x20 or 0xA0) */
@@ -97,8 +113,8 @@ static inline int irq_check(struct irq_handle * irq)
 }
 
 /* Hook a specific IRQ; NOTE: IRQ is disabled upon return, irq_enable() it */
-extern struct irq_handle *irq_hook(int irqno, void (*handler)(),
-                                   unsigned long size);
+extern struct irq_handle *irq_hook(int irqno, irq_handler handler,
+                                   irq_handler end);
 /* Unhook a previously hooked IRQ */
 extern void irq_unhook(struct irq_handle * irq);
 /* Start IRQ detection process (IRQ list is given with irq mask) */
@@ -118,5 +134,3 @@ extern unsigned int __irq_stack_size;
 extern unsigned int __irq_stack_count;
 
 #endif /* __DOSIRQ_H__ */
-
-/* ex:set ts=4: */

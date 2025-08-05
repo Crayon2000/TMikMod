@@ -42,6 +42,7 @@
 
 #ifdef DRV_DART
 
+#undef VERSION /* stop conflict with os2medef.h */
 #define INCL_DOS
 #define INCL_OS2MM
 #include <os2.h>
@@ -108,10 +109,10 @@ static LONG APIENTRY Dart_UpdateBuffers(ULONG ulStatus, PMCI_MIX_BUFFER pBuffer,
 		MUTEX_LOCK(vars);
 		if (Player_Paused_internal())
 			pBuffer->ulBufferLength =
-					VC_SilenceBytes(pBuffer->pBuffer, BufferSize);
+					VC_SilenceBytes((SBYTE*)pBuffer->pBuffer, BufferSize);
 		else
 			pBuffer->ulBufferLength =
-					VC_WriteBytes(pBuffer->pBuffer, BufferSize);
+					VC_WriteBytes((SBYTE*)pBuffer->pBuffer, BufferSize);
 		MUTEX_UNLOCK(vars);
 		MixSetupParms.pmixWrite(MixSetupParms.ulMixHandle, pBuffer, 1);
 	}
@@ -239,7 +240,7 @@ static int Dart_PlayStart(void)
 
 	/* silence buffers */
 	for (i = 0; i < BufferCount; i++) {
-		VC_SilenceBytes(MixBuffers[i].pBuffer, BufferSize);
+		VC_SilenceBytes((SBYTE*) MixBuffers[i].pBuffer, BufferSize);
 		MixBuffers[i].ulBufferLength = BufferSize;
 	}
 

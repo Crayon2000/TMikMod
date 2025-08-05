@@ -19,17 +19,12 @@
 */
 
 /*==============================================================================
-
-  $Id$
-
   libGUS-alike definitions for DOS
-
 ==============================================================================*/
 
 #ifndef __DOSGUS_H__
 #define __DOSGUS_H__
 
-#include <pc.h>
 #include "dosdma.h"
 #include "dosirq.h"
 #include "libgus.h"
@@ -352,6 +347,23 @@ typedef struct __gus_state_s {
 } __gus_state;
 
 extern __gus_state gus;
+
+#if !defined(__GNUC__) || (__GNUC__ < 3) || (__GNUC__ == 3 && __GNUC_MINOR__ == 0)
+# define _func_noinline volatile /* match original code */
+# define _func_noclone
+#else
+/* avoid warnings from newer gcc:
+ * "function definition has qualified void return type" and
+ * function return types not compatible due to 'volatile' */
+# define _func_noinline __attribute__((__noinline__))
+# if (__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 5)
+#  define _func_noclone
+# else
+#  define _func_noclone __attribute__((__noclone__))
+# endif
+#endif
+_func_noinline
+_func_noclone
 extern void __gus_delay();
 
 static unsigned long __gus_convert_addr16(unsigned long address)
@@ -469,7 +481,7 @@ static inline void __gus_mixer_output(boolean state)
 /* Inline routines for working with command pools */
 
 /* WARNING: no bounds checking due to performance reasons */
-#define __POOL_VALUE(type,value)								\
+#define __POOL_VALUE(type,value)				\
   *((unsigned type *)&gus.cmd_pool [gus.cmd_pool_top]) = value;	\
   gus.cmd_pool_top += sizeof (type);
 
@@ -510,5 +522,3 @@ extern void __gus_mem_dump();
 #endif
 
 #endif /* __DOSGUS_H__ */
-
-/* ex:set ts=4: */

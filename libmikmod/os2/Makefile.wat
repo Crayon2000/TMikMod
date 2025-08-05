@@ -1,7 +1,7 @@
 # Makefile for OS/2 using Watcom compiler.
 #
 # wmake -f Makefile.wat
-# - builds mikmod.dll and its import lib (mikmod.lib)
+# - builds mikmod.dll and its import lib mikmod.lib
 #
 # wmake -f Makefile.wat target=static
 # - builds the static library mikmod_static.lib
@@ -10,6 +10,7 @@
 target = dll
 !endif
 
+INCLUDES=-I. -I"../include"
 CPPFLAGS=-DMIKMOD_BUILD -DHAVE_FCNTL_H -DHAVE_LIMITS_H -DHAVE_MALLOC_H
 
 # To build a debug version :
@@ -29,6 +30,8 @@ CPPFLAGS+= -DDRV_RAW
 # support for output to stdout (not needed by everyone)
 #CPPFLAGS+= -DDRV_STDOUT
 
+# disable support for module depackers
+#CPPFLAGS+= -DNO_DEPACKERS
 # disable the high quality mixer (build only with the standart mixer)
 #CPPFLAGS+= -DNO_HQMIXER
 
@@ -36,6 +39,8 @@ CPPFLAGS+= -DDRV_RAW
 LIBS = mmpm2.lib
 
 CFLAGS = -bt=os2 -bm -fp5 -fpi87 -mf -oeatxh -w4 -ei -zp8 -zq
+# newer OpenWatcom versions enable W303 by default.
+CFLAGS+= -wcd=303
 # -5s  :  Pentium stack calling conventions.
 # -5r  :  Pentium register calling conventions.
 CFLAGS+= -5s
@@ -44,10 +49,13 @@ DLLFLAGS=-bd
 .SUFFIXES:
 .SUFFIXES: .obj .c
 
-DLLNAME=mikmod.dll
-EXPNAME=mikmod.exp
-LIBNAME=mikmod.lib
+DLLNAME=mikmod3.dll
+EXPNAME=mikmod3.exp
+MAPNAME=mikmod3.map
+LIBNAME=mikmod3.lib
+LNKFILE=mikmod3.lnk
 LIBSTATIC=mikmod_static.lib
+LBCFILE=mikmod3.lbc
 
 !ifeq target static
 CPPFLAGS+= -DMIKMOD_STATIC=1
@@ -73,31 +81,37 @@ OBJ=drv_os2.obj drv_dart.obj &
 all: $(BLD_TARGET)
 
 # rely on symbol name, not ordinal: -irn switch of wlib is default, but -inn is not.
-$(DLLNAME): $(OBJ)
-	wlink NAM $@ SYSTEM os2v2_dll INITINSTANCE TERMINSTANCE OPTION MANYAUTODATA LIBR {$(LIBS)} FIL {$(OBJ)} OPTION IMPF=$(EXPNAME)
-	wlib -q -b -n -inn -pa -s -t -zld -ii -io $(LIBNAME) +$(DLLNAME)
+$(DLLNAME): $(OBJ) $(LNKFILE)
+	wlink @$(LNKFILE)
+	wlib -q -b -n -c -pa -s -t -zld -ii -io -inn $(LIBNAME) +$(DLLNAME)
 
-$(LIBSTATIC): $(OBJ)
-	wlib -q -b -n $@ $(OBJ)
+$(LIBSTATIC): $(OBJ) $(LBCFILE)
+	wlib -q -b -n -c -pa -s -t -zld -ii -io $@ @$(LBCFILE)
 
+.c: ../drivers;../loaders;../depackers;../mmio;../playercode;../posix;
 .c.obj:
 	$(COMPILE) -fo=$^@ $<
 
-!ifndef __UNIX__
 distclean: clean .symbolic
-	@if exist $(LIBSTATIC) del $(LIBSTATIC)
-	@if exist $(DLLNAME) del $(DLLNAME)
-	@if exist $(EXPNAME) del $(EXPNAME)
-	@if exist $(LIBNAME) del $(LIBNAME)
-clean: .symbolic
-	@if exist *.obj del *.obj
-.c: ..\drivers;..\loaders;..\depackers;..\mmio;..\playercode;..\posix
-INCLUDES=-I..\os2 -I..\include
-!else
-distclean: clean .symbolic
+	rm -f $(MAPNAME) $(LNKFILE) $(LBCFILE) 
 	rm -f $(DLLNAME) $(EXPNAME) $(LIBNAME) $(LIBSTATIC)
 clean: .symbolic
 	rm -f *.obj
-.c: ../drivers;../loaders;../depackers;../mmio;../playercode;../posix
-INCLUDES=-I../os2 -I../include
-!endif
+
+$(LNKFILE):
+	@echo Creating linker file: $@
+	@%create $@
+	@%append $@ SYSTEM os2v2_dll INITINSTANCE TERMINSTANCE
+	@%append $@ NAME $(DLLNAME)
+	@for %i in ($(OBJ)) do @%append $@ FILE %i
+	@for %i in ($(LIBS)) do @%append $@ LIB %i
+	@%append $@ OPTION QUIET
+	@%append $@ OPTION MANYAUTODATA
+	@%append $@ OPTION IMPF=$(EXPNAME)
+	@%append $@ OPTION MAP=$(MAPNAME)
+	@%append $@ OPTION SHOWDEAD
+
+$(LBCFILE):
+	@echo Creating wlib commands file: $@
+	@%create $@
+	@for %i in ($(OBJ)) do @%append $@ +%i

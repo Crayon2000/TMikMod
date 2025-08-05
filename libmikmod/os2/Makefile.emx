@@ -4,9 +4,9 @@
 # make static : builds the static library mikmod_static.lib
 
 INCLUDES=-I../os2 -I../include
+CC=gcc
 AR=emxomfar
 ARFLAGS=cr
-CC=gcc
 IMPLIB=emximp
 
 CFLAGS=-O2 -Wall -funroll-loops -ffast-math -fno-strength-reduce -Zomf -Zmt
@@ -29,6 +29,8 @@ CPPFLAGS+= -DDRV_RAW
 # support for output to stdout (not needed by everyone)
 #CPPFLAGS+= -DDRV_STDOUT
 
+# disable support for module depackers
+#CPPFLAGS+= -DNO_DEPACKERS
 # disable the high quality mixer (build only with the standart mixer)
 #CPPFLAGS+= -DNO_HQMIXER
 
@@ -40,9 +42,9 @@ COMPILE=$(CC) $(CFLAGS) $(CPPFLAGS) $(INCLUDES)
 .SUFFIXES:
 .SUFFIXES: .o .c
 
-LIBNAME=mikmod.lib
+LIBNAME=mikmod3.lib
 LIBSTATIC=mikmod_static.lib
-DLLNAME=mikmod.dll
+DLLNAME=mikmod3.dll
 DEFNAME=mikmod.def
 
 OBJ=drv_os2.o drv_dart.o \
