@@ -19,6 +19,7 @@
 target = dll
 !endif
 
+INCLUDES=-I. -I"../include"
 CPPFLAGS=-DMIKMOD_BUILD -DHAVE_FCNTL_H -DHAVE_LIMITS_H -DHAVE_MALLOC_H
 
 # To build a debug version :
@@ -37,6 +38,8 @@ CPPFLAGS+= -DDRV_RAW
 # support for output to stdout (not needed by everyone)
 #CPPFLAGS+= -DDRV_STDOUT
 
+# disable support for module depackers
+#CPPFLAGS+= -DNO_DEPACKERS
 # disable the high quality mixer (build only with the standart mixer)
 #CPPFLAGS+= -DNO_HQMIXER
 
@@ -44,6 +47,8 @@ CPPFLAGS+= -DDRV_RAW
 LIBS = winmm.lib dsound.lib dxguid.lib
 
 CFLAGS = -bt=nt -bm -fp5 -fpi87 -mf -oeatxh -w4 -ei -zp8 -zq
+# newer OpenWatcom versions enable W303 by default.
+CFLAGS+= -wcd=303
 # -5s  :  Pentium stack calling conventions.
 # -5r  :  Pentium register calling conventions.
 CFLAGS+= -5s
@@ -52,10 +57,13 @@ DLLFLAGS=-bd
 .SUFFIXES:
 .SUFFIXES: .obj .c
 
-DLLNAME=mikmod.dll
-EXPNAME=mikmod.exp
-LIBNAME=mikmod.lib
-LIBSTATIC=mikmod_static.lib
+DLLNAME=libmikmod.dll
+EXPNAME=libmikmod.exp
+MAPNAME=libmikmod.map
+LIBNAME=libmikmod.lib
+LNKFILE=libmikmod.lnk
+LIBSTATIC=mikmod-static.lib
+LBCFILE=libmikmod.lbc
 
 !ifeq target static
 CPPFLAGS+= -DMIKMOD_STATIC=1
@@ -82,31 +90,36 @@ OBJ=drv_win.obj drv_ds.obj &
 all: $(BLD_TARGET)
 
 # rely on symbol name, not ordinal: -irn switch of wlib is default, but -inn is not.
-$(DLLNAME): $(OBJ)
-	wlink NAM $@ SYSTEM nt_dll INITINSTANCE TERMINSTANCE LIBR {$(LIBS)} FIL {$(OBJ)} OPTION IMPF=$(EXPNAME)
-	wlib -q -b -n -inn -pa -s -t -zld -ii -io $(LIBNAME) +$(DLLNAME)
+$(DLLNAME): $(OBJ) $(LNKFILE)
+	wlink @$(LNKFILE)
+	wlib -q -b -n -c -pa -s -t -zld -ii -io -inn $(LIBNAME) +$(DLLNAME)
 
-$(LIBSTATIC): $(OBJ)
-	wlib -q -b -n $@ $(OBJ)
+$(LIBSTATIC): $(OBJ) $(LBCFILE)
+	wlib -q -b -n -c -pa -s -t -zld -ii -io $@ @$(LBCFILE)
 
+.c: ../drivers;../loaders;../depackers;../mmio;../playercode;../posix;
 .c.obj:
 	$(COMPILE) -fo=$^@ $<
 
-!ifndef __UNIX__
 distclean: clean .symbolic
-	@if exist $(LIBSTATIC) del $(LIBSTATIC)
-	@if exist $(DLLNAME) del $(DLLNAME)
-	@if exist $(EXPNAME) del $(EXPNAME)
-	@if exist $(LIBNAME) del $(LIBNAME)
-clean: .symbolic
-	@if exist *.obj del *.obj
-.c: ..\drivers;..\loaders;..\depackers;..\mmio;..\playercode;..\posix
-INCLUDES=-I..\win32 -I..\include
-!else
-distclean: clean .symbolic
+	rm -f $(MAPNAME) $(LNKFILE) $(LBCFILE) 
 	rm -f $(DLLNAME) $(EXPNAME) $(LIBNAME) $(LIBSTATIC)
 clean: .symbolic
 	rm -f *.obj
-.c: ../drivers;../loaders;../depackers;../mmio;../playercode;../posix
-INCLUDES=-I../win32 -I../include
-!endif
+
+$(LNKFILE):
+	@echo Creating linker file: $@
+	@%create $@
+	@%append $@ SYSTEM nt_dll INITINSTANCE TERMINSTANCE
+	@%append $@ NAME $(DLLNAME)
+	@for %i in ($(OBJ)) do @%append $@ FILE %i
+	@for %i in ($(LIBS)) do @%append $@ LIB %i
+	@%append $@ OPTION QUIET
+	@%append $@ OPTION IMPF=$(EXPNAME)
+	@%append $@ OPTION MAP=$(MAPNAME)
+	@%append $@ OPTION SHOWDEAD
+
+$(LBCFILE):
+	@echo Creating wlib commands file: $@
+	@%create $@
+	@for %i in ($(OBJ)) do @%append $@ +%i

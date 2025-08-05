@@ -1,8 +1,5 @@
 /* config.h --  Generated CMake. */
 
-/* Version number of package */
-#cmakedefine VERSION "${VERSION}"
-
 /* ========== Features selection */
 
 /* Define if your system supports binary pipes (i.e. Unix) */
@@ -66,7 +63,8 @@
 /* Define if you want a debug version of the library */
 #cmakedefine MIKMOD_DEBUG 1
 
-/* Define if you want runtime dynamic linking of ALSA and EsounD drivers */
+/* Define if you want runtime dynamic linking of ALSA, PulseAudio, or EsounD
+   drivers */
 #cmakedefine MIKMOD_DYNAMIC 1
 
 /* Define if you want to use SIMD (AltiVec or SSE2) optimizations (Unstable!)  */
@@ -75,6 +73,9 @@
 /* Define to 0 or 1 to override MIKMOD_UNIX in mikmod_internals.h. */
 #cmakedefine MIKMOD_UNIX 1
 
+/* disable module depackers support. */
+#cmakedefine NO_DEPACKERS 1
+
 /* disable the high quality mixer (build only with the standart mixer) */
 #cmakedefine  NO_HQMIXER 1
 
@@ -82,15 +83,6 @@
 
 /* Define if your system is SunOS 4.* */
 #cmakedefine SUNOS 1
-/* Define if your system is AIX 3.* - might be needed for 4.* too */
-#cmakedefine AIX 1
-
-/* Define if your system defines random(3) and srandom(3) in math.h instead
-   of stdlib.h */
-#cmakedefine SRANDOM_IN_MATH_H 1
-
-/* Define if your system has RTLD_GLOBAL defined in <dlfcn.h> */
-#cmakedefine HAVE_RTLD_GLOBAL 1
 
 /* Define if your system provides POSIX.4 threads */
 #cmakedefine HAVE_PTHREAD 1
@@ -177,17 +169,11 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #cmakedefine HAVE_STDLIB_H 1
 
-/* Define to 1 if you have the `memcmp' function. */
-#cmakedefine HAVE_MEMCMP 1
-
 /* Define to 1 if you have the <soundcard.h> header file. */
 #cmakedefine HAVE_SOUNDCARD_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
 #cmakedefine HAVE_STRING_H 1
-
-/* Define to 1 if you have the `strstr' function. */
-#cmakedefine HAVE_STRSTR 1
 
 /* Define to 1 if you have the <sun/audioio.h> header file. */
 #cmakedefine HAVE_SUN_AUDIOIO_H 1
@@ -249,9 +235,6 @@
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #cmakedefine const
-
-/* Define to empty if compiler does not understand the `signed' keyword. */
-#cmakedefine signed
 
 /* Define to `int' if <sys/types.h> does not define. */
 #cmakedefine pid_t

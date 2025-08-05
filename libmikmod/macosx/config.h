@@ -1,4 +1,4 @@
-/* config.h.in.  Generated for Mac OS X builds.  */
+/* config.h.in.  Generated manually for Mac OS X.  */
 
 /* Define if you have the posix_memalign function. */
 /* posix_memalign this requires OSX 10.6 or newer! */
@@ -9,6 +9,9 @@
 
 /* Define if you have the ANSI C header files.  */
 #define STDC_HEADERS 1
+
+/* disable support for module depackers */
+/* #define NO_DEPACKERS */
 
 /* disable the high quality mixer (build only with the standart mixer) */
 /* #define NO_HQMIXER */
@@ -40,12 +43,6 @@
 /* Define if your system provides POSIX.4 threads */
 #define HAVE_PTHREAD 1
 
-/* Define if your system defines random(3) and srandom(3) in math.h instead
-   of stdlib.h */
-/* #undef SRANDOM_IN_MATH_H */
-
-/* Define if your system has RTLD_GLOBAL defined in <dlfcn.h> */
-#define HAVE_RTLD_GLOBAL 1
 /* Define if your system needs leading underscore to function names in dlsym() calls */
 /* #undef DLSYM_NEEDS_UNDERSCORE */
 
@@ -57,9 +54,6 @@
 
 /* Define if you have the srandom function.  */
 #define HAVE_SRANDOM 1
-
-/* Define if you have the strstr function.  */
-#define HAVE_STRSTR 1
 
 /* Define if you have the <dlfcn.h> header file.  */
 #define HAVE_DLFCN_H 1

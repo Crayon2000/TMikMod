@@ -1,6 +1,9 @@
 # makefile fragment for m68k-amigaos / gcc
 
-LDFLAGS+= -noixemul
-LDLIBS += -lm
-CFLAGS += -noixemul
+#CRT_FLAGS = -mcrt=clib2
+CRT_FLAGS = -noixemul
+
+LDFLAGS+= $(CRT_FLAGS)
+CFLAGS += $(CRT_FLAGS)
 CPPFLAGS+= -DWORDS_BIGENDIAN=1
+

@@ -2,17 +2,16 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
 
-AC_INIT([libmikmod],[3.3.11])
+AC_INIT([libmikmod],[3.3.13])
 LIBMIKMOD_MAJOR_VERSION=3
 LIBMIKMOD_MINOR_VERSION=3
-LIBMIKMOD_MICRO_VERSION=11
+LIBMIKMOD_MICRO_VERSION=13
 LIBMIKMOD_VERSION=$LIBMIKMOD_MAJOR_VERSION.$LIBMIKMOD_MINOR_VERSION.$LIBMIKMOD_MICRO_VERSION
 
 AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE([1.10 foreign subdir-objects])
 AC_CONFIG_SRCDIR([include/mikmod_internals.h])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_LIBOBJ_DIR([posix])
 AM_MAINTAINER_MODE
 
 # Library versioning for libtool: CURRENT, REVISION, AGE
@@ -52,6 +51,7 @@ libmikmod_hpux=no
 
 case $host_os in
 	mingw*) libmikmod_mingw=yes ;;
+	msys*) libmikmod_mingw=yes ;;
 	cygwin*) libmikmod_cygwin=yes ;;
 	linux*) libmikmod_linux=yes ;;
 	darwin*) libmikmod_darwin=yes ;;
@@ -64,8 +64,7 @@ case $host_os in
 	haiku*) libmikmod_haiku=yes ;;
 	hpux*) libmikmod_hpux=yes ;;
 	irix*) libmikmod_irix=yes ;;
-	aix*) AC_DEFINE([AIX], 1, [Define if your system is AIX 3.x - might be needed for 4.x too])
-		libmikmod_aix=yes ;;
+	aix*) libmikmod_aix=yes ;;
 	sunos*|solaris*)
 		if test "$cross_compiling" != yes
 		then
@@ -80,6 +79,7 @@ esac
 # libmikmod specific control variables and their default values.
 # ==============================================================
 
+libmikmod_depackers=yes
 libmikmod_hqmixer=yes
 
 libmikmod_driverlist=nosound
@@ -120,11 +120,13 @@ libmikmod_driver_wav=yes
 libmikmod_driver_raw=yes
 libmikmod_driver_stdout=yes
 libmikmod_driver_pipe=yes
-# ANDROID and DRV_OSLES are not configury-integrated
+# FIXME: ANDROID and DRV_OSLES are not configury-integrated.
 libmikmod_driver_osles=no
 
 libmikmod_dynload=yes
 libmikmod_dynload_underscores=no
+libmikmod_dynload_used=no
+libmikmod_dynload_style=none
 libmikmod_debug=no
 libmikmod_threads=yes
 libmikmod_simd=no
@@ -145,6 +147,14 @@ then
   libmikmod_hqmixer=no
 else
   libmikmod_hqmixer=yes
+fi])
+
+AC_ARG_ENABLE([depackers], [AS_HELP_STRING([--disable-depackers],[exclude support for module depackers [default=no]])],
+[if test "$enableval" = "no"
+then
+  libmikmod_depackers=no
+else
+  libmikmod_depackers=yes
 fi])
 
 AC_ARG_ENABLE([alldrv], [AS_HELP_STRING([--disable-alldrv],[disable all of the audio drivers. using additional --enable-XXX options enables the specified drivers.])],
@@ -192,7 +202,7 @@ fi])
 AC_ARG_ENABLE([alsa], [AS_HELP_STRING([--enable-alsa],[Linux only: include ALSA driver [guessed]])],
 [if test "$enableval" = "yes"
 then
-  libmikmod_driver_alsa=$libmikmod_linux
+  libmikmod_driver_alsa=yes
 else
   libmikmod_driver_alsa=no
 fi])
@@ -212,10 +222,6 @@ then
 else
   libmikmod_driver_sun=no
 fi])
-case $host_os in
-  netbsd*|openbsd*|sunos*|solaris*) ;;
-  *) libmikmod_driver_sun=no ;;
-esac
 
 AC_ARG_ENABLE([sndio], [AS_HELP_STRING([--enable-sndio],[OpenBSD only: include sndio driver [guessed]])],
 [if test "$enableval" = "yes"
@@ -224,11 +230,6 @@ then
 else
   libmikmod_driver_sndio=no
 fi])
-case $host_os in
-# hey, a linux port at sndio.org ..
-  openbsd*|linux*) ;;
-  *) libmikmod_driver_sndio=no ;;
-esac
 
 AC_ARG_ENABLE([aix], [AS_HELP_STRING([--enable-aix],[AIX only: include AIX audio driver [guessed]])],
 [if test "$enableval" = "yes"
@@ -455,7 +456,7 @@ else
   libmikmod_driver_ultra=no
 fi])
 
-AC_ARG_ENABLE([dl], [AS_HELP_STRING([--enable-dl],[load alsa, esound and ultra drivers at runtime [default=yes]])],
+AC_ARG_ENABLE([dl], [AS_HELP_STRING([--enable-dl],[load alsa, pulseaudio or esound drivers at runtime [default=yes]])],
 [if test "$enableval" = "yes"
 then
   libmikmod_dynload=yes
@@ -511,29 +512,20 @@ fi])
 # ===================
 
 AC_PROG_CC
+AC_PROG_EGREP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-#LT_INIT([win32-dll])
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll])
+dnl for sdl.m4 and sdl2.m4:
+PKG_PROG_PKG_CONFIG
 
 # =============================================================
 # Check for typedefs, structures, and compiler characteristics.
 # =============================================================
 
-AC_PROG_GCC_TRADITIONAL
 AC_C_CONST
 AC_C_INLINE
-AC_CACHE_CHECK([if compiler understands the signed keyword],[libmikmod_cv_gcc_signed],
-	AC_LANG_SAVE
-	AC_LANG_C
-	AC_TRY_COMPILE(,[signed int t = 0;],[libmikmod_cv_gcc_signed=yes],[libmikmod_cv_gcc_signed=no])
-	AC_LANG_RESTORE)
-if test $libmikmod_cv_gcc_signed = no
-then
-	AC_DEFINE(signed,,[Define to empty if compiler does not understand the `signed' keyword.])
-fi
 
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
@@ -543,19 +535,15 @@ AC_C_BIGENDIAN
 # Check for header files.
 # =======================
 
-AC_HEADER_STDC
-AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([fcntl.h limits.h malloc.h memory.h sys/ioctl.h unistd.h])
+
+AC_HEADER_SYS_WAIT
 
 # ============================
 # Check for library functions.
 # ============================
 
 AC_CHECK_FUNCS([posix_memalign setenv snprintf srandom])
-AC_REPLACE_FUNCS([memcmp strstr])
-AC_CHECK_LIB([m],[floor],LIBRARY_LIB="-lm $LIBRARY_LIB")
-AC_EGREP_HEADER([srandom],[math.h],AC_DEFINE([SRANDOM_IN_MATH_H], 1,
-					 [Define if your system defines random(3) and srandom(3) in math.h instead of stdlib.h]))
 
 # ====================
 # Check for libraries.
@@ -571,21 +559,20 @@ fi
 
 if test $libmikmod_dynload = yes
 then
-	libmikmod_dynload=no
 	libmikmod_dllib=
 	# SunOS-style shared libraries
 	AC_CHECK_HEADERS([dlfcn.h])
 	if test $ac_cv_header_dlfcn_h = yes
 	then
-		AC_CHECK_LIB([c],[dlopen],[libmikmod_dynload=sun],
-		             [AC_CHECK_LIB([dl],[dlopen],[libmikmod_dynload=sun
+		AC_CHECK_LIB([c],[dlopen],[libmikmod_dynload_style=sun],
+		             [AC_CHECK_LIB([dl],[dlopen],[libmikmod_dynload_style=sun
 		                                      libmikmod_dllib="-ldl"],[libmikmod_dynload=no])])
 	else
 		# HP-UX-style shared libraries
 		AC_CHECK_HEADERS([dl.h])
 		if test $ac_cv_header_dl_h = yes
 		then
-			AC_CHECK_LIB([dld],[shl_load],[libmikmod_dynload=hp
+			AC_CHECK_LIB([dld],[shl_load],[libmikmod_dynload_style=hp
 			                           libmikmod_dllib="-ldld"
 			                           CFLAGS="${CFLAGS} -DMIKMOD_DLAPI_HP=1 -I${srcdir}/dlapi"],
 			                          [libmikmod_dynload=no])
@@ -593,30 +580,29 @@ then
 	fi
 fi
 
-if test $libmikmod_dynload = sun
+if test $libmikmod_dynload_style = sun
 then
 	AC_CACHE_CHECK([wherever dynamically loaded symbols need underscores],[libmikmod_cv_dynload_underscores],
 		libmikmod_oldlibs=$LIBS
 		LIBS="$LIBS $libmikmod_dllib"
-		AC_LANG_SAVE
-		AC_LANG_C
-		AC_TRY_RUN(
-[#include <dlfcn.h>
+		AC_LANG_PUSH([C])
+		AC_RUN_IFELSE([AC_LANG_SOURCE(
+[[#include <dlfcn.h>
 #ifndef RTLD_GLOBAL
 #define RTLD_GLOBAL 0
 #endif
 int main(void) {
 	void *libc, *printfptr;
 	libc = dlopen("libc.so", RTLD_LAZY | RTLD_GLOBAL);
-	if (!libc) exit(1);
+	if (!libc) return 1;
 	printfptr = dlsym(libc, "_printf");
 	dlclose(libc);
-	exit(!printfptr);
-}],
+	return !printfptr;
+}]])],
 			[libmikmod_cv_dynload_underscores=yes],
 			[libmikmod_cv_dynload_underscores=no],
 			[libmikmod_cv_dynload_underscores=no])
-		AC_LANG_RESTORE
+		AC_LANG_POP([C])
 		LIBS=$libmikmod_oldlibs
 	)
 	if test $libmikmod_cv_dynload_underscores = yes
@@ -629,7 +615,7 @@ fi
 # ---------------
 if test $libmikmod_mingw = yes || test $libmikmod_amiga = yes
 then
-	dnl libmikmod_threads variable is for pthreads only
+	# libmikmod_threads variable is for pthreads only
 	libmikmod_threads=no
 fi
 
@@ -639,26 +625,25 @@ then
 	AC_CACHE_CHECK([if compiler recognizes -pthread],[libmikmod_cv_gcc_pthread],
 		ac_save_CFLAGS=$CFLAGS
 		CFLAGS="$CFLAGS -pthread"
-		AC_LANG_SAVE
-		AC_LANG_C
-		AC_TRY_LINK([#include <pthread.h>],
-			[int p = pthread_create(NULL,NULL,NULL,NULL);],
+		AC_LANG_PUSH([C])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <pthread.h>]],
+			[int p = pthread_create(NULL,NULL,NULL,NULL);])],
 			[libmikmod_cv_gcc_pthread=yes],
 			[libmikmod_cv_gcc_pthread=no])
-		AC_LANG_RESTORE
+		AC_LANG_POP([C])
 		CFLAGS=$ac_save_CFLAGS
 	)
 	if test $libmikmod_cv_gcc_pthread = yes
 	then
-		dnl There is no need for -pthread on darwin or haiku, as gcc
-		dnl complains about unrecognized option -pthread
+		# There is no need for -pthread on darwin or haiku, as gcc
+		# complains about unrecognized option -pthread
 		if test $libmikmod_darwin = no && test $libmikmod_haiku = no
 		then
 			libmikmod_threads=""
 			CFLAGS="$CFLAGS -pthread"
 		fi
 	else
-		dnl AC_CHECK_HEADERS(pthread.h) unreliable
+		# AC_CHECK_HEADERS(pthread.h) unreliable
 		AC_CHECK_LIB([pthread],[pthread_create],[libmikmod_threads=-lpthread],
 				[AC_CHECK_LIB([c_r],[pthread_create],[libmikmod_threads=-lc_r])])
 	fi
@@ -714,8 +699,8 @@ then
 		test -n "$ac_x_libraries" && LDFLAGS="$LDFLAGS -L$ac_x_libraries"
 		LIBS="$LIBS -laudio"
 		AC_MSG_CHECKING([X11 locations for NAS])
-		AC_TRY_LINK([#include <audio/audiolib.h>],
-				[AuFlowID f=AuCreateFlow(0,0);],
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <audio/audiolib.h>]],
+				[AuFlowID f=AuCreateFlow(0,0);])],
 				[libmikmod_driver_nas=yes])
 		CFLAGS=$ac_save_CFLAGS
 		LDFLAGS=$ac_save_LDFLAGS
@@ -792,13 +777,13 @@ AC_SUBST(SDL_LIBS)
 # Windows audio
 # ---------------------
 case $host_os in
- mingw*|cygwin*)
+ mingw*|msys*|cygwin*)
 	# do a windows.h check, just in case..
 	AC_CHECK_HEADERS([windows.h],,[AC_MSG_ERROR([Targeting windows, but windows.h not available])])
 	if test $libmikmod_driver_ds = yes
 	then
 		libmikmod_driver_ds=no
-		AC_CHECK_HEADERS([dsound.h],[libmikmod_driver_ds=yes])
+		AC_CHECK_HEADERS([dsound.h],[libmikmod_driver_ds=yes],[],[#include <windows.h>])
 	fi
 	if test $libmikmod_driver_xaudio2 = yes
 	then
@@ -812,8 +797,11 @@ case $host_os in
 		if test $libmikmod_driver_xaudio2 = yes
 		then
 			AC_CACHE_CHECK([if XAUDIO2_VOICE_NOSAMPLESPLAYED is defined],[libmikmod_cv_xaudio2_7_header],
-			 [AC_TRY_COMPILE([#include <xaudio2.h>],[int flag=XAUDIO2_VOICE_NOSAMPLESPLAYED;],
-					[libmikmod_cv_xaudio2_7_header=yes],[libmikmod_cv_xaudio2_7_header=no])])
+			 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+					[[#include <xaudio2.h>]],
+					[int flag=XAUDIO2_VOICE_NOSAMPLESPLAYED;])],
+					[libmikmod_cv_xaudio2_7_header=yes],
+					[libmikmod_cv_xaudio2_7_header=no])])
 			if test $libmikmod_cv_xaudio2_7_header = yes && test $use_xaudio28 = yes
 			then
 			  AC_MSG_WARN([xaudio2.h <= 2.7 and xaudio2.8 enabled - build will likely fail.])
@@ -867,11 +855,13 @@ then
 	if test $ac_cv_header_libgus_h = yes
 	then
 		AC_CACHE_CHECK([if libgus is new enough],[libmikmod_cv_libgus_h_good],
-		 [AC_TRY_COMPILE([#include <libgus.h>],
+		 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[#include <libgus.h>]],
 [gus_info_t *info;
 int flg1=GUS_INSTR_SIMPLE;
-int flg2=GUS_WAVE_BIDIR;],
-				[libmikmod_cv_libgus_h_good=yes],[libmikmod_cv_libgus_h_good=no])])
+int flg2=GUS_WAVE_BIDIR;])],
+				[libmikmod_cv_libgus_h_good=yes],
+				[libmikmod_cv_libgus_h_good=no])])
 
 		if test $libmikmod_cv_libgus_h_good = yes
 		then
@@ -1029,6 +1019,8 @@ then
 	if test $libmikmod_dynload = no
 	then
 		LIBRARY_LIB="-lasound $LIBRARY_LIB"
+	else
+		libmikmod_dynload_used=yes
 	fi
 fi
 
@@ -1036,7 +1028,12 @@ if test $libmikmod_driver_pulseaudio = yes
 then
 	libmikmod_driverlist="pulseaudio $libmikmod_driverlist"
 	AC_DEFINE([DRV_PULSEAUDIO], 1, [Define if the PulseAudio driver is compiled])
-	LIBRARY_LIB="-lpulse-simple -lpulse $LIBRARY_LIB"
+	if test $libmikmod_dynload = no
+	then
+		LIBRARY_LIB="-lpulse-simple -lpulse $LIBRARY_LIB"
+	else
+		libmikmod_dynload_used=yes
+	fi
 fi
 
 if test $libmikmod_driver_esd = yes
@@ -1048,9 +1045,10 @@ then
 	# dependencies to libmikmod's dependency list.
 	# However, no need to keep libraries we won't require (libossaudio on BSD
 	# systems, libaudiofile, libasound on Linux)
-	if test $libmikmod_dynload != no
+	if test $libmikmod_dynload = yes
 	then
 		ESD_LIBS="`echo $ESD_LIBS|sed -e 's/-lesd//'|sed -e 's/-lasound//'|sed -e 's/-laudiofile//'|sed -e 's/-lossaudio//'`"
+		libmikmod_dynload_used=yes
 	fi
 	LIBRARY_LIB="$ESD_LIBS $LIBRARY_LIB"
 fi
@@ -1102,7 +1100,8 @@ then
 	esac
 
 	AC_MSG_CHECKING([whether OSS code compiles])
-	AC_TRY_COMPILE([#ifdef HAVE_SYS_IOCTL_H
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[#ifdef HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>
 #endif
 #ifdef HAVE_SYS_SOUNDCARD_H
@@ -1113,8 +1112,8 @@ then
 # include <soundcard.h>
 #else
 error No OSS header present.
-#endif],
-			[int i=SNDCTL_DSP_RESET;],
+#endif]],
+			[int i=SNDCTL_DSP_RESET;])],
 			[libmikmod_driver_oss=yes],
 			[libmikmod_driver_oss=no])
 	AC_MSG_RESULT([$libmikmod_driver_oss])
@@ -1133,7 +1132,7 @@ if test $libmikmod_driver_osx = yes
 then
 	libmikmod_driverlist="osx $libmikmod_driverlist"
 	AC_DEFINE([DRV_OSX], 1, [Define this if you want the MacOS X CoreAudio driver])
-	LIBRARY_LIB="-framework CoreAudio $LIBRARY_LIB"
+	LIBRARY_LIB="-framework AudioToolbox -framework AudioUnit -framework CoreServices $LIBRARY_LIB"
 fi
 
 #OpenSL ES driver (e.g. Android)
@@ -1183,6 +1182,8 @@ then
 	if test $libmikmod_dynload = no
 	then
 		LIBRARY_LIB="-lgus $LIBRARY_LIB"
+	else
+		libmikmod_dynload_used=yes
 	fi
 fi
 
@@ -1194,76 +1195,41 @@ fi
 
 if test $libmikmod_dynload != no
 then
-	AC_DEFINE([MIKMOD_DYNAMIC], 1, [Define if you want runtime dynamic linking of ALSA and EsounD drivers])
+	AC_DEFINE([MIKMOD_DYNAMIC], 1, [Define if you want runtime dynamic linking of ALSA, PulseAudio, or EsounD drivers])
 
-	LIBRARY_LIB="$libmikmod_dllib $LIBRARY_LIB"
-	if test $libmikmod_dynload = sun
+	if test -n $libmikmod_dllib && test $libmikmod_dynload_used = yes
 	then
-		# RTLD_GLOBAL is not defined under every system
-		AC_CACHE_CHECK([if RTLD_GLOBAL is defined],libmikmod_cv_decl_rtld_global,
-		 [AC_TRY_COMPILE([#include <dlfcn.h>],[int flag=RTLD_GLOBAL;],
-			[libmikmod_cv_decl_rtld_global=yes],
-			[libmikmod_cv_decl_rtld_global=no])])
-		if test $libmikmod_cv_decl_rtld_global = yes
-		then
-			AC_DEFINE([HAVE_RTLD_GLOBAL], 1, [Define if your system has RTLD_GLOBAL defined in <dlfcn.h>])
-		fi
+		LIBRARY_LIB="$libmikmod_dllib $LIBRARY_LIB"
 	fi
 fi
 
 # If compiling with gcc, use adequate optimization flags
-if test $ac_cv_prog_gcc = yes
+if test $ac_cv_c_compiler_gnu = yes
 then
-	# On at least x86 platforms, gcc 2.7.2.1 and earlier won't work if -O3 (or
-	# -finline-functions) are used. Versions 2.7.2.3, 2.8.x and egcs are ok
-	# (didn't test 2.7.2.2).
-	# Until there's an easy way to catch broken inlining, we choose flags known
-	# to work correctly depending of the compiler version.
-	AC_CACHE_CHECK([if inlining functions is safe],[libmikmod_cv_gcc_inline_safe],
-	 [AC_TRY_COMPILE(,[
-#if !(defined __GNUC__ && (__GNUC__ > 2 || __GNUC__ == 2 && __GNUC_MINOR__ > 7))
-#error inlining functions is not safe
-#endif
-],
-	[libmikmod_cv_gcc_inline_safe=yes],
-	[libmikmod_cv_gcc_inline_safe=no])])
-	if test $libmikmod_cv_gcc_inline_safe = no
+	CFLAGS="$CFLAGS -Wall"
+	if test $libmikmod_debug = yes
 	then
-		CFLAGS="$CFLAGS -fno-strength-reduce"
+		CFLAGS="$CFLAGS -Werror"
 	fi
 	CFLAGS="$CFLAGS -ffast-math"
 	if test $libmikmod_darwin = yes
 	then
 		CFLAGS="$CFLAGS -fno-common"
 	fi
-	if test $libmikmod_debug = yes
-	then
-		CFLAGS="$CFLAGS -Wall -Werror"
-	else
-		CFLAGS="$CFLAGS -Wall"
-	fi
 
-	# pgcc 2.95.2 appears not to be able to compile libmikmod, although regular
-	# gcc works fine. Issue a warning if the compiler is pgcc, until a reliable
-	# way to detect flawed version (or, better, a reliable workaround) is
-	# found.
-dnl do not cache this test - better rechecking every time
-	AC_MSG_CHECKING([if compiler is pgcc])
-	if ($CC -v 2>&1 | grep ^pgcc > /dev/null) 2>/dev/null
+	# On at least x86 platforms, gcc 2.7.2.1 and earlier won't work if -O3 (or
+	# -finline-functions) are used. Versions 2.7.2.3, 2.8.x and egcs are ok
+	# (didn't test 2.7.2.2). Using flags known to work correctly depending on
+	# the compiler version:
+	AC_CACHE_CHECK([if inlining functions is safe],[libmikmod_cv_gcc_inline_safe],
+	 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[
+#if defined __GNUC__ && !(__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 7))
+#error inlining functions not safe
+#endif
+]])], [libmikmod_cv_gcc_inline_safe=yes], [libmikmod_cv_gcc_inline_safe=no])])
+	if test $libmikmod_cv_gcc_inline_safe = no
 	then
-		libmikmod_gcc_is_pgcc=yes
-	else
-		libmikmod_gcc_is_pgcc=no
-	fi
-	AC_MSG_RESULT([$libmikmod_gcc_is_pgcc])
-	if test $libmikmod_gcc_is_pgcc = yes
-	then
-		echo "
-*** Version 2.95.2 of this compiler, and perhaps others, are unable to
-*** compile libmikmod. If compilation fails for playercode/virtch.c
-*** around line 650, with the error ``internal error--insn does not
-*** satisfy its constraints'', then you'll have to use another compiler.
-" >&2
+		CFLAGS="$CFLAGS -fno-strength-reduce"
 	fi
 fi
 
@@ -1275,8 +1241,8 @@ then
 	REENTRANT="-D_REENTRANT"
 	if test $libmikmod_cv_gcc_pthread = yes
 	then
-		dnl There is no need for -pthread on darwin or haiku, as gcc
-		dnl complains about unrecognized option -pthread
+		# There is no need for -pthread on darwin or haiku, as gcc
+		# complains about unrecognized option -pthread
 		if test $libmikmod_darwin = no && test $libmikmod_haiku = no
 		then
 			REENTRANT="-pthread $REENTRANT"
@@ -1292,11 +1258,11 @@ case $host_cpu in
 	then
 		case $host_os in
 		  darwin*)
-			dnl compile all Altivec functions, check at run-time
+			# compile all Altivec functions, check at run-time
 			CFLAGS="$CFLAGS -faltivec -force_cpusubtype_ALL" ;;
 		  *)
-			dnl -faltivec and -force_cpusubtype_ALL are Apple-only
-			dnl features.  -maltivec compiles all code for AltiVec..
+			# -faltivec and -force_cpusubtype_ALL are Apple-only
+			# features.  -maltivec compiles all code for AltiVec.
 			CFLAGS="$CFLAGS -maltivec" ;;
 		esac
 		libmikmod_altivec=yes
@@ -1309,8 +1275,8 @@ case $host_cpu in
 	AC_MSG_CHECKING(whether to use sse2)
 	if test x$libmikmod_simd = xyes
 	then
-		dnl x86_64 already enables sse2
-		dnl add -msse2 for x86 to enable it
+		# x86_64 already enables sse2
+		# add -msse2 for x86 to enable it
 		case `arch` in
 		  i*86) CFLAGS="$CFLAGS -msse2" ;;
 		esac
@@ -1339,18 +1305,25 @@ then
 	AC_DEFINE([NO_HQMIXER], 1, [disable the high quality mixer (build only with the standart mixer)])
 fi
 
+if test $libmikmod_depackers = no
+then
+	AC_DEFINE([NO_DEPACKERS], 1, [disable support for module depackers])
+fi
+
 # symbol visibility
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -fvisibility=hidden -Werror"
 AC_CACHE_CHECK([if compiler supports visibility attributes],[libmikmod_cv_gcc_visibility],
-	AC_LANG_SAVE
-	AC_LANG_C
-	AC_TRY_COMPILE([void foo(void);
-__attribute__((visibility("default"))) void foo(void) {}],
-		[],
+	AC_LANG_PUSH([C])
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+__attribute__((visibility("default"))) int foo(void);
+__attribute__((visibility("hidden")))  int bar(void);
+int foo(void) { return 0; }
+int bar(void) { return 1; }],
+		[])],
 		[libmikmod_cv_gcc_visibility=yes],
 		[libmikmod_cv_gcc_visibility=no])
-	AC_LANG_RESTORE)
+	AC_LANG_POP([C]))
 # we want symbol -fvisibility for elf targets, however it works
 # with darwin/macho too.  other than that, windows, dos, os/2, amiga
 # do not need it:  for any such targets, the -Werror switch is
@@ -1365,6 +1338,11 @@ CFLAGS="$ac_save_CFLAGS"
 if test $libmikmod_cv_gcc_visibility = yes
 then
    CFLAGS="$CFLAGS -DSYM_VISIBILITY -fvisibility=hidden"
+fi
+# for os2, use our def file for exports:
+if test $libmikmod_os2 = yes
+then
+   LT_EXTRA="-Wl,$srcdir/os2/mikmod.def"
 fi
 
 # =================
@@ -1382,6 +1360,7 @@ AC_SUBST(LIBMIKMOD_MINOR_VERSION)
 AC_SUBST(LIBMIKMOD_MICRO_VERSION)
 AC_SUBST(LIBMIKMOD_VERSION)
 
+AC_SUBST(LT_EXTRA)
 AC_SUBST(LIB_LDADD)
 
 AC_CONFIG_FILES([
@@ -1409,9 +1388,9 @@ chmod +x libmikmod-config
 # Print configuration.
 # ====================
 
-if test $libmikmod_dynload != no
+if test $libmikmod_dynload_used = yes
 then
-	libmikmod_dynload="yes, ${libmikmod_dynload} style"
+	libmikmod_dynload_used="yes, ${libmikmod_dynload_style} style"
 fi
 
 echo "
@@ -1422,7 +1401,7 @@ Library configuration:
   Compiler flags: $CFLAGS
   Debug version: $libmikmod_debug
   SIMD optimizations: $libmikmod_simd
-  Dynamically loaded drivers whenever possible: $libmikmod_dynload
+  Dynamically loading drivers when possible: $libmikmod_dynload_used
   Drivers to be compiled: $libmikmod_driverlist
   HQ Mixer: $libmikmod_hqmixer
   Install path: $prefix/lib, $prefix/include

@@ -1,9 +1,11 @@
 # makefile fragment for ppc-amigaos4 / gcc
 
-LDFLAGS+= -noixemul
-LDLIBS += -lm
-CFLAGS += -noixemul
-CPPFLAGS+= -DWORDS_BIGENDIAN=1
+#CRT_FLAGS = -mcrt=clib2
+#CRT_FLAGS = -noixemul
+CRT_FLAGS = -mcrt=newlib
 
-#CPPFLAGS+= -D__USE_INLINE__
-#CPPFLAGS+= -D__USE_OLD_TIMEVAL__
+LDFLAGS+= $(CRT_FLAGS)
+CFLAGS += $(CRT_FLAGS)
+CPPFLAGS+= -DWORDS_BIGENDIAN=1
+#CPPFLAGS+= -D__USE_INLINE__ -D__USE_OLD_TIMEVAL__
+

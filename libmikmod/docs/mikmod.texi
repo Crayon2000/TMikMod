@@ -16,8 +16,8 @@
 
 @syncodeindex tp vr
 @set documentation-version 1.3
-@set documentation-date August 2016
-@set library-version 3.3.11
+@set documentation-date December 2024
+@set library-version 3.3.13
 @set authorname Miodrag Vallat
 @set authoraddress miod@@mikmod.org
 
@@ -3188,6 +3188,9 @@ This driver is only for the GP32 platform, and uses the ``GP32'' api.@*
 This driver only supports software mixing. This driver is not tested yet.
 @item drv_hp
 This driver is only available under HP-UX, and access its audio device.@*
+This driver only supports software mixing.
+@item drv_n64
+This driver is only for the Nintendo 64 platform, and uses the ``libdragon`` api.@*
 This driver only supports software mixing.
 @item drv_mac
 This driver is only available under MacOS, and uses the ``Sound Manager''.@*

@@ -20,14 +20,8 @@
 
 /*==============================================================================
 
-  $Id$
-
-  Driver for Gravis Ultrasound cards using libGUS.
-  A subset of libGUS is provided for DOS/DJGPP and OS/2
-
-==============================================================================*/
-
-/*
+	Driver for Gravis Ultrasound cards using libGUS.
+	A subset of libGUS is provided for DOS/DJGPP and OS/2
 
 	Written by Andy Lo A Foe <andy@alsa-project.org>
 
@@ -40,7 +34,7 @@
 	+ Samples are no longer kept in normal memory.
 	+ Removed sample 'unclick' logic... libGUS does unclick internally.
 
-*/
+==============================================================================*/
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -75,7 +69,7 @@
 #endif
 
 /* DOS/DJGPP and OS/2 libGUS'es have gus_get_voice_status() */
-#if defined(__EMX__) || defined(__DJGPP__)
+#if defined(__EMX__) || defined(__DJGPP__) || defined(_DOS)
 #define HAVE_VOICE_STATUS
 #else
 #include <time.h>
@@ -146,7 +140,7 @@ static int (*_libgus_timer_start)(void*);
 static int (*_libgus_timer_stop) (void*);
 static int (*_libgus_timer_tempo) (void*, int);
 #endif
-#ifndef HAVE_RTLD_GLOBAL
+#ifndef RTLD_GLOBAL
 #define RTLD_GLOBAL (0)
 #endif
 static void *libgus = NULL;
@@ -416,7 +410,7 @@ static void Ultra_CommandLine(const CHAR *cmdline)
 			ultra_dev = buf;
 		MikMod_free(ptr);
 	}
-#ifdef __DJGPP__
+#if defined(__DJGPP__) || defined(_DOS)
 	ptr = MD_GetAtom("dma", cmdline, 0);
 	if (ptr) {
 		gus_dma_usage (atoi(ptr));
@@ -623,8 +617,8 @@ static int Ultra_Init_internal(void)
 #endif
 
 	/* Zero the voice states and sample handles */
-	memset (&voices, 0, sizeof (voices));
-	memset (&samples, 0, sizeof (samples));
+	memset(voices, 0, sizeof (voices));
+	memset(samples, 0, sizeof (samples));
 
 	return 0;
 }
@@ -725,7 +719,7 @@ static void UltraPlayer(void)
 }
 
 /* Play sound */
-#if defined(__DJGPP__) || defined(__EMX__)
+#if defined(__DJGPP__) || defined(_DOS) || defined(__EMX__)
 static void Ultra_Callback(void)
 {
 	UltraPlayer();
@@ -742,7 +736,6 @@ static void Ultra_Update(void)
 		ultra_bpm = md_bpm;
 	}
 }
-
 #else
 static void Ultra_Update(void)
 {
@@ -771,7 +764,6 @@ static void Ultra_Update(void)
 	/* Wait so that all voice commands gets executed */
 	libgus_do_wait (1);
 }
-
 #endif
 
 /* Start playback */
@@ -815,7 +807,7 @@ static int Ultra_PlayStart(void)
 		return 1;
 	}
 
-#if defined(__DJGPP__) || defined(__EMX__)
+#if defined(__DJGPP__) || defined(_DOS) || defined(__EMX__)
 	gus_timer_callback(Ultra_Callback);
 #endif
 
@@ -843,7 +835,7 @@ static void Ultra_PlayStop(void)
 	for(voice = 0; voice < md_numchn; voice++)
 		libgus_do_voice_stop(voice, 0);
 
-#if defined(__DJGPP__) || defined(__EMX__)
+#if defined(__DJGPP__) || defined(_DOS) || defined(__EMX__)
 	gus_timer_callback(NULL);
 #endif
 
@@ -985,7 +977,7 @@ MDRIVER drv_ultra = {
 	"Gravis Ultrasound native mode driver v1.2",
 	0, (GUS_CHANNELS)-1,
 	"ultra",
-#ifdef __DJGPP__
+#if defined(__DJGPP__) || defined(_DOS)
         "dma:b:1:Use DMA for transferring samples into GUS DRAM\n"
 #endif
 	"card:r:0,8,0:Soundcard number\n",
@@ -1021,5 +1013,3 @@ MDRIVER drv_ultra = {
 MISSING(drv_ultra);
 
 #endif /* DRV_ULTRA */
-
-/* ex:set ts=8: */

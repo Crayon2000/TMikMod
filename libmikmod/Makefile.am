@@ -9,11 +9,10 @@ SUBDIRS = drivers include loaders mmio depackers playercode \
 bin_SCRIPTS = libmikmod-config
 
 EXTRA_DIST = libmikmod-config.in libmikmod.m4 libmikmod.pc.in \
-	     libmikmod.spec.in libmikmod.spec COPYING.LESSER \
-	     amiga android macosx win32 \
-	     dos dc gp32 macintosh os2 psp \
-	     examples \
-	     config.h.cmake CMakeLists.txt cmake
+	     libmikmod.spec.in libmikmod.spec COPYING.LESSER  \
+	     examples config.h.cmake CMakeLists.txt cmake     \
+	     amiga android macosx win32 dos os2 macintosh     \
+	     dc gp32 n64 psp webaudio
 
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libmikmod.m4
@@ -47,6 +46,7 @@ libmikmod_la_SOURCES = \
 		drivers/drv_mac.c \
 		drivers/drv_nas.c \
 		drivers/drv_nos.c \
+		drivers/drv_n64.c \
 		drivers/drv_openal.c \
 		drivers/drv_os2.c \
 		drivers/drv_osles.c \
@@ -112,6 +112,6 @@ libmikmod_la_SOURCES = \
 		playercode/virtch2.c \
 		playercode/virtch_common.c
 
-libmikmod_la_LDFLAGS = -no-undefined -version-info @MIKMOD_LT_CURRENT@:@MIKMOD_LT_REVISION@:@MIKMOD_LT_AGE@
+libmikmod_la_LDFLAGS = -no-undefined -version-info @MIKMOD_LT_CURRENT@:@MIKMOD_LT_REVISION@:@MIKMOD_LT_AGE@ @LT_EXTRA@
 libmikmod_la_LIBADD = @LTLIBOBJS@ @LIBRARY_LIB@
 
